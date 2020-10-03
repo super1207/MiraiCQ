@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQP", "CQP\CQP.dll.vcproj", "{74382C4F-993E-4D34-AAE7-860F4EBA9F33}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiraiQ", "MiraiQ\test.vcproj", "{46CBC04E-42D8-4A42-A68A-7E87AFED9336}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74382C4F-993E-4D34-AAE7-860F4EBA9F33}.Debug|Win32.ActiveCfg = Debug|Win32
+		{74382C4F-993E-4D34-AAE7-860F4EBA9F33}.Debug|Win32.Build.0 = Debug|Win32
+		{74382C4F-993E-4D34-AAE7-860F4EBA9F33}.Release|Win32.ActiveCfg = Release|Win32
+		{74382C4F-993E-4D34-AAE7-860F4EBA9F33}.Release|Win32.Build.0 = Release|Win32
+		{46CBC04E-42D8-4A42-A68A-7E87AFED9336}.Debug|Win32.ActiveCfg = Debug|Win32
+		{46CBC04E-42D8-4A42-A68A-7E87AFED9336}.Debug|Win32.Build.0 = Debug|Win32
+		{46CBC04E-42D8-4A42-A68A-7E87AFED9336}.Release|Win32.ActiveCfg = Release|Win32
+		{46CBC04E-42D8-4A42-A68A-7E87AFED9336}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
