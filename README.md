@@ -19,11 +19,11 @@ clone本项目，双击test.sln文件，点击生成解决方案即可完成编�
 <2> 目前酷Q已经无法运作了，缺乏对比验证，很多细节全靠记忆 <br />
 <3> 到处都是Bug...不过群/私聊复读机终于可以复活了！ <br />
 ## 问题回馈
-随意反馈，[有空]就改，建议自己该，然后发pr
+随意反馈，[有空]就改，建议自己改，然后发pr
 ## 参考与依赖
 感谢他/她们！<br />
 [https://github.com/Mrs4s/MiraiGo](https://github.com/Mrs4s/MiraiGo) (运行依赖)  <br />
-[https://github.com/super1207/mirai](https://github.com/super1207/mirai) (起名依赖)  <br />
+[https://github.com/mamoe/mirai](https://github.com/mamoe/mirai) (起名依赖)  <br />
 [https://github.com/howmanybots/onebot](https://github.com/howmanybots/onebot) (教材) <br />
 [https://github.com/howmanybots/cqcppsdk](https://github.com/howmanybots/cqcppsdk) (少量源码依赖)  <br />
 [https://github.com/zaphoyd/websocketpp](https://github.com/zaphoyd/websocketpp) (抄作业)  <br />
