@@ -68,8 +68,8 @@ void keyfun()
 int runBot()
 {
 
-		boost::function0< void> f =  boost::bind(&keyfun);
-		new boost::thread(f);
+		//boost::function0< void> f =  boost::bind(&keyfun);
+		//new boost::thread(f);
 
 		//boost::log::core::get()->set_filter(boost::log::trivial::severity>=boost::log::trivial::info);
 		MiraiQ * mq = MiraiQ::getInstance();
@@ -138,6 +138,11 @@ int runBot()
 
 int main()
 {
+	if(!LoadLibraryA("CQP.dll"))
+	{
+		MessageBoxA(NULL,"CQP.dll not found!","error",MB_OK);
+		return -1;
+	}
 	try
 	{
 		runBot();

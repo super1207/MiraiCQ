@@ -14,11 +14,30 @@
 #define STR2(R)  STR1(R)
 
 
+template <class T>
+class TP10086
+{
+};
+
+static const char * RETERR(const TP10086<const char *> & v)
+{
+	return "";
+}
+static __int32 RETERR(const TP10086<__int32> & v)
+{
+	return -100;
+}
+static __int64 RETERR(const TP10086<__int64> & v)
+{
+	return -100;
+}
+
+
 #define FFUN1(ReturnType, FuncName, ...) FUNC(ReturnType, FuncName, __VA_ARGS__) \
 {\
 	typedef ReturnType( __stdcall  * fun_ptr_type)(__VA_ARGS__);\
 	fun_ptr_type fun_ptr = (fun_ptr_type)GetProcAddress(GetModuleHandle(NULL),"CQ_"STR2(FuncName) "_T");\
-	if(!fun_ptr){ReturnType ret = NULL;return ret;}
+	if(!fun_ptr){ReturnType ret = RETERR(TP10086<ReturnType>());return ret;}
 
 #define FFUN2(...) return fun_ptr(__VA_ARGS__);}
 	

@@ -25,12 +25,12 @@ static autotime_str g_autotime_str;
 
 
 #define CHECK_AC(AC,X) std::pair<bool,Plus::PlusDef> X = MiraiQ::get_plus_ptr()->get_plusdef(AC);\
-	if(X##.first == false) {return AC_NOT_EXIST;} \
-	if(X##.second.is_enable == false){return APP_NOT_ENABLE;}
+	if(X##.first == false) {return AC_NOT_EXIST;}// \
+	//if(X##.second.is_enable == false){return APP_NOT_ENABLE;}
 
 #define CHECK_PTRAC(AC,X) std::pair<bool,Plus::PlusDef> X =MiraiQ::get_plus_ptr()->get_plusdef(AC);\
-	if(X##.first == false) {return NULL;} \
-	if(X##.second.is_enable == false){return NULL;}
+	if(X##.first == false) {return "";} //\
+	//if(X##.second.is_enable == false){return "";}
 
 
 #define RET_STR(X) char * retstr__t = new char[X##.length() + 1];\
@@ -39,7 +39,7 @@ static autotime_str g_autotime_str;
 	return retstr__t;
 
 #define CHECK_RET(RET,RETCODE) if(RET##.isNull())return NET_ERROR;  __int32 RETCODE = RET##["retcode"].asInt();if(RETCODE != 0){return NET_ERROR;}
-#define CHECK_PTRRET(RET,RETCODE) if(RET##.isNull())return NULL; __int32 RETCODE = RET##["retcode"].asInt();if(RETCODE != 0){return NULL;}
+#define CHECK_PTRRET(RET,RETCODE) if(RET##.isNull())return ""; __int32 RETCODE = RET##["retcode"].asInt();if(RETCODE != 0){return "";}
 
 #define cq_bool_t __int32
 #define FFUN1(RETTYPE,FUNNAME,...) static RETTYPE  CQ_##FUNNAME##_(__VA_ARGS__)
@@ -57,7 +57,7 @@ class TP10086
 
 static const char * RETERR(const TP10086<const char *> & v)
 {
-	return NULL;
+	return "";
 }
 static __int32 RETERR(const TP10086<__int32> & v)
 {
@@ -95,7 +95,9 @@ FFUN1(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg)
 		std::string  gbkmsg = to_u8(msg?msg:"");
 	Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendPrivateMsg(qq,gbkmsg.c_str());
 	CHECK_RET(ret_json,retcode)
-		return ret_json["data"]["message_id"].asInt();
+		MsgIdConvert * cvt = MsgIdConvert::getInstance();
+	assert(cvt);
+	return cvt->to_cq(ret_json["data"]["message_id"].asInt());
 }
 FFUN1(__int32, sendGroupMsg, __int32 auth_code, __int64 group_id, const char *msg)
 {
@@ -103,7 +105,9 @@ FFUN1(__int32, sendGroupMsg, __int32 auth_code, __int64 group_id, const char *ms
 		std::string  gbkmsg = to_u8((msg?msg:""));
 	Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendGroupMsg(group_id,gbkmsg.c_str());
 	CHECK_RET(ret_json,retcode)
-		return ret_json["data"]["message_id"].asInt();
+		MsgIdConvert * cvt = MsgIdConvert::getInstance();
+		assert(cvt);
+		return cvt->to_cq(ret_json["data"]["message_id"].asInt());
 }
 FFUN1(__int32, sendDiscussMsg, __int32 auth_code, __int64 discuss_id, const char *msg)
 {
@@ -115,6 +119,7 @@ FFUN1(__int32, deleteMsg, __int32 auth_code, __int64 msg_id)
 		MsgIdConvert * msg_id_convert = MsgIdConvert::getInstance();
 	assert(msg_id_convert);
 	Json::Value ret_json =  MiraiQ::get_bot_ptr()->deleteMsg(msg_id_convert->to_web((__int32)msg_id));
+	std::cout<< ret_json.toStyledString();
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
@@ -301,8 +306,8 @@ FFUN1(const char *, getGroupList, __int32 auth_code)
 		BinPack bin_pack_child;
 		bin_pack_child.int64_push(json_arr[i]["group_id"].asInt64());
 		bin_pack_child.string_push(to_gbk(json_arr[i]["group_name"].asString()));
-		//bin_pack_child.int32_push(json_arr[i]["member_count"].asInt());
-		//bin_pack_child.int32_push(json_arr[i]["max_member_count"].asInt());
+		bin_pack_child.int32_push(json_arr[i]["member_count"].asInt());
+		bin_pack_child.int32_push(json_arr[i]["max_member_count"].asInt());
 		bin_pack.token_push(bin_pack_child.content);	
 	}
 	std::string ret_str = base64_encode((const unsigned char *)(&(bin_pack.content[0])),bin_pack.content.size());
@@ -383,7 +388,8 @@ FFUN1(const char *, getGroupMemberList, __int32 auth_code, __int64 group_id)
 
 		bin_pack_child.string_push(to_gbk(json_arr[i]["title"].asString()));
 
-		bin_pack_child.int32_push(json_arr[i]["title_expire_time"].asInt());
+		bin_pack_child.int32_push(json_arr[i]["title_expire_time"].asUInt());
+
 		bin_pack_child.bool_push(json_arr[i]["card_changeable"].asBool());
 
 		bin_pack.token_push(bin_pack_child.content);	
@@ -448,7 +454,7 @@ FFUN1(const char *, getGroupMemberInfoV2, __int32 auth_code, __int64 group_id, _
 
 	bin_pack.string_push(to_gbk(ret_json["data"]["title"].asString()));
 
-	bin_pack.int32_push(ret_json["data"]["title_expire_time"].asInt());
+	bin_pack.int32_push(ret_json["data"]["title_expire_time"].asUInt());
 	bin_pack.bool_push(ret_json["data"]["card_changeable"].asBool());
 	std::string ret_str = base64_encode((const unsigned char *)(&(bin_pack.content[0])),bin_pack.content.size());
 	RET_STR(ret_str)
@@ -457,11 +463,11 @@ FFUN1(const char *, getGroupMemberInfoV2, __int32 auth_code, __int64 group_id, _
 // CoolQ
 FFUN1(const char *, getCookies, __int32 auth_code)
 {
-	return NULL;
+	return "";
 }
 FFUN1(const char *, getCookiesV2, __int32 auth_code, const char *domain)
 {
-	return NULL;
+	return "";
 }
 FFUN1(__int32, getCsrfToken, __int32 auth_code)
 {
@@ -476,13 +482,13 @@ FFUN1(const char *, getAppDirectory, __int32 auth_code)
 	{
 		if(!boost::filesystem::create_directory(plus_path))
 		{
-			return NULL;
+			return "";
 		}
 	}
 	std::string path_str = plus_path.string();
 	if(path_str == "")
 	{
-		return NULL;
+		return "";
 	}
 	if(path_str[path_str.length() -1] != '\\')
 	{
@@ -532,7 +538,7 @@ FFUN1(__int32, addLog, __int32 auth_code, __int32 log_level, const char *categor
 {
 	CHECK_AC(auth_code,pdf)
 		BOOST_LOG_TRIVIAL(debug) << "[" <<pdf.second.name << "] " << category << " " << log_msg;
-	return 0;
+	return 1;
 }
 FFUN1(__int32, setFatal, __int32 auth_code, const char *error_info) 
 {

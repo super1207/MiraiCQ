@@ -9,7 +9,7 @@ public:
 		size_t len = str.length();
 		if(len > 32767)
 		{
-			return false;
+			throw std::exception("binpack string_push error");
 		}
 		int16_push((__int16)len);
 		for(size_t i = 0;i < str.length();++i)
@@ -23,6 +23,7 @@ public:
 		content.push_back('\0');
 		content.push_back('\0');
 		std::memcpy(&content[content.size() - 2], &num, 2);
+		std::reverse(content.end()-2,content.end());
 	}
 	void int64_push(__int64 num)
 	{
@@ -35,6 +36,7 @@ public:
 		content.push_back('\0');
 		content.push_back('\0');
 		std::memcpy(&content[content.size() - 8], &num, 8);
+		std::reverse(content.end()-8,content.end());
 	}
 	void int32_push(__int32 num)
 	{
@@ -43,6 +45,7 @@ public:
 		content.push_back('\0');
 		content.push_back('\0');
 		std::memcpy(&content[content.size() - 4], &num, 4);
+		std::reverse(content.end()-4,content.end());
 	}
 
 	void bool_push(bool bool_num)

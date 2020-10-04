@@ -190,6 +190,7 @@ public:
 	Json::Value send(Json::Value & outroot,__int32 milliseconds = 1000)
 	{
 		
+		
 		{
 			boost::recursive_mutex::scoped_lock lock(mx);
 			if(!isconnect)
@@ -209,6 +210,7 @@ public:
 			BOOST_LOG_TRIVIAL(debug) << outstr;
 			boost::recursive_mutex::scoped_lock lock(mx);
 			c.send(hdl,outstr,  websocketpp::frame::opcode::text , ec);
+			BOOST_LOG_TRIVIAL(debug) << "send: "<<outroot.toStyledString(); 
 		}
 		
 		if (ec) 
@@ -230,6 +232,7 @@ public:
 					{
 						Json::Value ret_json = ecb->operator [](i);
 						ecb->erase(ecb->begin()+i);
+						BOOST_LOG_TRIVIAL(debug) << "recv: "<<ret_json.toStyledString(); 
 						return ret_json;
 					}
 				}

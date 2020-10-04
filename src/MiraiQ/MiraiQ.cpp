@@ -253,8 +253,8 @@ __int32 MiraiQ::deal_a_message()
 	}
 	if(g_message_map[post_type][type2] != 0)
 	{
-		gs_io_service.post(boost::bind(g_message_map[post_type][type2], root,gs_plus));
-		//g_message_map[post_type][type2](root);
+		//gs_io_service.post(boost::bind(g_message_map[post_type][type2], root,gs_plus));
+		g_message_map[post_type][type2](root,gs_plus);
 	}
 	return 1;
 }
