@@ -1,15 +1,18 @@
-#pragma once
+#ifndef __MIRAIQ_H__BBQSEFBDAORUBXTX
+#define __MIRAIQ_H__BBQSEFBDAORUBXTX
 
-#define WIN32_LEAN_AND_MEAN      // 在#include<windows.h>前定义
-//#include <boost/asio.hpp>
-#include <windows.h>
+//#define WIN32_LEAN_AND_MEAN      // 在#include<windows.h>前定义
+//#include <windows.h>
 
 #include <string>
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
+
 #include "Bot.h"
 #include "plus.h"
-#include <vector>
+
 
 
 #define MIRAI_OK 0
@@ -76,3 +79,5 @@ private:
 	MiraiQ();
 
 };
+
+#endif

@@ -1,8 +1,10 @@
+#include <string>
+#include <vector>
+
 #include <boost/log/trivial.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/locale/encoding.hpp>
-#include <string>
-#include <vector>
+#include <boost/shared_ptr.hpp>
 
 
 #include "bot.h"
@@ -12,13 +14,10 @@
 #include "binpack.h"
 #include "base64.h"
 #include "MIraiQ.h"
-#include <boost/shared_ptr.hpp>
-#include <stdio.h>
-
-extern Bot *  g_bot;
+#include "msg_id_convert.h"
 
 
-autotime_str g_autotime_str;
+static autotime_str g_autotime_str;
 
 #define to_gbk(U8) boost::locale::conv::between((U8), "GBK", "UTF-8")
 #define to_u8(GBK) boost::locale::conv::between((GBK), "UTF-8", "GBK").c_str()
@@ -113,7 +112,9 @@ FFUN1(__int32, sendDiscussMsg, __int32 auth_code, __int64 discuss_id, const char
 FFUN1(__int32, deleteMsg, __int32 auth_code, __int64 msg_id) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json =  MiraiQ::get_bot_ptr()->deleteMsg(msg_id);
+		MsgIdConvert * msg_id_convert = MsgIdConvert::getInstance();
+	assert(msg_id_convert);
+	Json::Value ret_json =  MiraiQ::get_bot_ptr()->deleteMsg(msg_id_convert->to_web((__int32)msg_id));
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
@@ -530,13 +531,13 @@ FFUN1(__int32, canSendRecord, __int32 auth_code)
 FFUN1(__int32, addLog, __int32 auth_code, __int32 log_level, const char *category, const char *log_msg) 
 {
 	CHECK_AC(auth_code,pdf)
-	BOOST_LOG_TRIVIAL(debug) << "[" <<pdf.second.name << "] " << category << " " << log_msg;
+		BOOST_LOG_TRIVIAL(debug) << "[" <<pdf.second.name << "] " << category << " " << log_msg;
 	return 0;
 }
 FFUN1(__int32, setFatal, __int32 auth_code, const char *error_info) 
 {
 	CHECK_AC(auth_code,pdf)
-	BOOST_LOG_TRIVIAL(debug) << "[" <<pdf.second.name << "] " << error_info;
+		BOOST_LOG_TRIVIAL(debug) << "[" <<pdf.second.name << "] " << error_info;
 	return 0;
 }
 FFUN1(__int32, setRestart, __int32 auth_code) 
@@ -550,7 +551,7 @@ extern "C"
 
 
 	// Message
-		FFUN2(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg) FFUN3(   auth_code,  qq, msg)
+	FFUN2(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg) FFUN3(   auth_code,  qq, msg)
 		FFUN2(__int32, sendGroupMsg, __int32 auth_code, __int64 group_id, const char *msg) FFUN3(   auth_code,  group_id, msg)
 		FFUN2(__int32, sendDiscussMsg, __int32 auth_code, __int64 discuss_id, const char *msg) FFUN3(   auth_code,  discuss_id, msg)
 		FFUN2(__int32, deleteMsg, __int32 auth_code, __int64 msg_id) FFUN3(   auth_code,  msg_id)

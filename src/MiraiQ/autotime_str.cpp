@@ -2,7 +2,7 @@
 #include "binpack.h"
 autotime_str::autotime_str()
 {
-	ts = 10; //10s
+	ts = 60; //60s
 }
 
 char * autotime_str::insert( char * new_str )

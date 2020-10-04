@@ -1,20 +1,19 @@
-#include <websocketpp/config/asio_no_tls_client.hpp>
-#include <websocketpp/client.hpp>
+#include <iostream>
+#include <vector>
+
 #include <boost/thread/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/locale/encoding.hpp>
-
+#include <boost/circular_buffer.hpp>
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 #include <boost/log/trivial.hpp>
 
-#include <iostream>
-#include <vector>
+#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/client.hpp>
 
-#include <jsoncpp/json.h>
-
-#include <boost/circular_buffer.hpp>
+#include "jsoncpp/json.h"
 
 #include "bot.h"
 
@@ -42,8 +41,7 @@ public:
 	{
 		this->ws_url = ws_url;
 		this->isconnect = false;
-		this->thrd = 0;
-		this->isfailed = false;
+		this->thrd = NULL;
 		c.bot = this;
 		cb = new boost::circular_buffer<Json::Value>(buffer_size);
 		assert(cb);
@@ -103,11 +101,9 @@ public:
 				}
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
 				bool is_con;
-				bool is_fai;
 				{
 					boost::recursive_mutex::scoped_lock lock(mx);
 					is_con = isconnect;
-					is_fai = isfailed;
 				}
 				if(isconnect)
 				{
@@ -161,7 +157,6 @@ public:
 
 			mx.lock();
 			isconnect = false;
-			isfailed = false;
 			 cb->clear();
 			 ecb->clear();
 			mx.unlock();
@@ -301,15 +296,13 @@ private:
 	static void on_failed(myclient* c, websocketpp::connection_hdl hdl) 
 	{
 		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
-		c->bot->isfailed = true;
-		c->bot->isfailed = false;
+		c->bot->isconnect = false;
 		BOOST_LOG_TRIVIAL(info) << "websocket failed!";
 	}
 	static void on_close(myclient* c, websocketpp::connection_hdl hdl) 
 	{
 		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
-		c->bot->isfailed = true;
-		c->bot->isfailed = false;
+		c->bot->isconnect = false;
 		BOOST_LOG_TRIVIAL(info) << "websocket close!";
 	}
 	void run()//in new thread
@@ -331,7 +324,6 @@ private:
 	std::string ws_url;
 	myclient c;
 	bool isconnect;
-	bool isfailed;
 	boost::thread * thrd;
 	boost::circular_buffer<Json::Value> * cb;
 	boost::circular_buffer<Json::Value> * ecb;

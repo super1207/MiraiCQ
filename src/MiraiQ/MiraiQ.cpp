@@ -1,12 +1,5 @@
 #pragma warning(disable:4819)
 
-#include "MIraiQ.h"
-#include "bot.h"
-#include "plus.h"
-
-#include "bot_event.h"
-
-
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/typeof/typeof.hpp> 
 #include <boost/asio/io_service.hpp>
@@ -15,6 +8,10 @@
 #include <boost/log/trivial.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "MIraiQ.h"
+#include "bot.h"
+#include "plus.h"
+#include "bot_event.h"
 
 #include <map>
 

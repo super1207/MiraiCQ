@@ -2,8 +2,10 @@
 #include "bot.h"
 #include "plus.h"
 #include "binpack.h"
-#include <plus.h>
 #include "base64.h"
+#include "msg_id_convert.h"
+
+
 #include <boost/locale/encoding.hpp>
 
 
@@ -12,18 +14,23 @@
 
 std::map<std::string,std::map<std::string,__int32(*)(const Json::Value &,boost::shared_ptr<Plus>)> > g_message_map;
 
+#define EVENT_IGNORE 0
+#define EVENT_BLOCK 1
+
 #define TEMP_EVENT_FUN(x) static __int32 temp_call_##x##(const std::map<__int32,Plus::PlusDef>::iterator & iter,const Json::Value & root)
 #define EVENT_FUN_ID(x) Plus::cq_##x##_id
 #define EVENT_FUN_TYPE(x) Plus::cq_##x##_funtype
 #define GET_FUNPTR(FUNTYPE) \
 	BOOST_AUTO(fun_ptr,((EVENT_FUN_TYPE(FUNTYPE))Plus::get_plus_function(iter->second,EVENT_FUN_ID(FUNTYPE))));\
-	if(!fun_ptr){return -1;}
+	if(!fun_ptr){return EVENT_BLOCK;}
+
+
 
 
 TEMP_EVENT_FUN(event_private_message)
 {
 	GET_FUNPTR(event_private_message)
-	std::string msg = boost::locale::conv::between(root["message"].asString(), "GBK", "UTF-8");
+	std::string msg = to_gbk(root["message"].asString());
 	std::string subtype = root["sub_type"].asString();
 	__int32 sub_type;
 	if(subtype == "friend")
@@ -36,13 +43,14 @@ TEMP_EVENT_FUN(event_private_message)
 	{
 		sub_type = 1;
 	}
-	
-	__int32 ret = fun_ptr(sub_type,root["message_id"].asInt(),root["user_id"].asInt64(),msg.c_str(),root["font"].asInt());
+	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
+	assert(msgid_convert);
+	__int32 ret = fun_ptr(sub_type,msgid_convert->to_cq(root["message_id"].asInt()),root["user_id"].asInt64(),msg.c_str(),root["font"].asInt());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK; //
 }
 
 TEMP_EVENT_FUN(event_group_message)
@@ -66,17 +74,21 @@ TEMP_EVENT_FUN(event_group_message)
 	}*/
 
 	std::string msg = to_gbk(root["message"].asString());
-	__int32 ret = fun_ptr(1,root["message_id"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64(),from_anonymous_base64.c_str(),msg.c_str(),root["font"].asInt());
+
+	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
+	assert(msgid_convert);
+	__int32 ret = fun_ptr(1,msgid_convert->to_cq(root["message_id"].asInt()),root["group_id"].asInt64(),root["user_id"].asInt64(),from_anonymous_base64.c_str(),msg.c_str(),root["font"].asInt());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
+
 /* 目前没有discuss了 */
 TEMP_EVENT_FUN(event_discuss_message)
 {
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_group_upload)
@@ -106,9 +118,9 @@ TEMP_EVENT_FUN(event_group_upload)
 	__int32 ret = fun_ptr(1, root["time"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64(),file_base64.c_str());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_group_admin)
@@ -126,9 +138,9 @@ TEMP_EVENT_FUN(event_group_admin)
 	__int32 ret = fun_ptr(sub_type,root["time"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_group_member_decrease)
@@ -144,14 +156,14 @@ TEMP_EVENT_FUN(event_group_member_decrease)
 		sub_type = 2;
 	}else
 	{
-		sub_type = 3; //自己被踢
+		sub_type = 3; //kick self
 	}
 	__int32 ret = fun_ptr(sub_type,root["time"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64(),root["operator_id"].asInt64());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_group_member_increase)
@@ -169,9 +181,9 @@ TEMP_EVENT_FUN(event_group_member_increase)
 	__int32 ret = fun_ptr(sub_type,root["time"].asInt(),root["group_id"].asInt64(),root["operator_id"].asInt64(),root["user_id"].asInt64());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_group_ban)
@@ -189,9 +201,9 @@ TEMP_EVENT_FUN(event_group_ban)
 	__int32 ret = fun_ptr(sub_type,root["time"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64(),root["operator_id"].asInt64(),root["duration"].asInt64());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_friend_add)
@@ -200,9 +212,9 @@ TEMP_EVENT_FUN(event_friend_add)
 	__int32 ret = fun_ptr(1,root["time"].asInt(),root["user_id"].asInt64());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_friend_request)
@@ -213,9 +225,9 @@ TEMP_EVENT_FUN(event_friend_request)
 	__int32 ret = fun_ptr(1,root["time"].asInt(),root["user_id"].asInt64(),msg.c_str(),response_flag.c_str());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 TEMP_EVENT_FUN(event_group_request)
@@ -235,9 +247,9 @@ TEMP_EVENT_FUN(event_group_request)
 	__int32 ret = fun_ptr(sub_type,root["time"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64(),msg.c_str(),response_flag.c_str());
 	if(ret == 0)
 	{
-		return 0;
+		return EVENT_IGNORE;
 	}
-	return 1;
+	return EVENT_BLOCK;
 }
 
 
@@ -259,7 +271,7 @@ TEMP_EVENT_FUN(event_group_request)
 		__int32 ret;try{ret = temp_call_##X(iter,root);}\
 		catch(const std::exception & e){\
 		BOOST_LOG_TRIVIAL(info) <<"crashed on call fun temp_call_" << #X << ":" << e.what();return -1;}\
-		if(ret == 1)\
+		if(ret == EVENT_BLOCK)\
 		{\
 			break;\
 		}\
@@ -289,7 +301,7 @@ CALL_FUN_EVENT(event_group_request,_,_)
 
 void init_event_map()
 {
-	//g_message_map["_"]["_"] = CALL_FUNNAME(event_enable);
+	//g_message_map["_" ]["_"] = CALL_FUNNAME(event_enable);
 	//g_message_map["_"]["_"] = CALL_FUNNAME(event_disable);
 	//g_message_map["_"]["_"] = CALL_FUNNAME(event_coolq_start);
 	//g_message_map["_"]["_"] = CALL_FUNNAME(event_coolq_exit);

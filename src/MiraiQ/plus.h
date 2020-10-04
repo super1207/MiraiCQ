@@ -6,6 +6,9 @@
 #include <map>
 #include <set>
 
+#define WIN32_LEAN_AND_MEAN      // 在#include<windows.h>前定义
+#include <Windows.h>  //for dll's HMODULE
+
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/typeof/typeof.hpp> 
@@ -13,8 +16,9 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <Jsoncpp/json.h>
-#include <Windows.h>
+#include "Jsoncpp/json.h"
+
+
 
 
 #define cq_funtype(x) cq_##x##_funtype

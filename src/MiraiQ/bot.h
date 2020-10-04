@@ -2,8 +2,10 @@
 #define __BOT_H__LGQKADOYHORUBXTX
 
 #include <string>
-#include <jsoncpp/json.h>
+
 #include <boost/shared_ptr.hpp>
+
+#include "jsoncpp/json.h"
 
 #define cq_bool_t __int32
 
@@ -77,6 +79,7 @@ public:
 protected:
 	
 };
+
 #undef cq_bool_t
 
 

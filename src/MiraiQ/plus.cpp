@@ -1,7 +1,10 @@
 #include "plus.h"
 #include <fstream>
+
 static __int32 g_ac = 1; 
+
 #define cq_funtype(x) cq_##x##_funtype
+
 Plus::Plus()
 {
 
@@ -215,11 +218,31 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	//传递ac
 	__int32 plus_ac = g_ac;
 	g_ac++;
-	typedef __int32(  __stdcall * fun_ptr_type)(__int32);
-	fun_ptr_type fun_ptr = (fun_ptr_type)GetProcAddress(dll_ptr,"Initialize");
+	typedef __int32(  __stdcall * fun_ptr_type_1)(__int32);
+	typedef __int32(  __stdcall * fun_ptr_type_2)();
+	fun_ptr_type_1 fun_ptr1 = (fun_ptr_type_1)GetProcAddress(dll_ptr,"Initialize");
+	fun_ptr_type_2 fun_ptr2 = (fun_ptr_type_2)GetProcAddress(dll_ptr,"AppInfo");
 	mx.unlock();
-	BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize: " << plus_ac;
-	fun_ptr(plus_ac);
+	
+	if(!fun_ptr1)
+	{
+		FreeLibrary(dll_ptr);
+		BOOST_LOG_TRIVIAL(info) << "get function " << "Initialize"  << " from " << plusdef.plus_file_name << " failed";
+		return 0;
+	}
+	BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize: " << fun_ptr1;
+	fun_ptr1(plus_ac);
+
+	//AppInfo 在打包后不会被调用
+	//if(!fun_ptr2)
+	//{
+	//	FreeLibrary(dll_ptr);
+	//	BOOST_LOG_TRIVIAL(info) << "get function " << "AppInfo"  << " from " << plusdef.plus_file_name << " failed";
+	//	return 0;
+	//}
+	//BOOST_LOG_TRIVIAL(debug) <<"call plus's fun AppInfo: " << fun_ptr2;
+	//fun_ptr2();
+
 	boost::recursive_mutex::scoped_lock lock(mx);
 	plusdef.ac = plus_ac;
 
@@ -270,7 +293,7 @@ bool Plus::enable_plus(__int32 ac)
 	if(void_fun_ptr)
 	{
 		mx.unlock();
-		BOOST_LOG_TRIVIAL(debug) << "call plus's fun:cq_event_enable: " <<void_fun_ptr;
+		BOOST_LOG_TRIVIAL(debug) << "call "<<it->second.name <<"'s fun:cq_event_enable: " <<void_fun_ptr;
 		((cq_funtype(event_enable))void_fun_ptr)(); // 调用
 		mx.lock();
 	}

@@ -295,6 +295,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\msg_id_convert.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\msg_id_convert.h"
+				>
+			</File>
+			<File
 				RelativePath=".\plus.cpp"
 				>
 			</File>

@@ -74,16 +74,15 @@ int runBot()
 		//boost::log::core::get()->set_filter(boost::log::trivial::severity>=boost::log::trivial::info);
 		MiraiQ * mq = MiraiQ::getInstance();
 		assert(mq);
-		BOOST_LOG_TRIVIAL(debug) << "set_bot_url";
+		//BOOST_LOG_TRIVIAL(debug) << "set_bot_url";
 		mq->set_bot_url("ws://localhost:6700");
-		BOOST_LOG_TRIVIAL(debug) << "bot_connect";
+		//BOOST_LOG_TRIVIAL(debug) << "bot_connect";
 		mq->bot_connect();
-		mq->get_bot_ptr()->disconnect();
 	
 		static int is_first;
 		if(!is_first)
 		{
-			BOOST_LOG_TRIVIAL(debug) << "get_program_dir";
+			//BOOST_LOG_TRIVIAL(debug) << "get_program_dir";
 			//加载所有插件
 			std::string path_name, exe_name;
 			get_program_dir(path_name, exe_name);
@@ -94,11 +93,11 @@ int runBot()
 				mq->load_plus(dll_path_vec[i]);
 			}
 	
-			BOOST_LOG_TRIVIAL(debug) << "call_cq_start_fun";
+			//BOOST_LOG_TRIVIAL(debug) << "call_cq_start_fun";
 			//调用：启动
 			mq->call_cq_start_fun();
 	
-			BOOST_LOG_TRIVIAL(debug) << "get_plus_id_list";
+			//BOOST_LOG_TRIVIAL(debug) << "get_plus_id_list";
 			std::vector<__int32> ac_list = mq->get_plus_id_list();
 
 			//调用：启用
@@ -114,7 +113,7 @@ int runBot()
 			if(ret == -1)
 			{
 				BOOST_LOG_TRIVIAL(info) << "已经断线，五秒后重新连接";
-				Sleep(5000);
+				boost::this_thread::sleep_for(boost::chrono::seconds(5));
 				BOOST_LOG_TRIVIAL(info) << "正在重新连接......";
 				if(mq->bot_connect() == MIRAI_OK)
 				{
