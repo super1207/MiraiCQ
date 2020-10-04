@@ -85,7 +85,7 @@ public:
 			hdl = con->get_handle();
 			if (ec) 
 			{
-				BOOST_LOG_TRIVIAL(debug) << "could not create connection because: " << ec.message();
+				BOOST_LOG_TRIVIAL(info) << "could not create connection because: " << ec.message();
 				return false;
 			}
 			c.connect(con);
@@ -120,7 +120,7 @@ public:
 		}
 		catch (websocketpp::exception const & e)
 		{
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) << "could not create connection because: " << e.what();
 			return false;
 		}
 		return true;
@@ -140,8 +140,8 @@ public:
 				}
 				catch (websocketpp::exception const & e)
 				{
-					std::cout << e.what() << std::endl;
-
+					//已经关闭，无需log
+					//std::cout << e.what() << std::endl;
 				}
 
 				//c.stop_perpetual();
@@ -170,7 +170,7 @@ public:
 		}
 		catch (websocketpp::exception const & e)
 		{
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) <<"disconnect failed:" << e.what();
 			return false;
 		};
 	}
@@ -218,7 +218,7 @@ public:
 		
 		if (ec) 
 		{
-			BOOST_LOG_TRIVIAL(debug) << "Send failed because: " << ec.message() ;
+			BOOST_LOG_TRIVIAL(info) << "send failed because: " << ec.message() ;
 			return Json::Value();
 		}
 		
@@ -264,7 +264,7 @@ private:
 		try{
 			gbkmsg = boost::locale::conv::between(msg->get_payload(), "GBK", "UTF-8");
 		}catch(const std::exception & e){
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) <<"error in on_message's to_gbk:"<< e.what();
 			return ;
 		}
 		BOOST_LOG_TRIVIAL(debug) << "message: " << gbkmsg << std::endl;
@@ -296,21 +296,21 @@ private:
 	{
 		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
 		c->bot->isconnect = true;
-		BOOST_LOG_TRIVIAL(debug) << "websocket open!";
+		BOOST_LOG_TRIVIAL(info) << "websocket open!";
 	}
 	static void on_failed(myclient* c, websocketpp::connection_hdl hdl) 
 	{
 		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
 		c->bot->isfailed = true;
 		c->bot->isfailed = false;
-		BOOST_LOG_TRIVIAL(debug) << "websocket failed!";
+		BOOST_LOG_TRIVIAL(info) << "websocket failed!";
 	}
 	static void on_close(myclient* c, websocketpp::connection_hdl hdl) 
 	{
 		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
 		c->bot->isfailed = true;
 		c->bot->isfailed = false;
-		BOOST_LOG_TRIVIAL(debug) << "websocket close!";
+		BOOST_LOG_TRIVIAL(info) << "websocket close!";
 	}
 	void run()//in new thread
 	{

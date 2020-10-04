@@ -13,6 +13,7 @@
 #include "base64.h"
 #include "MIraiQ.h"
 #include <boost/shared_ptr.hpp>
+#include <stdio.h>
 
 extern Bot *  g_bot;
 
@@ -72,12 +73,13 @@ static __int64 RETERR(const TP10086<__int64> & v)
 
 #define FFUN2(ReturnType, FuncName, ...) ReturnType __stdcall CQ_##FuncName##_T(__VA_ARGS__) \
 {\
+	BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " has being called"; \
 	const TP10086<ReturnType> er;\
 	typedef ReturnType(  * fun_ptr_type)(__VA_ARGS__);\
 	fun_ptr_type fun_ptr = (fun_ptr_type)CQ_##FuncName##_;
 
 #define FFUN3(...) try{ return fun_ptr(__VA_ARGS__);}catch(const std::exception & e)\
-{BOOST_LOG_TRIVIAL(debug) << e.what();return RETERR(er);}}
+{BOOST_LOG_TRIVIAL(info) << "crashed in " << __FUNCTION__ << ":" <<e.what();return RETERR(er);}}
 
 
 enum{

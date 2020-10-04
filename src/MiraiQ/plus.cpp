@@ -55,7 +55,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	std::ifstream in(json_path.string().c_str(),std::ios::binary);
 	if (!in.is_open())
 	{
-		BOOST_LOG_TRIVIAL(debug) << "jsonfile can't open:"<< json_path.string();
+		BOOST_LOG_TRIVIAL(info) << "jsonfile can't open:"<< json_path.string();
 		mx.unlock();
 		return 0;
 	}
@@ -64,7 +64,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	if (!reader.parse(in, root))
 	{
 		in.close();
-		BOOST_LOG_TRIVIAL(debug) << "jsonfile parse error";
+		BOOST_LOG_TRIVIAL(info) << "jsonfile parse error";
 		mx.unlock();
 		return 0;
 	}
@@ -86,7 +86,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 		plusdef.is_enable = false;
 	}catch(const std::exception & e)
 	{
-		BOOST_LOG_TRIVIAL(debug) << e.what();
+		BOOST_LOG_TRIVIAL(info) << e.what();
 		mx.unlock();
 		return 0;
 	}
@@ -96,7 +96,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 
 	if(!event_arr.isArray())
 	{
-		BOOST_LOG_TRIVIAL(debug) << "bad jsonfile's event";
+		BOOST_LOG_TRIVIAL(info) << "bad jsonfile's event";
 		mx.unlock();
 		return 0;
 	}
@@ -112,7 +112,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 			event.function_name = event_arr[i]["function"].asString();
 		}catch(const std::exception & e)
 		{
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) << e.what();
 			mx.unlock();
 			return 0;
 		}
@@ -126,7 +126,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 
 	if(!auth_arr.isArray())
 	{
-		BOOST_LOG_TRIVIAL(debug) << "bad jsonfile's auth";
+		BOOST_LOG_TRIVIAL(info) << "bad jsonfile's auth";
 		mx.unlock();
 		return 0;
 	}
@@ -139,7 +139,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 		}
 		catch(const std::exception & e)
 		{
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) << e.what();
 			mx.unlock();
 			return 0;
 		}
@@ -150,7 +150,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	HMODULE dll_ptr = LoadLibraryA(path.string().c_str());
 	if(!dll_ptr)
 	{
-		BOOST_LOG_TRIVIAL(debug) << "dll can't load:" << plusdef.plus_file_name;
+		BOOST_LOG_TRIVIAL(info) << "dll can't load:" << plusdef.plus_file_name;
 		mx.unlock();
 		return 0;
 	}
@@ -167,7 +167,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 
 	if(!menu_arr.isArray())
 	{
-		BOOST_LOG_TRIVIAL(debug) << "bad jsonfile's menu";
+		BOOST_LOG_TRIVIAL(info) << "bad jsonfile's menu";
 		mx.unlock();
 		return 0;
 	}
@@ -182,14 +182,14 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 			menu.function_ptr = (void *)GetProcAddress(dll_ptr,menu.name.c_str());
 			if(menu.function_ptr == NULL)
 			{
-				BOOST_LOG_TRIVIAL(debug) << "menu function not fonud";
+				BOOST_LOG_TRIVIAL(info) << "menu function not fonud";
 				FreeLibrary(dll_ptr);
 				mx.unlock();
 				return 0;
 			}
 		}catch(const std::exception & e)
 		{
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) << e.what();
 			FreeLibrary(dll_ptr);
 			mx.unlock();
 			return 0;
@@ -204,7 +204,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 		if(dllFunc == NULL)
 		{
 			FreeLibrary(dll_ptr);
-			BOOST_LOG_TRIVIAL(debug) << "get function " << function_name  << " from " << plusdef.plus_file_name << " failed";
+			BOOST_LOG_TRIVIAL(info) << "get function " << function_name  << " from " << plusdef.plus_file_name << " failed";
 			mx.unlock();
 			return 0;
 		}
@@ -218,6 +218,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	typedef __int32(  __stdcall * fun_ptr_type)(__int32);
 	fun_ptr_type fun_ptr = (fun_ptr_type)GetProcAddress(dll_ptr,"Initialize");
 	mx.unlock();
+	BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize: " << plus_ac;
 	fun_ptr(plus_ac);
 	boost::recursive_mutex::scoped_lock lock(mx);
 	plusdef.ac = plus_ac;
@@ -225,7 +226,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	plusdef.dll_ptr = dll_ptr;
 
 	plus_map[plus_ac] = plusdef;
-	BOOST_LOG_TRIVIAL(debug) << "load " << plusdef.name << " success!";
+	BOOST_LOG_TRIVIAL(info) << "load " << plusdef.name << " success!";
 	return plus_ac;
 }
 
@@ -269,6 +270,7 @@ bool Plus::enable_plus(__int32 ac)
 	if(void_fun_ptr)
 	{
 		mx.unlock();
+		BOOST_LOG_TRIVIAL(debug) << "call plus's fun:cq_event_enable: " <<void_fun_ptr;
 		((cq_funtype(event_enable))void_fun_ptr)(); // 调用
 		mx.lock();
 	}
@@ -295,6 +297,7 @@ bool Plus::disable_plus(__int32 ac)
 	if(void_fun_ptr)
 	{
 		mx.unlock();
+		BOOST_LOG_TRIVIAL(debug) << "call plus's fun:cq_event_disable: " <<void_fun_ptr;
 		((cq_event_disable_funtype)void_fun_ptr)(); // 调用
 		mx.lock();
 	}

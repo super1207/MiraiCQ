@@ -65,7 +65,7 @@ void keyfun()
 	}
 }
 
-int main()
+int runBot()
 {
 
 		boost::function0< void> f =  boost::bind(&keyfun);
@@ -78,6 +78,7 @@ int main()
 		mq->set_bot_url("ws://localhost:6700");
 		BOOST_LOG_TRIVIAL(debug) << "bot_connect";
 		mq->bot_connect();
+		mq->get_bot_ptr()->disconnect();
 	
 		static int is_first;
 		if(!is_first)
@@ -112,8 +113,9 @@ int main()
 			__int32 ret = mq->deal_a_message();
 			if(ret == -1)
 			{
-				BOOST_LOG_TRIVIAL(info) << "已经断线，五秒后正在重新连接";
+				BOOST_LOG_TRIVIAL(info) << "已经断线，五秒后重新连接";
 				Sleep(5000);
+				BOOST_LOG_TRIVIAL(info) << "正在重新连接......";
 				if(mq->bot_connect() == MIRAI_OK)
 				{
 					BOOST_LOG_TRIVIAL(info) << "重新连接成功" ;
@@ -122,10 +124,10 @@ int main()
 					BOOST_LOG_TRIVIAL(info) << "重新连接失败" ;
 				}
 				
-			}else if(ret == 0)
+			}else if(ret == 0)  //no message be dealed
 			{
 				Sleep(1);
-			}else if(ret == 1)
+			}else if(ret == 1)  //dealed a message
 			{
 				continue;
 			}
@@ -134,6 +136,22 @@ int main()
 	
 	return 0;
 }
+
+int main()
+{
+	try
+	{
+		runBot();
+	}catch(const std::exception & e)
+	{
+		BOOST_LOG_TRIVIAL(info) << "crash:" <<e.what();
+	}catch(...)
+	{
+		BOOST_LOG_TRIVIAL(info) << "crash:unkown:";
+	}
+	
+}
+
 
 
 

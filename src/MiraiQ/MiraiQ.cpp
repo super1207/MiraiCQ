@@ -47,6 +47,7 @@ MiraiQ::MiraiQ()
 	gs_is_bot_connect = MIRAIQ_BOT_NOT_CONNECT;
 	gs_url = "";
 	gs_plus = boost::shared_ptr<Plus>(new Plus());
+	gs_bot = boost::shared_ptr<Bot>(Bot::getInstance());
 	assert(gs_plus);
 	for(size_t i = 0;i < 30;++i)
 	{
@@ -223,7 +224,11 @@ void MiraiQ::call_cq_start_fun()
 	for (iter=gs_plus->plus_map.begin(); iter!=gs_plus->plus_map.end(); iter++)
 	{
 		GET_FUNPTR(event_coolq_start,fun_ptr,iter->second)
-		if(fun_ptr)fun_ptr();
+		if(fun_ptr)
+		{
+			BOOST_LOG_TRIVIAL(debug) << "call plus's fun:event_coolq_start: " <<fun_ptr;
+			fun_ptr();
+		}
 	}
 }
 
@@ -246,7 +251,7 @@ __int32 MiraiQ::deal_a_message()
 		type2 = root[post_type+"_type"].asString();
 	}catch(const std::exception & e)
 	{
-		BOOST_LOG_TRIVIAL(debug) << e.what();
+		BOOST_LOG_TRIVIAL(info) << e.what();
 		return 1;
 	}
 	if(g_message_map[post_type][type2] != 0)

@@ -257,7 +257,8 @@ TEMP_EVENT_FUN(event_group_request)
 			continue;\
 		}\
 		__int32 ret;try{ret = temp_call_##X(iter,root);}\
-		catch(const std::exception & e){BOOST_LOG_TRIVIAL(debug) << e.what();return -1;}\
+		catch(const std::exception & e){\
+		BOOST_LOG_TRIVIAL(info) <<"crashed on call fun temp_call_" << #X << ":" << e.what();return -1;}\
 		if(ret == 1)\
 		{\
 			break;\
