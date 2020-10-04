@@ -12,6 +12,7 @@
 #include "binpack.h"
 #include "base64.h"
 #include "MIraiQ.h"
+#include <boost/shared_ptr.hpp>
 
 extern Bot *  g_bot;
 
@@ -23,11 +24,11 @@ autotime_str g_autotime_str;
 
 
 
-#define CHECK_AC(AC,X) std::pair<bool,Plus::PlusDef> X = ((Plus *)(MiraiQ::get_plus_ptr()))->get_plusdef(AC);\
+#define CHECK_AC(AC,X) std::pair<bool,Plus::PlusDef> X = MiraiQ::get_plus_ptr()->get_plusdef(AC);\
 	if(X##.first == false) {return AC_NOT_EXIST;} \
 	if(X##.second.is_enable == false){return APP_NOT_ENABLE;}
 
-#define CHECK_PTRAC(AC,X) std::pair<bool,Plus::PlusDef> X =((Plus *)(MiraiQ::get_plus_ptr()))->get_plusdef(AC);\
+#define CHECK_PTRAC(AC,X) std::pair<bool,Plus::PlusDef> X =MiraiQ::get_plus_ptr()->get_plusdef(AC);\
 	if(X##.first == false) {return NULL;} \
 	if(X##.second.is_enable == false){return NULL;}
 
@@ -91,7 +92,7 @@ FFUN1(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg)
 {
 	CHECK_AC(auth_code,pdf)
 		std::string  gbkmsg = to_u8(msg?msg:"");
-	Json::Value ret_json =  ((Bot *)(MiraiQ::get_bot_ptr()))->sendPrivateMsg(qq,gbkmsg.c_str());
+	Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendPrivateMsg(qq,gbkmsg.c_str());
 	CHECK_RET(ret_json,retcode)
 		return ret_json["data"]["message_id"].asInt();
 }
@@ -99,7 +100,7 @@ FFUN1(__int32, sendGroupMsg, __int32 auth_code, __int64 group_id, const char *ms
 {
 	CHECK_AC(auth_code,pdf)
 		std::string  gbkmsg = to_u8((msg?msg:""));
-	Json::Value ret_json =  ((Bot *)(MiraiQ::get_bot_ptr()))->sendGroupMsg(group_id,gbkmsg.c_str());
+	Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendGroupMsg(group_id,gbkmsg.c_str());
 	CHECK_RET(ret_json,retcode)
 		return ret_json["data"]["message_id"].asInt();
 }
@@ -110,7 +111,7 @@ FFUN1(__int32, sendDiscussMsg, __int32 auth_code, __int64 discuss_id, const char
 FFUN1(__int32, deleteMsg, __int32 auth_code, __int64 msg_id) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json =  ((Bot *)(MiraiQ::get_bot_ptr()))->deleteMsg(msg_id);
+		Json::Value ret_json =  MiraiQ::get_bot_ptr()->deleteMsg(msg_id);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
@@ -129,14 +130,14 @@ FFUN1(__int32, sendLikeV2, __int32 auth_code, __int64 qq, __int32 times)
 FFUN1(__int32, setGroupKick, __int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t reject_add_request)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupKick(group_id,qq,reject_add_request);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupKick(group_id,qq,reject_add_request);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupBan, __int32 auth_code, __int64 group_id, __int64 qq, __int64 duration)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupBan(group_id,qq,duration);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupBan(group_id,qq,duration);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
@@ -145,49 +146,49 @@ FFUN1(__int32, setGroupAnonymousBan, __int32 auth_code, __int64 group_id, const 
 
 	//TODO...
 	//CHECK_AC(auth_code,pdf)
-	//Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupAnonymousBan(group_id,(anonymous?anonymous:""),duration);
+	//Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAnonymousBan(group_id,(anonymous?anonymous:""),duration);
 	//CHECK_RET(ret_json,retcode)
 	return FUN_NOT_EXIST;
 }
 FFUN1(__int32, setGroupWholeBan, __int32 auth_code, __int64 group_id, cq_bool_t enable) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupWholeBan(group_id,enable);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupWholeBan(group_id,enable);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupAdmin, __int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t set)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupAdmin(group_id,qq,set);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAdmin(group_id,qq,set);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupAnonymous, __int32 auth_code, __int64 group_id, cq_bool_t enable) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupAnonymous(group_id,enable);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAnonymous(group_id,enable);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupCard, __int32 auth_code, __int64 group_id, __int64 qq, const char *new_card)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupCard(group_id,qq,to_u8(new_card?new_card:""));
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupCard(group_id,qq,to_u8(new_card?new_card:""));
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupLeave, __int32 auth_code, __int64 group_id, cq_bool_t is_dismiss) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupLeave(group_id,is_dismiss);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupLeave(group_id,is_dismiss);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupSpecialTitle, __int32 auth_code, __int64 group_id, __int64 qq, const char *new_special_title,__int64 duration) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupSpecialTitle(group_id,qq,to_u8(new_special_title?new_special_title:""),duration);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupSpecialTitle(group_id,qq,to_u8(new_special_title?new_special_title:""),duration);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
@@ -200,21 +201,21 @@ FFUN1(__int32, setDiscussLeave, __int32 auth_code, __int64 discuss_id)
 FFUN1(__int32, setFriendAddRequest, __int32 auth_code, const char *response_flag, __int32 response_operation,const char *remark)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setFriendAddRequest(response_flag,response_operation,to_u8(remark?remark:""));
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setFriendAddRequest(response_flag,response_operation,to_u8(remark?remark:""));
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupAddRequest, __int32 auth_code, const char *response_flag, __int32 request_type,__int32 response_operation) 
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupAddRequest(response_flag,request_type,response_operation);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAddRequest(response_flag,request_type,response_operation);
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
 FFUN1(__int32, setGroupAddRequestV2, __int32 auth_code, const char *response_flag, __int32 request_type,__int32 response_operation, const char *reason)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->setGroupAddRequestV2(response_flag,request_type,response_operation,to_u8(reason?reason:""));
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAddRequestV2(response_flag,request_type,response_operation,to_u8(reason?reason:""));
 	CHECK_RET(ret_json,retcode)
 		return 0;
 }
@@ -223,14 +224,14 @@ FFUN1(__int32, setGroupAddRequestV2, __int32 auth_code, const char *response_fla
 FFUN1(__int64, getLoginQQ, __int32 auth_code)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getLoginQQ();
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getLoginQQ();
 	CHECK_RET(ret_json,retcode)
 		return ret_json["data"]["user_id"].asInt64();
 }
 FFUN1(const char *, getLoginNick, __int32 auth_code)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getLoginNick();
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getLoginNick();
 	CHECK_PTRRET(ret_json,retcode)
 		std::string login_nick = to_gbk(ret_json["data"]["nickname"].asString());
 	RET_STR(login_nick)
@@ -238,7 +239,7 @@ FFUN1(const char *, getLoginNick, __int32 auth_code)
 FFUN1(const char *, getStrangerInfo, __int32 auth_code, __int64 qq, cq_bool_t no_cache)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getStrangerInfo(qq,no_cache);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getStrangerInfo(qq,no_cache);
 	CHECK_PTRRET(ret_json,retcode)
 		__int64 user_id = ret_json["data"]["user_id"].asInt64();
 	std::string nickname = ret_json["data"]["nickname"].asString();
@@ -268,7 +269,7 @@ FFUN1(const char *, getStrangerInfo, __int32 auth_code, __int64 qq, cq_bool_t no
 FFUN1(const char *, getFriendList, __int32 auth_code, cq_bool_t reserved)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getFriendList(reserved);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getFriendList(reserved);
 	CHECK_PTRRET(ret_json,retcode)
 		Json::Value json_arr = ret_json["data"];
 	BinPack bin_pack;
@@ -287,7 +288,7 @@ FFUN1(const char *, getFriendList, __int32 auth_code, cq_bool_t reserved)
 FFUN1(const char *, getGroupList, __int32 auth_code)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getGroupList();
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getGroupList();
 	CHECK_PTRRET(ret_json,retcode)
 		Json::Value json_arr = ret_json["data"];
 	BinPack bin_pack;
@@ -307,7 +308,7 @@ FFUN1(const char *, getGroupList, __int32 auth_code)
 FFUN1(const char *, getGroupInfo, __int32 auth_code, __int64 group_id, cq_bool_t no_cache) 
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getGroupInfo(group_id,no_cache);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getGroupInfo(group_id,no_cache);
 	CHECK_PTRRET(ret_json,retcode)
 		BinPack bin_pack;
 	bin_pack.int64_push(ret_json["data"]["group_id"].asInt64());
@@ -320,7 +321,7 @@ FFUN1(const char *, getGroupInfo, __int32 auth_code, __int64 group_id, cq_bool_t
 FFUN1(const char *, getGroupMemberList, __int32 auth_code, __int64 group_id) 
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getGroupMemberList(group_id);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getGroupMemberList(group_id);
 	CHECK_PTRRET(ret_json,retcode)
 		Json::Value json_arr = ret_json["data"];
 	BinPack bin_pack;
@@ -391,7 +392,7 @@ FFUN1(const char *, getGroupMemberList, __int32 auth_code, __int64 group_id)
 FFUN1(const char *, getGroupMemberInfoV2, __int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t no_cache) 
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getGroupMemberInfoV2(group_id,qq,no_cache);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getGroupMemberInfoV2(group_id,qq,no_cache);
 	CHECK_PTRRET(ret_json,retcode)
 		BinPack bin_pack;
 	bin_pack.int64_push(ret_json["data"]["group_id"].asInt64());
@@ -489,7 +490,7 @@ FFUN1(const char *, getAppDirectory, __int32 auth_code)
 FFUN1(const char *, getRecord, __int32 auth_code, const char *file, const char *out_format)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getRecord(file,out_format);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getRecord(file,out_format);
 	CHECK_PTRRET(ret_json,retcode)
 		std::string ret_str = ret_json["data"]["file"].asString();
 	RET_STR(ret_str)
@@ -497,7 +498,7 @@ FFUN1(const char *, getRecord, __int32 auth_code, const char *file, const char *
 FFUN1(const char *, getRecordV2, __int32 auth_code, const char *file, const char *out_format)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getRecordV2(file,out_format);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getRecordV2(file,out_format);
 	CHECK_PTRRET(ret_json,retcode)
 		std::string ret_str = ret_json["data"]["file"].asString();
 	RET_STR(ret_str)
@@ -505,7 +506,7 @@ FFUN1(const char *, getRecordV2, __int32 auth_code, const char *file, const char
 FFUN1(const char *, getImage, __int32 auth_code, const char *file)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->getImage(file);
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->getImage(file);
 	CHECK_PTRRET(ret_json,retcode)
 		std::string ret_str = ret_json["data"]["file"].asString();
 	RET_STR(ret_str)
@@ -513,14 +514,14 @@ FFUN1(const char *, getImage, __int32 auth_code, const char *file)
 FFUN1(__int32, canSendImage, __int32 auth_code)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->canSendImage();
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->canSendImage();
 	CHECK_RET(ret_json,retcode)
 		return ret_json["data"]["yes"].asBool();
 }
 FFUN1(__int32, canSendRecord, __int32 auth_code)
 {
 	CHECK_AC(auth_code,pdf)
-		Json::Value ret_json = ((Bot *)(MiraiQ::get_bot_ptr()))->canSendRecord();
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->canSendRecord();
 	CHECK_RET(ret_json,retcode)
 		return ret_json["data"]["yes"].asBool();
 }

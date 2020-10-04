@@ -6,6 +6,9 @@
 
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/shared_ptr.hpp>
+#include "Bot.h"
+#include "plus.h"
 #include <vector>
 
 
@@ -61,10 +64,10 @@ public:
 	virtual __int32 deal_a_message();
 
 	/* 获得Bot的指针 */
-	static void * get_bot_ptr();
+	static boost::shared_ptr<Bot> get_bot_ptr();
 
 	/* 获得Plus的指针 */
-	static void * get_plus_ptr();
+	static boost::shared_ptr<Plus> get_plus_ptr();
 
 	virtual ~MiraiQ(){};
 

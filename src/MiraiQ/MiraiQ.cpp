@@ -13,6 +13,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 #include <map>
@@ -28,8 +29,8 @@
 
 #define LOCK_AREA boost::recursive_mutex::scoped_lock lock(gs_mutex); 
 
-static Bot * gs_bot; 
-static Plus * gs_plus;
+static boost::shared_ptr<Bot> gs_bot; 
+static boost::shared_ptr<Plus> gs_plus;
 static __int32 gs_is_bot_connect;
 static boost::recursive_mutex gs_mutex;
 static std::string gs_url;
@@ -43,11 +44,9 @@ MiraiQ::MiraiQ()
 {
 	LOCK_AREA
 	init_event_map();
-	gs_bot = NULL;
-	gs_plus = NULL;
 	gs_is_bot_connect = MIRAIQ_BOT_NOT_CONNECT;
 	gs_url = "";
-	gs_plus = new Plus();
+	gs_plus = boost::shared_ptr<Plus>(new Plus());
 	assert(gs_plus);
 	for(size_t i = 0;i < 30;++i)
 	{
@@ -68,8 +67,7 @@ __int32 MiraiQ::is_bot_connect()
 		if(gs_bot->is_connect() == false)
 		{
 			gs_is_bot_connect = MIRAIQ_BOT_NOT_CONNECT;
-			delete gs_bot;
-			gs_bot = NULL;
+			gs_bot = boost::shared_ptr<Bot>(Bot::getInstance(gs_url));
 		}else
 		{
 			gs_is_bot_connect = MIRAIQ_BOT_IS_CONNECT;
@@ -114,14 +112,13 @@ __int32 MiraiQ::bot_connect()
 	{
 		return MIRAIQ_URL_NOT_SET;
 	}
-	Bot * bot = Bot::getInstance(gs_url);
+	boost::shared_ptr<Bot> bot(Bot::getInstance(gs_url));
 	if(!bot)
 	{
 		return MIRAIQ_BOT_NOT_CONNECT;
 	}
 	if(!bot->connect())
 	{
-		delete bot;
 		return MIRAIQ_BOT_NOT_CONNECT;
 	}
 	gs_bot = bot;
@@ -133,8 +130,7 @@ __int32 MiraiQ::bot_connect()
 __int32 MiraiQ::bot_disconnect()
 {
 	LOCK_AREA
-	delete gs_bot;
-	gs_bot = NULL;
+	gs_bot = boost::shared_ptr<Bot>(Bot::getInstance(gs_url));
 	gs_is_bot_connect = MIRAIQ_BOT_NOT_CONNECT;
 	return 0;//TODO...
 }
@@ -255,29 +251,21 @@ __int32 MiraiQ::deal_a_message()
 	}
 	if(g_message_map[post_type][type2] != 0)
 	{
-		gs_io_service.post(boost::bind(g_message_map[post_type][type2], root));
+		gs_io_service.post(boost::bind(g_message_map[post_type][type2], root,gs_plus));
 		//g_message_map[post_type][type2](root);
 	}
 	return 1;
 }
 
-void * MiraiQ::get_bot_ptr()
+boost::shared_ptr<Bot> MiraiQ::get_bot_ptr()
 {
 	LOCK_AREA
-	if(!gs_bot)
-	{
-		throw std::exception("bot_ptr is null");
-	}
 	return gs_bot;
 }
 
-void * MiraiQ::get_plus_ptr()
+boost::shared_ptr<Plus> MiraiQ::get_plus_ptr()
 {
 	LOCK_AREA
-	if(!gs_plus)
-	{
-		throw std::exception("plus_ptr is null");
-	}
 	return gs_plus;
 }
 

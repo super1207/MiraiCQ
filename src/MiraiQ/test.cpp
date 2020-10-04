@@ -38,7 +38,7 @@ void keyfun()
 			std::string cmd = a;
 			if(cmd == "show")
 			{
-				std::map<__int32,Plus::PlusDef> mp = ((Plus *)MiraiQ::get_plus_ptr())->get_plus_map();
+				std::map<__int32,Plus::PlusDef> mp = MiraiQ::get_plus_ptr()->get_plus_map();
 				std::map<__int32,Plus::PlusDef>::iterator iter;
 				for(iter = mp.begin();iter!=mp.end();++iter)
 				{
@@ -53,7 +53,7 @@ void keyfun()
 				int ac = boost::lexical_cast<__int32>(itemlist.at(0));
 				int num = boost::lexical_cast<__int32>(itemlist.at(1));
 					void *  ptr = (
-						((Plus *)MiraiQ::get_plus_ptr())->get_plusdef(ac).second.menu.at(num).function_ptr
+						MiraiQ::get_plus_ptr()->get_plusdef(ac).second.menu.at(num).function_ptr
 					);
 					((void(*)())ptr)();
 			}
@@ -86,7 +86,7 @@ int main()
 			//加载所有插件
 			std::string path_name, exe_name;
 			get_program_dir(path_name, exe_name);
-			std::vector<boost::filesystem::path>  dll_path_vec = ((Plus *)(MiraiQ::get_plus_ptr()))->find_plus_file(boost::filesystem::path(path_name)/"app");
+			std::vector<boost::filesystem::path>  dll_path_vec = MiraiQ::get_plus_ptr()->find_plus_file(boost::filesystem::path(path_name)/"app");
 			for(size_t i = 0;i < dll_path_vec.size();++i)
 			{
 				BOOST_LOG_TRIVIAL(debug) << dll_path_vec[i];

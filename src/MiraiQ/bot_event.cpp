@@ -2,14 +2,15 @@
 #include "bot.h"
 #include "plus.h"
 #include "binpack.h"
-#include "MIraiQ.h"
+#include <plus.h>
 #include "base64.h"
 #include <boost/locale/encoding.hpp>
+
 
 #define to_gbk(U8) boost::locale::conv::between((U8), "GBK", "UTF-8")
 #define to_u8(GBK) boost::locale::conv::between((GBK), "UTF-8", "GBK").c_str()
 
-std::map<std::string,std::map<std::string,__int32(*)(const Json::Value &)> > g_message_map;
+std::map<std::string,std::map<std::string,__int32(*)(const Json::Value &,boost::shared_ptr<Plus>)> > g_message_map;
 
 #define TEMP_EVENT_FUN(x) static __int32 temp_call_##x##(const std::map<__int32,Plus::PlusDef>::iterator & iter,const Json::Value & root)
 #define EVENT_FUN_ID(x) Plus::cq_##x##_id
@@ -245,9 +246,9 @@ TEMP_EVENT_FUN(event_group_request)
 
 
 
-#define CALL_FUN_EVENT(X,M1,M2)  __int32 call_##X (const Json::Value & root) \
+#define CALL_FUN_EVENT(X,M1,M2)  __int32 call_##X (const Json::Value & root,boost::shared_ptr<Plus> plus) \
 { \
-	std::map<__int32,Plus::PlusDef> plus_map = ((Plus *)(MiraiQ::get_plus_ptr()))->get_plus_map();\
+	std::map<__int32,Plus::PlusDef> plus_map = plus->get_plus_map();\
 	std::map<__int32,Plus::PlusDef>::iterator iter;\
 	for(iter = plus_map.begin();iter != plus_map.end();++iter)\
 	{\
