@@ -4,6 +4,7 @@ MiraiCQ 的目的是实现 [onebot](https://github.com/howmanybots/onebot) 标�
 更重要的是可以使用c++或者易语言来写复读机了 <br />
 onebot_websocket_api        <------->    MiraiCQ        <------->    cq_native_dll <br />
 MiraiCQ 使用websocket正向连接，与实现了onebot标准的机器人框架对接。
+![](https://ftp.bmp.ovh/imgs/2020/10/bc4e2057663fb481.png)
 
 ## 如何编译
 我使用 VS2008 x86 + boost_1_55_0 ,除此之外无需自己安装其他依赖。<br />
@@ -29,4 +30,5 @@ clone本项目，双击test.sln文件，点击生成解决方案即可完成编�
 [https://github.com/zaphoyd/websocketpp](https://github.com/zaphoyd/websocketpp) (抄作业)  <br />
 [https://github.com/open-source-parsers/jsoncpp](https://github.com/open-source-parsers/jsoncpp) (抄作业)  <br />
 [https://github.com/iTXTech/mirai-native](https://github.com/iTXTech/mirai-native) (相似项目参考)  <br />
-[https://www.boost.org/](https://www.boost.org/) (编译依赖)
+[https://www.boost.org/](https://www.boost.org/) (编译依赖) <br />
+[https://github.com/richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api) (插件测试)
