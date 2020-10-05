@@ -1,0 +1,1 @@
+#include "gobal_value.h"

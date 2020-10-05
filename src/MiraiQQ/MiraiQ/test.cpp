@@ -55,7 +55,7 @@ void keyfun()
 					void *  ptr = (
 						MiraiQ::get_plus_ptr()->get_plusdef(ac).second.menu.at(num).function_ptr
 					);
-					((void(*)())ptr)();
+					((void(__stdcall *)())ptr)();
 			}
 		}catch(const std::exception & e)
 		{
