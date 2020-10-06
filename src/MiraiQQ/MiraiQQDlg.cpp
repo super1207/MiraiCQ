@@ -218,8 +218,7 @@ void CMiraiQQDlg::OnBnClickedButton1()
 	GetDlgItem(IDC_EDIT1)->GetWindowText(ws_url);
 	MiraiQ * mq = MiraiQ::getInstance();
 	assert(mq);
-	mq->set_bot_url(ws_url.GetBuffer(0));
-	if(mq->bot_connect() != MIRAI_OK)
+	if(mq->bot_connect(ws_url.GetBuffer(0)) != MIRAI_OK)
 	{
 		AfxMessageBox(_T("µÇÂ½Ê§°Ü"));
 		return ;

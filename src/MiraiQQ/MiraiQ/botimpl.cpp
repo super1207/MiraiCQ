@@ -10,6 +10,8 @@
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 #include <boost/log/trivial.hpp>
 
+#include <boost/atomic.hpp>
+
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 
@@ -47,27 +49,19 @@ public:
 		assert(cb);
 		ecb = new boost::circular_buffer<Json::Value>(buffer_size);
 		assert(ecb);
+		isconnect = 0;
 	}
 	bool is_connect()
 	{
-		boost::recursive_mutex::scoped_lock lock(mx);
-		return isconnect;
+		return isconnect == 3;
 	}
 	bool connect()
 	{
+		if(isconnect != 0)
 		{
-			boost::recursive_mutex::scoped_lock lock(mx);
-			if(isconnect == true)
-			{
-				return false;
-			}
+			return false;
 		}
-		
-		if(thrd != 0)
-		{
-			delete thrd;
-			thrd = 0;
-		}
+		isconnect = 1;
 		try {
 
 			c.set_access_channels(websocketpp::log::alevel::none);
@@ -84,6 +78,7 @@ public:
 			if (ec) 
 			{
 				BOOST_LOG_TRIVIAL(info) << "could not create connection because: " << ec.message();
+				isconnect = 5;
 				return false;
 			}
 			c.connect(con);
@@ -97,80 +92,57 @@ public:
 				timess ++;
 				if(timess == 5000)
 				{
+					isconnect = 5;
 					return false;
 				}
 				boost::this_thread::sleep_for(boost::chrono::milliseconds(1));
-				bool is_con;
-				{
-					boost::recursive_mutex::scoped_lock lock(mx);
-					is_con = isconnect;
-				}
-				if(isconnect)
+				if(isconnect == 3)
 				{
 					break;
 				}
 				
 			}
-			//isconnect = true;
 			return true;
 		}
 		catch (websocketpp::exception const & e)
 		{
 			BOOST_LOG_TRIVIAL(info) << "could not create connection because: " << e.what();
+			isconnect = 5;
 			return false;
 		}
+		isconnect = 3;
 		return true;
 	}
 	bool disconnect()
 	{
-		try
+		if(isconnect != 3)
 		{
-			{
-				boost::recursive_mutex::scoped_lock lock(mx);
-				if(isconnect == false)
-				{
-					return true;
-				}
-				try {
-					c.close( hdl, websocketpp::close::status::normal, "" );
-				}
-				catch (websocketpp::exception const & e)
-				{
-					//已经关闭，无需log
-					//std::cout << e.what() << std::endl;
-				}
-
-				//c.stop_perpetual();
-				//c.stop();
-				
-			}	
-			mx.lock();
-			if(thrd != 0)
-			{
-				mx.unlock();
-				thrd->join();  //必须确保此处属于unlock状态
-				mx.lock();
-				delete thrd;
-				thrd = 0;
-			}
-			mx.unlock();
-
-			mx.lock();
-			isconnect = false;
-			 cb->clear();
-			 ecb->clear();
-			mx.unlock();
-			return true;
-
+			return false;
+		}
+		isconnect = 4;
+		try {
+			c.close( hdl, websocketpp::close::status::normal, "" );
 		}
 		catch (websocketpp::exception const & e)
 		{
-			BOOST_LOG_TRIVIAL(info) <<"disconnect failed:" << e.what();
-			return false;
-		};
+			//已经关闭，无需log
+			//std::cout << e.what() << std::endl;
+		}
+		if(thrd != 0)
+		{
+			thrd->join(); 
+		}
+		cb->clear();
+		ecb->clear();
+		isconnect = 5;
+		return true;
 	}
 	Json::Value get_message()
 	{
+		if(isconnect != 3)
+		{
+			return Json::Value();
+		}
 		boost::recursive_mutex::scoped_lock lock(mx);
 		if(cb->size() == 0)
 		{
@@ -185,18 +157,18 @@ public:
 		disconnect();
 		delete cb;
 		delete ecb;
+		if(thrd)
+		{
+			delete thrd;
+		}
+		
 		
 	}
 	Json::Value send(Json::Value & outroot,__int32 milliseconds = 1000)
 	{
-		
-		
+		if(isconnect != 3)
 		{
-			boost::recursive_mutex::scoped_lock lock(mx);
-			if(!isconnect)
-			{
-				return Json::Value();
-			}
+			return Json::Value();
 		}
 		//for get reply
 		std::string s_uuid = boost::uuids::to_string(boost::uuids::random_generator()());
@@ -204,15 +176,10 @@ public:
 
 		//send
 		websocketpp::lib::error_code ec;
-
-		{
-			std::string outstr = Json::FastWriter().write(outroot);
-			BOOST_LOG_TRIVIAL(debug) << outstr;
-			boost::recursive_mutex::scoped_lock lock(mx);
-			c.send(hdl,outstr,  websocketpp::frame::opcode::text , ec);
-			BOOST_LOG_TRIVIAL(debug) << "send: "<<outroot.toStyledString(); 
-		}
-		
+		std::string outstr = Json::FastWriter().write(outroot);
+		BOOST_LOG_TRIVIAL(debug) << outstr;
+		c.send(hdl,outstr,  websocketpp::frame::opcode::text , ec);
+		BOOST_LOG_TRIVIAL(debug) << "send: "<<outroot.toStyledString(); 
 		if (ec) 
 		{
 			BOOST_LOG_TRIVIAL(info) << "send failed because: " << ec.message() ;
@@ -243,8 +210,6 @@ public:
 			}
 			t.expires_from_now(boost::posix_time::milliseconds(i + 2));
 		}
-
-
 		return Json::Value();
 	}
 	//public:
@@ -292,19 +257,16 @@ private:
 	}
 	static void on_open(myclient* c, websocketpp::connection_hdl hdl) 
 	{
-		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
-		c->bot->isconnect = true;
+		c->bot->isconnect = 3;
 		BOOST_LOG_TRIVIAL(info) << "websocket open!";
 	}
 	static void on_failed(myclient* c, websocketpp::connection_hdl hdl) 
 	{
-		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
 		c->bot->isconnect = false;
 		BOOST_LOG_TRIVIAL(info) << "websocket failed!";
 	}
 	static void on_close(myclient* c, websocketpp::connection_hdl hdl) 
 	{
-		boost::recursive_mutex::scoped_lock lock(c->bot->mx);
 		c->bot->isconnect = false;
 		BOOST_LOG_TRIVIAL(info) << "websocket close!";
 	}
@@ -318,15 +280,15 @@ private:
 		{
 			BOOST_LOG_TRIVIAL(debug) << e.what();
 		}
-		boost::recursive_mutex::scoped_lock lock(mx);
-		isconnect = false;
+		isconnect = 5;
 		
 	}
 	websocketpp::connection_hdl  hdl;
 	boost::recursive_mutex mx;
 	std::string ws_url;
 	myclient c;
-	bool isconnect;
+	//0:ready to connect //2:connecting //3:connected //4:disconnecting //5:can't use 
+	mutable boost::atomic<__int32> isconnect; 
 	boost::thread * thrd;
 	boost::circular_buffer<Json::Value> * cb;
 	boost::circular_buffer<Json::Value> * ecb;

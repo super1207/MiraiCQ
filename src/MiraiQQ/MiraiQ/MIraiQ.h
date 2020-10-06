@@ -33,14 +33,11 @@ public:
 	/* 是否处于连接状态 */
 	virtual __int32 is_bot_connect();
 
-	/* 设置url */
-	virtual __int32 set_bot_url(const std::string & url);
-
 	/* 获取url */
 	virtual std::string get_bot_url();
 
 	/* 连接 */
-	virtual __int32 bot_connect();
+	virtual __int32 bot_connect(const std::string & url = "");
 
 	/* 断开连接 */
 	virtual __int32 bot_disconnect();

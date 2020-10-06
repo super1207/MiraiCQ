@@ -75,9 +75,8 @@ int runBot()
 		MiraiQ * mq = MiraiQ::getInstance();
 		assert(mq);
 		//BOOST_LOG_TRIVIAL(debug) << "set_bot_url";
-		mq->set_bot_url("ws://localhost:6700");
 		//BOOST_LOG_TRIVIAL(debug) << "bot_connect";
-		mq->bot_connect();
+		mq->bot_connect("ws://localhost:6700");
 	
 		static int is_first;
 		if(!is_first)
