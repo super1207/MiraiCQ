@@ -99,6 +99,13 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 
 	Json::Value event_arr =  root["event"];
 
+	if(event_arr.isNull())
+	{	
+		Json::Value v;
+		v.resize(0);
+		event_arr = v;  
+	}
+
 	if(!event_arr.isArray())
 	{
 		BOOST_LOG_TRIVIAL(info) << "bad jsonfile's event";
@@ -128,6 +135,13 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 
 	
 	Json::Value auth_arr =  root["auth"];
+
+	if(auth_arr.isNull())
+	{	
+		Json::Value v;
+		v.resize(0);
+		auth_arr = v;  
+	}
 
 	if(!auth_arr.isArray())
 	{
