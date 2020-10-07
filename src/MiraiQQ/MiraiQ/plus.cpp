@@ -55,7 +55,9 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	//¶ÁÈ¡jsonÎÄ¼þ
 	PlusDef plusdef;
 
+	std::locale loc= std::locale::global(std::locale(""));
 	std::ifstream in(json_path.string().c_str(),std::ios::binary);
+	std::locale::global(loc);
 	if (!in.is_open())
 	{
 		BOOST_LOG_TRIVIAL(info) << "jsonfile can't open:"<< json_path.string();
