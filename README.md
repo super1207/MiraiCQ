@@ -1,6 +1,6 @@
 # MiraiCQ
 ## 这是什么
-MiraiCQ 的目的是实现 [onebot](https://github.com/howmanybots/onebot) 标准向原生酷Q标准的转化，使得原来酷Q的插件得以直接运行。<br />
+MiraiCQ 的目的是实现 [onebot](https://github.com/howmanybots/onebot) 标准向原生酷Q标准（[miraicq标准](https://github.com/super1207/MiraiCQ/blob/main/doc/miraicq_std.md)）的转化，使得原来酷Q的插件得以直接运行。<br />
 更重要的是可以使用c++或者易语言来写复读机了 <br />
 onebot_websocket_api        <------->    MiraiCQ        <------->    cq_native_dll <br />
 MiraiCQ 使用websocket正向连接，与实现了onebot标准的机器人框架对接。
