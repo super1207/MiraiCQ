@@ -476,7 +476,7 @@ FFUN1(__int32, getCsrfToken, __int32 auth_code)
 FFUN1(const char *, getAppDirectory, __int32 auth_code)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		boost::filesystem::path plus_path = pdf.second.plus_path / pdf.second.appid;
+		boost::filesystem::path plus_path = pdf.second.plus_path / boost::filesystem::path(pdf.second.plus_file_name).stem();
 	if (!( boost::filesystem::exists(plus_path) && 
 		boost::filesystem::is_directory(plus_path)))
 	{
