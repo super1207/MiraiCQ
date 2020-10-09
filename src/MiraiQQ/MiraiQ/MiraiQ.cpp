@@ -260,6 +260,28 @@ void MiraiQ::call_cq_start_fun()
 	}
 }
 
+void MiraiQ::call_cq_stop_fun()
+{
+	boost::shared_ptr<Plus> plus;
+	{
+		LOCK_DATA
+			plus = gs_plus;
+	}
+
+	std::map<__int32,Plus::PlusDef>::iterator iter;
+	for (iter=plus->plus_map.begin(); iter!=plus->plus_map.end(); iter++)
+	{
+		GET_FUNPTR(event_coolq_exit,fun_ptr,iter->second)
+			if(fun_ptr)
+			{
+				BOOST_LOG_TRIVIAL(debug) << "call plus's fun:event_coolq_stop: " <<fun_ptr;
+				gs_io_service.post(fun_ptr);
+			}
+	}
+	boost::this_thread::sleep_for(boost::chrono::seconds(5));
+
+}
+
 __int32 MiraiQ::deal_a_message()
 {
 	boost::shared_ptr<Bot> bot;

@@ -60,6 +60,9 @@ public:
 	/* 对所有插件调用 cq_start */
 	virtual void call_cq_start_fun();
 
+	/* 对所有插件调用 cq_stop */
+	virtual void call_cq_stop_fun();
+
 	/* 处理一条消息 */
 	virtual __int32 deal_a_message();
 
