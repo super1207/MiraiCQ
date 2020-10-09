@@ -1,4 +1,4 @@
-// PlusMenuDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// PlusMenuDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include <boost/lexical_cast.hpp> 
 
 
-// CPlusMenuDlg ¶Ô»°¿ò
+// CPlusMenuDlg å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CPlusMenuDlg, CDialog)
 
@@ -37,9 +37,9 @@ BOOL CPlusMenuDlg::OnInitDialog()
 {
 	
 	CListCtrl * list_ctrl = (CListCtrl*)GetDlgItem(IDC_LIST1);
-	list_ctrl->InsertColumn(0, _T("±êÌâ"), LVCFMT_LEFT, 150);
+	list_ctrl->InsertColumn(0, _T("æ ‡é¢˜"), LVCFMT_LEFT, 150);
 
-	//¸ù¾İACµÃµ½²å¼ş
+	//æ ¹æ®ACå¾—åˆ°æ’ä»¶
 	MiraiQ * mq = MiraiQ::getInstance();
 	std::map<__int32,Plus::PlusDef> plus_map = mq->get_plus_ptr()->get_plus_map();
 	Plus::PlusDef & plusdef = plus_map[ac];
@@ -55,12 +55,12 @@ BOOL CPlusMenuDlg::OnInitDialog()
 }
 
 
-// CPlusMenuDlg ÏûÏ¢´¦Àí³ÌĞò
+// CPlusMenuDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 void CPlusMenuDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	//LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<NMITEMACTIVATE>(pNMHDR);
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CListCtrl * list_ctrl = (CListCtrl*)GetDlgItem(IDC_LIST1);
 	POSITION pos=list_ctrl->GetFirstSelectedItemPosition();
 	int nId=(int)list_ctrl->GetNextSelectedItem(pos);

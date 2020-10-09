@@ -1,7 +1,7 @@
 #ifndef __MSG_ID_CONVERT_H__LGOOODOYHORUBXTX
 #define __MSG_ID_CONVERT_H__LGOOODOYHORUBXTX
 
-//用于转化msgId为正整数
+//鐢ㄤ簬杞寲msgId涓烘鏁存暟
 
 class MsgIdConvert
 {

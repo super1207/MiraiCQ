@@ -116,6 +116,8 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CQPDLL_EXPORTS"
+				GeneratePreprocessedFile="0"
+				KeepComments="false"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"

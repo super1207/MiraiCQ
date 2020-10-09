@@ -1,4 +1,4 @@
-// MiraiContrlDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// MiraiContrlDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "MiraiQ/MIraiQ.h"
 
 
-// CMiraiContrlDlg ¶Ô»°¿ò
+// CMiraiContrlDlg å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CMiraiContrlDlg, CDialog)
 
@@ -35,30 +35,30 @@ BEGIN_MESSAGE_MAP(CMiraiContrlDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CMiraiContrlDlg ÏûÏ¢´¦Àí³ÌĞò
+// CMiraiContrlDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 void CMiraiContrlDlg::OnBnClickedButton3()
 {
 	CMiraiPlugsDlg dlg;
 	dlg.DoModal();
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 }
 
 void CMiraiContrlDlg::OnBnClickedButton4()
 {
 	if(MiraiQ::getInstance()->is_bot_connect() == MIRAIQ_BOT_IS_CONNECT)
 	{
-		AfxMessageBox("websocketÒÑ¾­³É¹¦Á¬½Ó");
+		AfxMessageBox("websocketå·²ç»æˆåŠŸè¿æ¥");
 	}else
 	{
-		AfxMessageBox("websocketÃ»ÓĞ³É¹¦Á´½Ó");
+		AfxMessageBox("websocketæ²¡æœ‰æˆåŠŸé“¾æ¥");
 	}
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 }
 
 void CMiraiContrlDlg::OnClose()
 {
-	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
 	HANDLE hself = GetCurrentProcess();
 	TerminateProcess(hself, 0);
 	CDialog::OnClose();

@@ -1,7 +1,7 @@
 #ifndef __MIRAIQ_H__BBQSEFBDAORUBXTX
 #define __MIRAIQ_H__BBQSEFBDAORUBXTX
 
-//#define WIN32_LEAN_AND_MEAN      // ÔÚ#include<windows.h>Ç°¶¨Òå
+//#define WIN32_LEAN_AND_MEAN      // åœ¨#include<windows.h>å‰å®šä¹‰
 //#include <windows.h>
 
 #include <string>
@@ -30,43 +30,43 @@ class MiraiQ
 
 public:
 
-	/* ÊÇ·ñ´¦ÓÚÁ¬½Ó×´Ì¬ */
+	/* æ˜¯å¦å¤„äºè¿æ¥çŠ¶æ€ */
 	virtual __int32 is_bot_connect();
 
-	/* »ñÈ¡url */
+	/* è·å–url */
 	virtual std::string get_bot_url();
 
-	/* Á¬½Ó */
+	/* è¿æ¥ */
 	virtual __int32 bot_connect(const std::string & url = "");
 
-	/* ¶Ï¿ªÁ¬½Ó */
+	/* æ–­å¼€è¿æ¥ */
 	virtual __int32 bot_disconnect();
 
-	/* ¼ÓÔØÒ»¸ö²å¼ş */
+	/* åŠ è½½ä¸€ä¸ªæ’ä»¶ */
 	virtual __int32 load_plus(const boost::filesystem::path & path);
 
-	/* »ñÈ¡²å¼şµÄplus_id±í */
+	/* è·å–æ’ä»¶çš„plus_idè¡¨ */
 	virtual std::vector<__int32> get_plus_id_list(); 
 
-	/* ÆôÓÃÒ»¸ö²å¼ş */
+	/* å¯ç”¨ä¸€ä¸ªæ’ä»¶ */
 	virtual __int32 enable_plus(__int32 plus_id);
 
-	/* Í£ÓÃÒ»¸ö²å¼ş */
+	/* åœç”¨ä¸€ä¸ªæ’ä»¶ */
 	virtual __int32 disable_plus(__int32 plus_id);
 
-	/* ²é¿´Ò»¸ö²å¼şÊÇ·ñÆôÓÃ */
+	/* æŸ¥çœ‹ä¸€ä¸ªæ’ä»¶æ˜¯å¦å¯ç”¨ */
 	virtual __int32 is_plus_enable(__int32 plus_id);
 
-	/* ¶ÔËùÓĞ²å¼şµ÷ÓÃ cq_start */
+	/* å¯¹æ‰€æœ‰æ’ä»¶è°ƒç”¨ cq_start */
 	virtual void call_cq_start_fun();
 
-	/* ´¦ÀíÒ»ÌõÏûÏ¢ */
+	/* å¤„ç†ä¸€æ¡æ¶ˆæ¯ */
 	virtual __int32 deal_a_message();
 
-	/* »ñµÃBotµÄÖ¸Õë */
+	/* è·å¾—Botçš„æŒ‡é’ˆ */
 	static boost::shared_ptr<Bot> get_bot_ptr();
 
-	/* »ñµÃPlusµÄÖ¸Õë */
+	/* è·å¾—Plusçš„æŒ‡é’ˆ */
 	static boost::shared_ptr<Plus> get_plus_ptr();
 
 	virtual ~MiraiQ(){};

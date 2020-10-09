@@ -86,11 +86,10 @@ public:
 			boost::function0< void> f =  boost::bind(&BotImpl::run,this);
 			thrd = new boost::thread(f);
 
-			int timess = 0;
+			time_t timess = time(NULL);
 			while(true)
 			{
-				timess ++;
-				if(timess == 5000)
+				if(time(NULL) - timess >= 5)
 				{
 					isconnect = 5;
 					return false;
@@ -125,7 +124,7 @@ public:
 		}
 		catch (websocketpp::exception const & e)
 		{
-			//已经关闭，无需log
+			//宸茬粡鍏抽棴锛屾棤闇�log
 			//std::cout << e.what() << std::endl;
 		}
 		if(thrd != 0)
