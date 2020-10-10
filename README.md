@@ -18,6 +18,7 @@ clone本项目，双击test.sln文件，点击生成解决方案即可完成编�
 ## 快速体验
 此处提供一个快速体验(预览)版本，但是不保证能及时更新: <br />
 [fast_try_0_1.7z](https://super1207.lanzous.com/iZmv9h7ak7g)
+[fast_try_0_2.7z](https://super1207.lanzous.com/iNHIYharzuj)
 ## 当前缺陷
 <1> 目前并没有完整实现了 OneBot 标准的框架 <br />
 <2> 目前酷Q已经无法运作了，缺乏对比验证，很多细节全靠记忆 <br />
