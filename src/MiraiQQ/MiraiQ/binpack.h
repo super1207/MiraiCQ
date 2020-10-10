@@ -4,7 +4,7 @@
 class BinPack {
 public:
 	std::vector<char> content;
-	bool string_push(const std::string & str)
+	void string_push(const std::string & str)
 	{
 		size_t len = str.length();
 		if(len > 32767)
@@ -16,7 +16,6 @@ public:
 		{
 			content.push_back(str[i]);
 		}
-		return true;
 	}
 	void int16_push(__int16 num)
 	{
@@ -66,20 +65,19 @@ public:
 		}
 	}
 
-	bool token_push(const std::vector<char> & token)
+	void token_push(const std::vector<char> & token)
 	{
 		size_t len = token.size();
 		if(len > 32767)
 		{
-			return false;
+			throw std::exception("binpack token_push error");
 		}
 		int16_push((__int16)len);
 		if(len == 0)
 		{
-			return true;
+			return ;
 		}
 		byte_push(&token[0],len);
-		return true;
 
 	}
 	/*BinPack() : bytes_(""), curr_(0) {
