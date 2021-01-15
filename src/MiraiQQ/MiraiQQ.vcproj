@@ -439,22 +439,6 @@
 				RelativePath=".\MiraiQ\test.cpp"
 				>
 			</File>
-			<Filter
-				Name="jsoncpp"
-				>
-				<File
-					RelativePath=".\MiraiQ\jsoncpp\json_reader.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\MiraiQ\jsoncpp\json_value.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\MiraiQ\jsoncpp\json_writer.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"
