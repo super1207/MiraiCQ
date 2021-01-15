@@ -1,0 +1,5 @@
+LIBRARY	"PicHP"
+EXPORTS 
+	Initialize @ 1
+	event_private_message @ 2
+

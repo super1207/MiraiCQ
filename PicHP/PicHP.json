@@ -1,0 +1,12 @@
+{
+  "name": "PicHp",
+  "version": "1.0.1",
+  "author": "super1207",
+  "description": "¸´¶ÁHello",
+  "event": [
+    {
+      "type": 21,
+      "function": "event_private_message"
+    }
+  ]
+}
