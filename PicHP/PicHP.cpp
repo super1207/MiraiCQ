@@ -35,22 +35,22 @@ extern "C" __int32 __stdcall CQ_setFriendAddRequest(__int32 auth_code, const cha
 extern "C" __int32 __stdcall CQ_setGroupAddRequest(__int32 auth_code, const char *response_flag, __int32 request_type,__int32 response_operation);
 extern "C" __int32 __stdcall CQ_setGroupAddRequestV2(__int32 auth_code, const char *response_flag, __int32 request_type,__int32 response_operation, const char *reason);
 
-extern "C" __int32 __stdcall CQ_getLoginQQ(__int32 auth_code);
-extern "C" __int32 __stdcall CQ_getLoginNick(__int32 auth_code);
-extern "C" __int32 __stdcall CQ_getStrangerInfo(__int32 auth_code, __int64 qq, cq_bool_t no_cache);
-extern "C" __int32 __stdcall CQ_getFriendList(__int32 auth_code, cq_bool_t reserved);
-extern "C" __int32 __stdcall CQ_getGroupList(__int32 auth_code);
-extern "C" __int32 __stdcall CQ_getGroupInfo(__int32 auth_code, __int64 group_id, cq_bool_t no_cache);
-extern "C" __int32 __stdcall CQ_getGroupMemberList(__int32 auth_code, __int64 group_id);
-extern "C" __int32 __stdcall CQ_getGroupMemberInfoV2(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t no_cache);
+extern "C" __int64 __stdcall CQ_getLoginQQ(__int32 auth_code);
+extern "C" const char * __stdcall CQ_getLoginNick(__int32 auth_code);
+extern "C" const char * __stdcall CQ_getStrangerInfo(__int32 auth_code, __int64 qq, cq_bool_t no_cache);
+extern "C" const char * __stdcall CQ_getFriendList(__int32 auth_code, cq_bool_t reserved);
+extern "C" const char * __stdcall CQ_getGroupList(__int32 auth_code);
+extern "C" const char * __stdcall CQ_getGroupInfo(__int32 auth_code, __int64 group_id, cq_bool_t no_cache);
+extern "C" const char * __stdcall CQ_getGroupMemberList(__int32 auth_code, __int64 group_id);
+extern "C" const char * __stdcall CQ_getGroupMemberInfoV2(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t no_cache);
 
-extern "C" __int32 __stdcall CQ_getCookies(__int32 auth_code); //未实现
-extern "C" __int32 __stdcall CQ_getCookiesV2(__int32 auth_code, const char *domain); //未实现
+extern "C" const char * __stdcall CQ_getCookies(__int32 auth_code); //未实现
+extern "C" const char * __stdcall CQ_getCookiesV2(__int32 auth_code, const char *domain); //未实现
 extern "C" __int32 __stdcall CQ_getCsrfToken(__int32 auth_code); //未实现
-extern "C" __int32 __stdcall CQ_getAppDirectory(__int32 auth_code);
-extern "C" __int32 __stdcall CQ_getRecord(__int32 auth_code, const char *file, const char *out_format);
-extern "C" __int32 __stdcall CQ_getRecordV2(__int32 auth_code, const char *file, const char *out_format);
-extern "C" __int32 __stdcall CQ_getImage(__int32 auth_code, const char *file);
+extern "C" const char * __stdcall CQ_getAppDirectory(__int32 auth_code);
+extern "C" const char * __stdcall CQ_getRecord(__int32 auth_code, const char *file, const char *out_format);
+extern "C" const char * __stdcall CQ_getRecordV2(__int32 auth_code, const char *file, const char *out_format);
+extern "C" const char * __stdcall CQ_getImage(__int32 auth_code, const char *file);
 extern "C" __int32 __stdcall CQ_canSendImage(__int32 auth_code);
 extern "C" __int32 __stdcall CQ_canSendRecord(__int32 auth_code);
 extern "C" __int32 __stdcall CQ_addLog(__int32 auth_code, __int32 log_level, const char *category, const char *log_msg);
