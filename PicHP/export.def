@@ -1,5 +1,21 @@
 LIBRARY	"PicHP"
 EXPORTS 
-	Initialize @ 1
-	event_private_message @ 2
+	Initialize
+	event_coolq_start
+	event_enable
+	event_private_message
+	event_group_message
+	event_discuss_message
+	event_group_upload
+	event_group_admin
+	event_group_member_decrease
+	event_group_member_increase
+	event_group_ban
+	event_friend_add
+	event_friend_request
+	event_group_request
+	event_disable
+	event_coolq_exit
+	menu_check_update
+	
 
