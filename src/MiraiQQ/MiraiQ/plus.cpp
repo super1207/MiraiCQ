@@ -13,7 +13,7 @@ Plus::Plus()
 std::vector<boost::filesystem::path> Plus::find_plus_file(const boost::filesystem::path & path)
 {
 
-	//å¾—åˆ°æ‰€æœ‰æ–‡ä»¶
+	//µÃµ½ËùÓĞÎÄ¼ş
 	std::vector<boost::filesystem::path> ret_vec;
 	boost::filesystem::directory_iterator end_it;
 	if (!( boost::filesystem::exists(path) && 
@@ -33,7 +33,7 @@ std::vector<boost::filesystem::path> Plus::find_plus_file(const boost::filesyste
 			}
 			if(boost::ends_with(boost::to_lower_copy(file_name),".dll"))
 			{
-				//è¿”å›ç»å¯¹è·¯å¾„
+				//·µ»Ø¾ø¶ÔÂ·¾¶
 				ret_vec.push_back(boost::filesystem::absolute(*iter));
 			}
 
@@ -52,7 +52,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	boost::filesystem::path json_path = parent_path;
 	json_path /= (file_stem + ".json");
 
-	//è¯»å–jsonæ–‡ä»¶
+	//¶ÁÈ¡jsonÎÄ¼ş
 	PlusDef plusdef;
 
 	std::locale loc= std::locale::global(std::locale(""));
@@ -231,7 +231,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	}
 
 
-	//ä¼ é€’ac
+	//´«µİac
 	__int32 plus_ac = g_ac;
 	g_ac++;
 	typedef __int32(  __stdcall * fun_ptr_type_1)(__int32);
@@ -249,7 +249,7 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize: " << fun_ptr1;
 	fun_ptr1(plus_ac);
 
-	//AppInfo åœ¨æ‰“åŒ…åä¸ä¼šè¢«è°ƒç”¨
+	//AppInfo ÔÚ´ò°üºó²»»á±»µ÷ÓÃ
 	//if(!fun_ptr2)
 	//{
 	//	FreeLibrary(dll_ptr);
@@ -310,7 +310,7 @@ bool Plus::enable_plus(__int32 ac)
 	{
 		mx.unlock();
 		BOOST_LOG_TRIVIAL(debug) << "call "<<it->second.name <<"'s fun:cq_event_enable: " <<void_fun_ptr;
-		((cq_funtype(event_enable))void_fun_ptr)(); // è°ƒç”¨
+		((cq_funtype(event_enable))void_fun_ptr)(); // µ÷ÓÃ
 		mx.lock();
 	}
 	it->second.is_enable = true;
@@ -337,7 +337,7 @@ bool Plus::disable_plus(__int32 ac)
 	{
 		mx.unlock();
 		BOOST_LOG_TRIVIAL(debug) << "call plus's fun:cq_event_disable: " <<void_fun_ptr;
-		((cq_event_disable_funtype)void_fun_ptr)(); // è°ƒç”¨
+		((cq_event_disable_funtype)void_fun_ptr)(); // µ÷ÓÃ
 		mx.lock();
 	}
 	mx.unlock();

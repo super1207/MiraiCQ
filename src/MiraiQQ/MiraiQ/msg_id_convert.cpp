@@ -7,7 +7,7 @@
 
 static __int32 gs_current_cq_msg_id;
 
-//æš‚æ—¶ä¿å­˜1024æ¡æ¶ˆæ¯
+//ÔİÊ±±£´æ1024ÌõÏûÏ¢
 static boost::circular_buffer<std::pair<__int32,__int32>> gs_cb(1024);
 
 static boost::shared_mutex  rw_mutex;

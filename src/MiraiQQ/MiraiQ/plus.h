@@ -6,7 +6,7 @@
 #include <map>
 #include <set>
 
-#define WIN32_LEAN_AND_MEAN      // åœ¨#include<windows.h>å‰å®šä¹‰
+#define WIN32_LEAN_AND_MEAN      // ÔÚ#include<windows.h>Ç°¶¨Òå
 #include <Windows.h>  //for dll's HMODULE
 
 #include <boost/shared_ptr.hpp>
@@ -54,9 +54,9 @@ public:
 			dll_ptr = NULL;
 			ac = 0;
 		}
-		__int32 ac; //æ’ä»¶è¯†åˆ«æ ‡è®°
-		std::string plus_file_name;  //æ’ä»¶æ–‡ä»¶åå­—
-		boost::filesystem::path plus_path; //æ’ä»¶è·¯å¾„ï¼Œä¸åŒ…å«æ–‡ä»¶å
+		__int32 ac; //²å¼şÊ¶±ğ±ê¼Ç
+		std::string plus_file_name;  //²å¼şÎÄ¼şÃû×Ö
+		boost::filesystem::path plus_path; //²å¼şÂ·¾¶£¬²»°üº¬ÎÄ¼şÃû
 		__int32 ret;
 		__int32 apiver;
 		std::string appid;
@@ -68,16 +68,16 @@ public:
 		std::vector<Event> event;
 		std::vector<Menu> menu;
 		std::vector<__int32> auth;
-		std::string plus_json_str;// æ’ä»¶çš„åŸå§‹jsonä¸²
+		std::string plus_json_str;// ²å¼şµÄÔ­Ê¼json´®
 		Json::Value json_value;
-		bool is_enable; //æ’ä»¶æ˜¯å¦è¢«å¯ç”¨
+		bool is_enable; //²å¼şÊÇ·ñ±»ÆôÓÃ
 		HMODULE dll_ptr;
 		
 	};
 
 	boost::recursive_mutex mx;
 
-	std::map<__int32,PlusDef> plus_map; //å®¹çº³æ’ä»¶çš„map
+	std::map<__int32,PlusDef> plus_map; //ÈİÄÉ²å¼şµÄmap
 
 	
 
@@ -120,13 +120,13 @@ public:
 
 	Plus();
 
-	/* æŸ¥æ‰¾ä¸€ä¸ªpathä¸‹çš„æ‰€æœ‰æ’ä»¶ */
+	/* ²éÕÒÒ»¸öpathÏÂµÄËùÓĞ²å¼ş */
 	static std::vector<boost::filesystem::path> find_plus_file(const boost::filesystem::path & path);
 
-	/* è½½å…¥ä¸€ä¸ªæ’ä»¶ï¼Œé»˜è®¤ä¸å¯ç”¨,è¿”å›acå·ï¼Œå¦‚æœè¿”å›0ï¼Œåˆ™è½½å…¥å¤±è´¥ */
+	/* ÔØÈëÒ»¸ö²å¼ş£¬Ä¬ÈÏ²»ÆôÓÃ,·µ»ØacºÅ£¬Èç¹û·µ»Ø0£¬ÔòÔØÈëÊ§°Ü */
 	virtual __int32 add_plus(const boost::filesystem::path & path);
 
-	/* å¸è½½ä¸€ä¸ªæ’ä»¶ */
+	/* Ğ¶ÔØÒ»¸ö²å¼ş */
 	virtual bool del_plus(__int32 ac);
 
 	std::pair<bool,PlusDef> get_plusdef(__int32 ac);
@@ -134,10 +134,10 @@ public:
 	std::map<__int32,PlusDef> get_plus_map();
 
 
-	/* å¯ç”¨ä¸€ä¸ªæ’ä»¶,è‹¥å·²ç»å¯ç”¨ï¼Œåˆ™ç›´æ¥è¿”å›true */
+	/* ÆôÓÃÒ»¸ö²å¼ş,ÈôÒÑ¾­ÆôÓÃ£¬ÔòÖ±½Ó·µ»Øtrue */
 	bool enable_plus(__int32 ac);
 
-	/* åœç”¨ä¸€ä¸ªæ’ä»¶,è‹¥æ²¡æœ‰å¯ç”¨ï¼Œåˆ™ç›´æ¥è¿”å›true */
+	/* Í£ÓÃÒ»¸ö²å¼ş,ÈôÃ»ÓĞÆôÓÃ£¬ÔòÖ±½Ó·µ»Øtrue */
 	bool disable_plus(__int32 ac);
 
 	static void * get_plus_function(const PlusDef & plus_def,__int32 id);

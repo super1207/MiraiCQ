@@ -1,4 +1,4 @@
-ï»¿// MiraiQQDlg.cpp : å®ç°æ–‡ä»¶
+// MiraiQQDlg.cpp : ÊµÏÖÎÄ¼ş
 //
 
 #include "stdafx.h"
@@ -13,20 +13,20 @@
 #endif
 
 
-// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
+// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -44,7 +44,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CMiraiQQDlg å¯¹è¯æ¡†
+// CMiraiQQDlg ¶Ô»°¿ò
 
 
 CMiraiQQDlg::CMiraiQQDlg(CWnd* pParent /*=NULL*/)
@@ -67,15 +67,15 @@ BEGIN_MESSAGE_MAP(CMiraiQQDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CMiraiQQDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMiraiQQDlg ÏûÏ¢´¦Àí³ÌĞò
 
 BOOL CMiraiQQDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// å°†â€œå…³äº...â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
+	// ½«¡°¹ØÓÚ...¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
 
-	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
+	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -91,18 +91,18 @@ BOOL CMiraiQQDlg::OnInitDialog()
 		}
 	}
 
-	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
-	//  æ‰§è¡Œæ­¤æ“ä½œ
-	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
-	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
+	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
+	//  Ö´ĞĞ´Ë²Ù×÷
+	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
+	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
 
 	ShowWindow(SW_NORMAL);
 
-	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
 	GetDlgItem(IDC_EDIT1)->SetWindowText("ws://localhost:6700");
 
 	//AllocConsole();
-	return TRUE;  // é™¤éå°†ç„¦ç‚¹è®¾ç½®åˆ°æ§ä»¶ï¼Œå¦åˆ™è¿”å› TRUE
+	return TRUE;  // ³ı·Ç½«½¹µãÉèÖÃµ½¿Ø¼ş£¬·ñÔò·µ»Ø TRUE
 }
 
 void CMiraiQQDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -118,19 +118,19 @@ void CMiraiQQDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
-//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
-//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
+// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
+//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
+//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
 
 void CMiraiQQDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
+		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// ä½¿å›¾æ ‡åœ¨å·¥ä½œåŒºçŸ©å½¢ä¸­å±…ä¸­
+		// Ê¹Í¼±êÔÚ¹¤×÷Çø¾ØĞÎÖĞ¾ÓÖĞ
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -138,7 +138,7 @@ void CMiraiQQDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ç»˜åˆ¶å›¾æ ‡
+		// »æÖÆÍ¼±ê
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -147,22 +147,22 @@ void CMiraiQQDlg::OnPaint()
 	}
 }
 
-//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡
-//æ˜¾ç¤ºã€‚
+//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±ê
+//ÏÔÊ¾¡£
 HCURSOR CMiraiQQDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
 
-//å¾—åˆ°æ‰§è¡Œçš„exeçš„åå­—å’Œè·¯å¾„(windows)
+//µÃµ½Ö´ĞĞµÄexeµÄÃû×ÖºÍÂ·¾¶(windows)
 static void get_program_dir(std::string &path_name, std::string &exe_name)
 {
 	char exe_path[MAX_PATH];
 	if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) == 0)
 	{
 		return ;
-		//throw logic_error("GetModuleFileNameAé”™è¯¯");
+		//throw logic_error("GetModuleFileNameA´íÎó");
 	}
 	std::string exe_path_string = exe_path;
 	size_t pos = exe_path_string.find_last_of('\\', exe_path_string.length());
@@ -180,15 +180,15 @@ static int runBot()
 		__int32 ret = mq->deal_a_message();
 		if(ret == -1)
 		{
-			BOOST_LOG_TRIVIAL(info) << "å·²ç»æ–­çº¿ï¼Œäº”ç§’åé‡æ–°è¿æ¥";
+			BOOST_LOG_TRIVIAL(info) << "ÒÑ¾­¶ÏÏß£¬ÎåÃëºóÖØĞÂÁ¬½Ó";
 			boost::this_thread::sleep_for(boost::chrono::seconds(5));
-			BOOST_LOG_TRIVIAL(info) << "æ­£åœ¨é‡æ–°è¿æ¥......";
+			BOOST_LOG_TRIVIAL(info) << "ÕıÔÚÖØĞÂÁ¬½Ó......";
 			if(mq->bot_connect() == MIRAI_OK)
 			{
-				BOOST_LOG_TRIVIAL(info) << "é‡æ–°è¿æ¥æˆåŠŸ" ;
+				BOOST_LOG_TRIVIAL(info) << "ÖØĞÂÁ¬½Ó³É¹¦" ;
 			}else
 			{
-				BOOST_LOG_TRIVIAL(info) << "é‡æ–°è¿æ¥å¤±è´¥" ;
+				BOOST_LOG_TRIVIAL(info) << "ÖØĞÂÁ¬½ÓÊ§°Ü" ;
 			}
 
 		}else if(ret == 0)  //no message be dealed
@@ -220,7 +220,7 @@ void CMiraiQQDlg::OnBnClickedButton1()
 	assert(mq);
 	if(mq->bot_connect(ws_url.GetBuffer(0)) != MIRAI_OK)
 	{
-		AfxMessageBox(_T("ç™»é™†å¤±è´¥"));
+		AfxMessageBox(_T("µÇÂ½Ê§°Ü"));
 		return ;
 	}
 	std::string path_name, exe_name;
@@ -236,7 +236,7 @@ void CMiraiQQDlg::OnBnClickedButton1()
 	//BOOST_LOG_TRIVIAL(debug) << "get_plus_id_list";
 	std::vector<__int32> ac_list = mq->get_plus_id_list();
 
-	//è°ƒç”¨ï¼šå¯ç”¨
+	//µ÷ÓÃ£ºÆôÓÃ
 	for (size_t i = 0; i < ac_list.size();++i)
 	{
 		mq->enable_plus(ac_list[i]);
@@ -249,5 +249,5 @@ void CMiraiQQDlg::OnBnClickedButton1()
     //INT_PTR nResponse = ddlg.DoModal();
 
 	CMiraiQQDlg::OnOK();
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 }

@@ -1,21 +1,21 @@
 #pragma once
 
 
-// CPlusMenuDlg å¯¹è¯æ¡†
+// CPlusMenuDlg ¶Ô»°¿ò
 
 class CPlusMenuDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CPlusMenuDlg)
 
 public:
-	CPlusMenuDlg(__int32 ac,CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
+	CPlusMenuDlg(__int32 ac,CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
 	virtual ~CPlusMenuDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_PLUS_MENU };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 private:

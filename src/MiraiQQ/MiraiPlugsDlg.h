@@ -2,21 +2,21 @@
 #include "afxcmn.h"
 
 
-// CMiraiPlugsDlg å¯¹è¯æ¡†
+// CMiraiPlugsDlg ¶Ô»°¿ò
 
 class CMiraiPlugsDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CMiraiPlugsDlg)
 
 public:
-	CMiraiPlugsDlg(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
+	CMiraiPlugsDlg(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
 	virtual ~CMiraiPlugsDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_MIRAIPLUGSDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:

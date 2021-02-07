@@ -1,4 +1,4 @@
-// PicHP.cpp : å®šä¹‰ DLL åº”ç”¨ç¨‹åºçš„å¯¼å‡ºå‡½æ•°ã€‚
+// PicHP.cpp : ¶¨Òå DLL Ó¦ÓÃ³ÌĞòµÄµ¼³öº¯Êı¡£
 //
 
 #include "stdafx.h"
@@ -8,28 +8,28 @@
 static __int32 sg_authCode = 0;
 
 
-//APIçš„å®ç°å¯ä»¥å‚è€ƒ https://github.com/super1207/MiraiCQ/blob/main/src/MiraiQQ/MiraiQ/api_list.cpp
+//APIµÄÊµÏÖ¿ÉÒÔ²Î¿¼ https://github.com/super1207/MiraiCQ/blob/main/src/MiraiQQ/MiraiQ/api_list.cpp
 
 #define cq_bool_t __int32
 
 extern "C" __int32 __stdcall CQ_sendPrivateMsg(__int32 auth_code, __int64 qq, const char *msg);
 extern "C" __int32 __stdcall CQ_sendGroupMsg(__int32 auth_code, __int64 group_id, const char *msg);
-extern "C" __int32 __stdcall CQ_sendDiscussMsg(__int32 auth_code, __int64 discuss_id, const char *msg);  //æœªå®ç°
+extern "C" __int32 __stdcall CQ_sendDiscussMsg(__int32 auth_code, __int64 discuss_id, const char *msg);  //Î´ÊµÏÖ
 extern "C" __int32 __stdcall CQ_deleteMsg(__int32 auth_code, __int64 msg_id);
 
-extern "C" __int32 __stdcall CQ_sendLike(__int32 auth_code, __int64 qq);  //æœªå®ç°
-extern "C" __int32 __stdcall CQ_sendLikeV2(__int32 auth_code, __int64 qq, __int32 times);  //æœªå®ç°
+extern "C" __int32 __stdcall CQ_sendLike(__int32 auth_code, __int64 qq);  //Î´ÊµÏÖ
+extern "C" __int32 __stdcall CQ_sendLikeV2(__int32 auth_code, __int64 qq, __int32 times);  //Î´ÊµÏÖ
 
 extern "C" __int32 __stdcall CQ_setGroupKick(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t reject_add_request);
 extern "C" __int32 __stdcall CQ_setGroupBan(__int32 auth_code, __int64 group_id, __int64 qq, __int64 duration);
-extern "C" __int32 __stdcall CQ_setGroupAnonymousBan(__int32 auth_code, __int64 group_id, const char *anonymous, __int64 duration);  //æœªå®ç°
+extern "C" __int32 __stdcall CQ_setGroupAnonymousBan(__int32 auth_code, __int64 group_id, const char *anonymous, __int64 duration);  //Î´ÊµÏÖ
 extern "C" __int32 __stdcall CQ_setGroupWholeBan(__int32 auth_code, __int64 group_id, cq_bool_t enable);
 extern "C" __int32 __stdcall CQ_setGroupAdmin(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t set);
 extern "C" __int32 __stdcall CQ_setGroupAnonymous(__int32 auth_code, __int64 group_id, cq_bool_t enable);
 extern "C" __int32 __stdcall CQ_setGroupCard(__int32 auth_code, __int64 group_id, __int64 qq, const char *new_card);
 extern "C" __int32 __stdcall CQ_setGroupLeave(__int32 auth_code, __int64 group_id, cq_bool_t is_dismiss);
 extern "C" __int32 __stdcall CQ_setGroupSpecialTitle(__int32 auth_code, __int64 group_id, __int64 qq, const char *new_special_title,__int64 duration);
-extern "C" __int32 __stdcall CQ_setDiscussLeave(__int32 auth_code, __int64 discuss_id);  //æœªå®ç°
+extern "C" __int32 __stdcall CQ_setDiscussLeave(__int32 auth_code, __int64 discuss_id);  //Î´ÊµÏÖ
 
 extern "C" __int32 __stdcall CQ_setFriendAddRequest(__int32 auth_code, const char *response_flag, __int32 response_operation,const char *remark);
 extern "C" __int32 __stdcall CQ_setGroupAddRequest(__int32 auth_code, const char *response_flag, __int32 request_type,__int32 response_operation);
@@ -44,9 +44,9 @@ extern "C" const char * __stdcall CQ_getGroupInfo(__int32 auth_code, __int64 gro
 extern "C" const char * __stdcall CQ_getGroupMemberList(__int32 auth_code, __int64 group_id);
 extern "C" const char * __stdcall CQ_getGroupMemberInfoV2(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t no_cache);
 
-extern "C" const char * __stdcall CQ_getCookies(__int32 auth_code); //æœªå®ç°
-extern "C" const char * __stdcall CQ_getCookiesV2(__int32 auth_code, const char *domain); //æœªå®ç°
-extern "C" __int32 __stdcall CQ_getCsrfToken(__int32 auth_code); //æœªå®ç°
+extern "C" const char * __stdcall CQ_getCookies(__int32 auth_code); //Î´ÊµÏÖ
+extern "C" const char * __stdcall CQ_getCookiesV2(__int32 auth_code, const char *domain); //Î´ÊµÏÖ
+extern "C" __int32 __stdcall CQ_getCsrfToken(__int32 auth_code); //Î´ÊµÏÖ
 extern "C" const char * __stdcall CQ_getAppDirectory(__int32 auth_code);
 extern "C" const char * __stdcall CQ_getRecord(__int32 auth_code, const char *file, const char *out_format);
 extern "C" const char * __stdcall CQ_getRecordV2(__int32 auth_code, const char *file, const char *out_format);
@@ -55,114 +55,114 @@ extern "C" __int32 __stdcall CQ_canSendImage(__int32 auth_code);
 extern "C" __int32 __stdcall CQ_canSendRecord(__int32 auth_code);
 extern "C" __int32 __stdcall CQ_addLog(__int32 auth_code, __int32 log_level, const char *category, const char *log_msg);
 extern "C" __int32 __stdcall CQ_setFatal(__int32 auth_code, const char *error_info);
-extern "C" __int32 __stdcall CQ_setRestart(__int32 auth_code);  //æœªå®ç°
+extern "C" __int32 __stdcall CQ_setRestart(__int32 auth_code);  //Î´ÊµÏÖ
 
 
-//eventçš„å®ç°å¯ä»¥å‚è€ƒ https://github.com/super1207/MiraiCQ/blob/main/src/MiraiQQ/MiraiQ/bot_event.cpp
+//eventµÄÊµÏÖ¿ÉÒÔ²Î¿¼ https://github.com/super1207/MiraiCQ/blob/main/src/MiraiQQ/MiraiQ/bot_event.cpp
 
-/* æ¥æ”¶authCode */
+/* ½ÓÊÕauthCode */
 extern "C" __int32 __stdcall Initialize(__int32 authCode)
 {
 	sg_authCode = authCode;
 	return 0;
 }
 
-/* æ¡†æ¶å¯åŠ¨äº‹ä»¶ type = 1001 */
+/* ¿ò¼ÜÆô¶¯ÊÂ¼ş type = 1001 */
 extern "C" __int32 __stdcall event_coolq_start()
 {
 	return 0;
 }
 
-/* æ’ä»¶å¯ç”¨äº‹ä»¶ type = 1003 */
+/* ²å¼şÆôÓÃÊÂ¼ş type = 1003 */
 extern "C" __int32 __stdcall event_enable()
 {
 	return 0;
 }
 
 
-/* ç§èŠäº‹ä»¶ type = 21 */
+/* Ë½ÁÄÊÂ¼ş type = 21 */
 extern "C" __int32 __stdcall event_private_message(__int32 sub_type, __int32 msg_id, __int64 from_qq, const char *msg, __int32 font)
 {
 	CQ_sendPrivateMsg(sg_authCode,from_qq,msg);
 	return 0;
 }
 
-/* ç¾¤èŠäº‹ä»¶ type = 2 from_anonymous_base64å®ç°ä¸å®Œæ•´ */
+/* ÈºÁÄÊÂ¼ş type = 2 from_anonymous_base64ÊµÏÖ²»ÍêÕû */
 extern "C" __int32 __stdcall event_group_message(__int32 sub_type, __int32 msg_id, __int64 from_group, __int64 from_qq, const char *from_anonymous_base64,const char *msg, __int32 font)
 {
 	return 0;
 }
 
-/* è®¨è®ºç»„äº‹ä»¶ type = 4 */
+/* ÌÖÂÛ×éÊÂ¼ş type = 4 */
 extern "C" __int32 __stdcall event_discuss_message(__int32 sub_type, __int32 msg_id, __int64 from_discuss, __int64 from_qq, const char *msg, __int32 font)
 {
 	return 0;
 }
 
-/* ç¾¤æ–‡ä»¶ä¸Šä¼ äº‹ä»¶ type = 11 file_base64å®ç°ä¸å®Œæ•´*/
+/* ÈºÎÄ¼şÉÏ´«ÊÂ¼ş type = 11 file_base64ÊµÏÖ²»ÍêÕû*/
 extern "C" __int32 __stdcall event_group_upload(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char *file_base64)
 {
 	return 0;
 }
 
-/* ç¾¤ç®¡ç†å‘˜å˜åŠ¨äº‹ä»¶ type = 101 */
+/* Èº¹ÜÀíÔ±±ä¶¯ÊÂ¼ş type = 101 */
 extern "C" __int32 __stdcall event_group_admin(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 being_operate_qq)
 {
 	return 0;
 }
 
-/* ç¾¤æˆå‘˜å‡å°‘äº‹ä»¶ type = 102 */
+/* Èº³ÉÔ±¼õÉÙÊÂ¼ş type = 102 */
 extern "C" __int32 __stdcall event_group_member_decrease(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq)
 {
 	return 0;
 }
 
-/* ç¾¤æˆå‘˜å¢åŠ äº‹ä»¶ type = 103 */
+/* Èº³ÉÔ±Ôö¼ÓÊÂ¼ş type = 103 */
 extern "C" __int32 __stdcall event_group_member_increase(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq)
 {
 	return 0;
 }
 
-/* ç¾¤ç¦è¨€äº‹ä»¶ type = 104 */
+/* Èº½ûÑÔÊÂ¼ş type = 104 */
 extern "C" __int32 __stdcall event_group_ban(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq, __int64 duration)
 {
 	return 0;
 }
 
-/* å¥½å‹æ·»åŠ äº‹ä»¶ type = 201 */
+/* ºÃÓÑÌí¼ÓÊÂ¼ş type = 201 */
 extern "C" __int32 __stdcall event_friend_add(__int32 sub_type, __int32 send_time, __int64 from_qq)
 {
 	return 0;
 }
 
-/* åŠ å¥½å‹è¯·æ±‚äº‹ä»¶ type = 301 */
+/* ¼ÓºÃÓÑÇëÇóÊÂ¼ş type = 301 */
 extern "C" __int32 __stdcall event_friend_request(__int32 sub_type, __int32 send_time, __int64 from_qq, const char *msg, const char *response_flag)
 {
 	return 0;
 }
 
-/* åŠ ç¾¤è¯·æ±‚ï¼é‚€è¯·äº‹ä»¶ type = 302 */
+/* ¼ÓÈºÇëÇó£¯ÑûÇëÊÂ¼ş type = 302 */
 extern "C" __int32 __stdcall event_group_request(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char *msg, const char *response_flag)
 {
 	return 0;
 }
 
-/* æ’ä»¶åœç”¨äº‹ä»¶ type = 1004 æ°¸ä¸è°ƒç”¨ */
+/* ²å¼şÍ£ÓÃÊÂ¼ş type = 1004 ÓÀ²»µ÷ÓÃ */
 extern "C" __int32 __stdcall event_disable()
 {
 	return 0;
 }
 
-/* æ¡†æ¶é€€å‡ºäº‹ä»¶ type = 1002 */
+/* ¿ò¼ÜÍË³öÊÂ¼ş type = 1002 */
 extern "C" __int32 __stdcall event_coolq_exit()
 {
 	return 0;
 }
 
-/* menu-æ£€æŸ¥æ›´æ–°äº‹ä»¶ */
+/* menu-¼ì²é¸üĞÂÊÂ¼ş */
 extern "C" __int32 __stdcall menu_check_update()
 {
-	MessageBoxA(NULL,"æ£€æŸ¥æ›´æ–°æŒ‰é’®è¢«ç‚¹å‡»","INFO",MB_OK);
+	MessageBoxA(NULL,"¼ì²é¸üĞÂ°´Å¥±»µã»÷","INFO",MB_OK);
 	return 0;
 }
 

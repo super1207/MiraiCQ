@@ -85,7 +85,7 @@ TEMP_EVENT_FUN(event_group_message)
 	return EVENT_BLOCK;
 }
 
-/* 目前没有discuss了 */
+/* Ŀǰû��discuss�� */
 TEMP_EVENT_FUN(event_discuss_message)
 {
 	return EVENT_BLOCK;

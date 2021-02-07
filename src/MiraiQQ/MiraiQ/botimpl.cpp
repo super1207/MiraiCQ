@@ -124,7 +124,7 @@ public:
 		}
 		catch (websocketpp::exception const & e)
 		{
-			//宸茬粡鍏抽棴锛屾棤闇�log
+			//已经关闭，无需log
 			//std::cout << e.what() << std::endl;
 		}
 		if(thrd != 0)

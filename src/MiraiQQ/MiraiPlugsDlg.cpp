@@ -1,4 +1,4 @@
-ï»¿// MiraiPlugsDlg.cpp : å®ç°æ–‡ä»¶
+// MiraiPlugsDlg.cpp : ÊµÏÖÎÄ¼ş
 //
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "MiraiQ/MIraiQ.h"
 #include <boost/lexical_cast.hpp> 
 
-// CMiraiPlugsDlg å¯¹è¯æ¡†
+// CMiraiPlugsDlg ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CMiraiPlugsDlg, CDialog)
 
@@ -40,9 +40,9 @@ BOOL CMiraiPlugsDlg::OnInitDialog()
 {
 	CListCtrl * list_ctrl = (CListCtrl*)GetDlgItem(IDC_LIST1);
 	list_ctrl->SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	list_ctrl->InsertColumn(0, _T("åç§°"), LVCFMT_LEFT, 100);
-	list_ctrl->InsertColumn(1, _T("ç‰ˆæœ¬"), LVCFMT_LEFT, 100); 
-	list_ctrl->InsertColumn(2, _T("ä½œè€…"), LVCFMT_LEFT, 100); 
+	list_ctrl->InsertColumn(0, _T("Ãû³Æ"), LVCFMT_LEFT, 100);
+	list_ctrl->InsertColumn(1, _T("°æ±¾"), LVCFMT_LEFT, 100); 
+	list_ctrl->InsertColumn(2, _T("×÷Õß"), LVCFMT_LEFT, 100); 
 	list_ctrl->InsertColumn(3, _T(""), LVCFMT_LEFT, 3); 
 	MiraiQ * mq = MiraiQ::getInstance();
 	std::map<__int32,Plus::PlusDef> plus_map = mq->get_plus_ptr()->get_plus_map();
@@ -61,14 +61,14 @@ BOOL CMiraiPlugsDlg::OnInitDialog()
 }
 
 
-// CMiraiPlugsDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMiraiPlugsDlg ÏûÏ¢´¦Àí³ÌĞò
 
 void CMiraiPlugsDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	//LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<NMITEMACTIVATE>(pNMHDR);
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 
-	//å¾—åˆ°é€‰ä¸­çš„æ’ä»¶çš„AC
+	//µÃµ½Ñ¡ÖĞµÄ²å¼şµÄAC
 	CListCtrl * list_ctrl = (CListCtrl*)GetDlgItem(IDC_LIST1);
 	POSITION pos=list_ctrl->GetFirstSelectedItemPosition();
 	int nId=(int)list_ctrl->GetNextSelectedItem(pos);
@@ -80,13 +80,13 @@ void CMiraiPlugsDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	
 	
 
-	//æ ¹æ®ACå¾—åˆ°æè¿°
+	//¸ù¾İACµÃµ½ÃèÊö
 	MiraiQ * mq = MiraiQ::getInstance();
 	int int_ac =  boost::lexical_cast<__int32>(ac_str);
 	std::map<__int32,Plus::PlusDef> plus_map = mq->get_plus_ptr()->get_plus_map();
 	Plus::PlusDef & plusdef = plus_map[int_ac];
 	
-	//è®¾ç½®æè¿°
+	//ÉèÖÃÃèÊö
 	CEdit * des_edit = (CEdit*)GetDlgItem(IDC_EDIT1);
 	des_edit->SetWindowText(plusdef.description.c_str());
 	GetDlgItem(IDC_STATIC1)->SetWindowText(plusdef.author.c_str());
@@ -96,12 +96,12 @@ void CMiraiPlugsDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CMiraiPlugsDlg::OnBnClickedButton2()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CListCtrl * list_ctrl = (CListCtrl*)GetDlgItem(IDC_LIST1);
 	int current_pos =  list_ctrl->GetSelectionMark();
 	if(current_pos == -1)
 	{
-		AfxMessageBox(_T("è¯·é€‰ä¸­ä¸€ä¸ªæ’ä»¶"));
+		AfxMessageBox(_T("ÇëÑ¡ÖĞÒ»¸ö²å¼ş"));
 		return ;
 	}
 

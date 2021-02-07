@@ -1,21 +1,21 @@
 #pragma once
 
 
-// CMiraiContrlDlg å¯¹è¯æ¡†
+// CMiraiContrlDlg ¶Ô»°¿ò
 
 class CMiraiContrlDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CMiraiContrlDlg)
 
 public:
-	CMiraiContrlDlg(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
+	CMiraiContrlDlg(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
 	virtual ~CMiraiContrlDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_MIRAICONTRLDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
 	DECLARE_MESSAGE_MAP()
 public:

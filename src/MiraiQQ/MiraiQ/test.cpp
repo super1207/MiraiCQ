@@ -10,14 +10,14 @@
 #include "MIraiQ.h"
 #include "plus.h"
 
-//å¾—åˆ°æ‰§è¡Œçš„exeçš„åå­—å’Œè·¯å¾„(windows)
+//µÃµ½Ö´ĞĞµÄexeµÄÃû×ÖºÍÂ·¾¶(windows)
 static void get_program_dir(std::string &path_name, std::string &exe_name)
 {
 	char exe_path[MAX_PATH];
 	if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) == 0)
 	{
 		return ;
-		//throw logic_error("GetModuleFileNameAé”™è¯¯");
+		//throw logic_error("GetModuleFileNameA´íÎó");
 	}
 	std::string exe_path_string = exe_path;
 	size_t pos = exe_path_string.find_last_of('\\', exe_path_string.length());
@@ -27,7 +27,7 @@ static void get_program_dir(std::string &path_name, std::string &exe_name)
 
 void keyfun()
 {
-	BOOST_LOG_TRIVIAL(info) << "æ¬¢è¿ä½¿ç”¨MiraiQ";
+	BOOST_LOG_TRIVIAL(info) << "»¶Ó­Ê¹ÓÃMiraiQ";
 	while(true)
 	{
 		try
@@ -82,7 +82,7 @@ int runBot()
 		if(!is_first)
 		{
 			//BOOST_LOG_TRIVIAL(debug) << "get_program_dir";
-			//åŠ è½½æ‰€æœ‰æ’ä»¶
+			//¼ÓÔØËùÓĞ²å¼ş
 			std::string path_name, exe_name;
 			get_program_dir(path_name, exe_name);
 			std::vector<boost::filesystem::path>  dll_path_vec = MiraiQ::get_plus_ptr()->find_plus_file(boost::filesystem::path(path_name)/"app");
@@ -93,13 +93,13 @@ int runBot()
 			}
 	
 			//BOOST_LOG_TRIVIAL(debug) << "call_cq_start_fun";
-			//è°ƒç”¨ï¼šå¯åŠ¨
+			//µ÷ÓÃ£ºÆô¶¯
 			mq->call_cq_start_fun();
 	
 			//BOOST_LOG_TRIVIAL(debug) << "get_plus_id_list";
 			std::vector<__int32> ac_list = mq->get_plus_id_list();
 
-			//è°ƒç”¨ï¼šå¯ç”¨
+			//µ÷ÓÃ£ºÆôÓÃ
 			for (size_t i = 0; i < ac_list.size();++i)
 			{
 				mq->enable_plus(ac_list[i]);
@@ -111,15 +111,15 @@ int runBot()
 			__int32 ret = mq->deal_a_message();
 			if(ret == -1)
 			{
-				BOOST_LOG_TRIVIAL(info) << "å·²ç»æ–­çº¿ï¼Œäº”ç§’åé‡æ–°è¿æ¥";
+				BOOST_LOG_TRIVIAL(info) << "ÒÑ¾­¶ÏÏß£¬ÎåÃëºóÖØĞÂÁ¬½Ó";
 				boost::this_thread::sleep_for(boost::chrono::seconds(5));
-				BOOST_LOG_TRIVIAL(info) << "æ­£åœ¨é‡æ–°è¿æ¥......";
+				BOOST_LOG_TRIVIAL(info) << "ÕıÔÚÖØĞÂÁ¬½Ó......";
 				if(mq->bot_connect() == MIRAI_OK)
 				{
-					BOOST_LOG_TRIVIAL(info) << "é‡æ–°è¿æ¥æˆåŠŸ" ;
+					BOOST_LOG_TRIVIAL(info) << "ÖØĞÂÁ¬½Ó³É¹¦" ;
 				}else
 				{
-					BOOST_LOG_TRIVIAL(info) << "é‡æ–°è¿æ¥å¤±è´¥" ;
+					BOOST_LOG_TRIVIAL(info) << "ÖØĞÂÁ¬½ÓÊ§°Ü" ;
 				}
 				
 			}else if(ret == 0)  //no message be dealed
