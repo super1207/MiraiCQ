@@ -151,12 +151,10 @@ FFUN1(__int32, setGroupBan, __int32 auth_code, __int64 group_id, __int64 qq, __i
 }
 FFUN1(__int32, setGroupAnonymousBan, __int32 auth_code, __int64 group_id, const char *anonymous, __int64 duration)
 {
-
-	//TODO...
-	//CHECK_AC(auth_code,pdf)
-	//Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAnonymousBan(group_id,(anonymous?anonymous:""),duration);
-	//CHECK_RET(ret_json,retcode)
-	return FUN_NOT_EXIST;
+	CHECK_AC(auth_code,pdf)
+		Json::Value ret_json = MiraiQ::get_bot_ptr()->setGroupAnonymousBan(group_id,(anonymous?anonymous:""),duration);
+	CHECK_RET(ret_json,retcode)
+		return 0;
 }
 FFUN1(__int32, setGroupWholeBan, __int32 auth_code, __int64 group_id, cq_bool_t enable) 
 {

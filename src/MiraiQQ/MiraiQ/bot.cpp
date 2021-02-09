@@ -1,4 +1,6 @@
 #include "bot.h"
+#include "binpack.h"
+#include "base64.h"
 
 #define cq_bool_t __int32
 #define DEFAULT_TIMEOUT 5000
@@ -69,7 +71,19 @@ Json::Value Bot::setGroupAnonymousBan(__int64 group_id, const char *anonymous, _
 	Json::Value outroot;
 	outroot["action"] = "set_group_anonymous_ban";
 	outroot["params"]["group_id"] = group_id;
-	outroot["params"]["anonymous"] = (anonymous?anonymous:"");
+	if(strcmp(anonymous,"") == 0)
+	{
+		outroot["params"]["flag"] = "";
+	}else
+	{
+		std::vector<char> vec;
+		std::string str = base64_decode(anonymous);
+		BinPack bin(std::vector<char>(str.begin(),str.end()));
+		bin.int64_pop();
+		bin.string_pop();
+		outroot["params"]["flag"] = bin.string_pop();
+
+	}
 	outroot["params"]["duration"] = duration;
 	return send(outroot,DEFAULT_TIMEOUT);
 }

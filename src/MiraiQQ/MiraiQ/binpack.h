@@ -4,6 +4,7 @@
 class BinPack {
 public:
 	std::vector<char> content;
+	size_t curr;
 	void string_push(const std::string & str)
 	{
 		size_t len = str.length();
@@ -79,6 +80,48 @@ public:
 		}
 		byte_push(&token[0],len);
 
+	}
+
+
+	BinPack(const std::vector<char> & content)  {
+		this->content = content;
+		curr = 0;
+	}
+	BinPack()  {
+		curr = 0;
+	}
+	__int64 int64_pop()
+	{
+		std::vector<char> s(content.begin()+curr,content.begin()+curr+8);
+		std::reverse(s.begin(), s.end());
+		__int64 result;
+		std::memcpy(static_cast<void *>(&result), &s.at(0), s.size());
+		curr += 8;
+		return result;
+	}
+	__int16 int16_pop()
+	{
+		std::vector<char> s(content.begin()+curr,content.begin()+curr+2);
+		std::reverse(s.begin(), s.end());
+		__int16 result;
+		std::memcpy(static_cast<void *>(&result), &s.at(0), s.size());
+		curr += 2;
+		return result;
+	}
+
+	std::string string_pop()
+	{
+		__int16 len = int16_pop();
+		if (len == 0) {
+			return std::string();
+		}
+		std::string result;
+		for(size_t i = curr;i < curr + len;++i)
+		{
+			result += (content.at(i));
+		}
+		curr += len;
+		return result;
 	}
 	/*BinPack() : bytes_(""), curr_(0) {
 	}

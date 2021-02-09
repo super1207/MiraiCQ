@@ -55,11 +55,10 @@ TEMP_EVENT_FUN(event_private_message)
 
 TEMP_EVENT_FUN(event_group_message)
 {
-	//TODO... base64...
 	GET_FUNPTR(event_group_message)
 	std::string from_anonymous_base64;
 
-	/*Json::Value anonymous = root["anonymous"];
+	Json::Value anonymous = root["anonymous"];
 	if(anonymous.isObject())
 	{
 		__int64 id = anonymous["id"].asInt64();
@@ -68,10 +67,10 @@ TEMP_EVENT_FUN(event_group_message)
 		BinPack bin_pack;
 		bin_pack.int64_push(id);
 		bin_pack.string_push(name);
-		bin_pack.token_push(std::vector<char>());
+		bin_pack.token_push(std::vector<char>(flag.begin(),flag.end()));
 		from_anonymous_base64 = base64_encode((const unsigned char *)(&(bin_pack.content[0])),bin_pack.content.size());
 
-	}*/
+	}
 
 	std::string msg = to_gbk(root["message"].asString());
 
@@ -93,7 +92,6 @@ TEMP_EVENT_FUN(event_discuss_message)
 
 TEMP_EVENT_FUN(event_group_upload)
 {
-	//TODO... base64...
 	GET_FUNPTR(event_group_upload)
 
 	std::string file_base64;
@@ -111,7 +109,6 @@ TEMP_EVENT_FUN(event_group_upload)
 		bin_pack.string_push(name);
 		bin_pack.int64_push(size);
 		bin_pack.int64_push(busid);
-		bin_pack.token_push(std::vector<char>());
 		file_base64 = base64_encode((const unsigned char *)(&(bin_pack.content[0])),bin_pack.content.size());
 
 	}
