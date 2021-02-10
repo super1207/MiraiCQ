@@ -99,7 +99,7 @@ extern "C" __int32 __stdcall event_discuss_message(__int32 sub_type, __int32 msg
 	return 0;
 }
 
-/* 群文件上传事件 type = 11 file_base64实现不完整*/
+/* 群文件上传事件 type = 11 file_base64实现不完整 */
 extern "C" __int32 __stdcall event_group_upload(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char *file_base64)
 {
 	return 0;
