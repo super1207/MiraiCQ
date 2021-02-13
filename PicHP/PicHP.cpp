@@ -2,6 +2,9 @@
 //
 
 #include "stdafx.h"
+#include <string>
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
 #pragma comment(lib, "CQP.lib")
 
@@ -79,7 +82,6 @@ extern "C" __int32 __stdcall event_enable()
 	return 0;
 }
 
-
 /* 私聊事件 type = 21 */
 extern "C" __int32 __stdcall event_private_message(__int32 sub_type, __int32 msg_id, __int64 from_qq, const char *msg, __int32 font)
 {
@@ -131,6 +133,29 @@ extern "C" __int32 __stdcall event_group_ban(__int32 sub_type, __int32 send_time
 
 /* 好友添加事件 type = 201 */
 extern "C" __int32 __stdcall event_friend_add(__int32 sub_type, __int32 send_time, __int64 from_qq)
+{
+	return 0;
+}
+
+/* (拓展)群内戳一戳事件,user_id为发送者QQ type = 202 */
+extern "C" __int32 __stdcall event_notify_pock(__int64 group_id, __int64 user_id, __int64 target_id)
+{
+	if(target_id == CQ_getLoginQQ(sg_authCode))
+	{
+		CQ_sendGroupMsg(sg_authCode,group_id,"不准戳~");
+	}
+	
+	return 0;
+}
+
+/* (拓展)群内运气王事件,user_id为发红包者QQ type = 203 */
+extern "C" __int32 __stdcall event_notify_lucky_king(__int64 group_id, __int64 user_id, __int64 target_id)
+{
+	return 0;
+}
+
+/* (拓展)群内荣誉变更事件,honor_type可以为talkative、performer、emotion type = 204 */
+extern "C" __int32 __stdcall event_notify_honor(__int64 group_id, const char * honor_type, __int64 user_id)
 {
 	return 0;
 }

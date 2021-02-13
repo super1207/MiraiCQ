@@ -95,6 +95,9 @@ public:
 	typedef __int32(  __stdcall * cq_funtype(event_group_member_increase))(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq);
 	typedef __int32(  __stdcall * cq_funtype(event_group_ban))(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq, __int64 duration);
 	typedef __int32(  __stdcall * cq_funtype(event_friend_add))(__int32 sub_type, __int32 send_time, __int64 from_qq);
+	typedef __int32(  __stdcall * cq_funtype(event_notify_pock))(__int64 group_id, __int64 user_id,__int64 target_id);
+	typedef __int32(  __stdcall * cq_funtype(event_notify_lucky_king))(__int64 group_id, __int64 user_id,__int64 target_id);
+	typedef __int32(  __stdcall * cq_funtype(event_notify_honor))(__int64 group_id, const char * honor_type,__int64 user_id);
 	typedef __int32(  __stdcall * cq_funtype(event_friend_request))(__int32 sub_type, __int32 send_time, __int64 from_qq, const char *msg, const char *response_flag);
 	typedef __int32(  __stdcall * cq_funtype(event_group_request))(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char *msg, const char *response_flag);
 	
@@ -114,6 +117,9 @@ public:
 		cq_funid(event_group_member_increase,103),
 		cq_funid(event_group_ban,104),
 		cq_funid(event_friend_add,201),
+		cq_funid(event_notify_pock,202),
+		cq_funid(event_notify_lucky_king,203),
+		cq_funid(event_notify_honor,204),
 		cq_funid(event_friend_request,301),
 		cq_funid(event_group_request,302)
 	};

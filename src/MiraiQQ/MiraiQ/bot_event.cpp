@@ -214,6 +214,40 @@ TEMP_EVENT_FUN(event_friend_add)
 	return EVENT_BLOCK;
 }
 
+TEMP_EVENT_FUN(event_notify)
+{
+	if(root["sub_type"] == "poke")
+	{
+		GET_FUNPTR(event_notify_pock)
+		__int32 ret = fun_ptr(root["group_id"].asInt64(),root["user_id"].asInt64(),root["target_id"].asInt64());
+		if(ret == 0)
+		{
+			return EVENT_IGNORE;
+		}
+		return EVENT_BLOCK;
+	}else if(root["sub_type"] == "lucky_king")
+	{
+		GET_FUNPTR(event_notify_lucky_king)
+		__int32 ret = fun_ptr(root["group_id"].asInt64(),root["user_id"].asInt64(),root["target_id"].asInt64());
+		if(ret == 0)
+		{
+			return EVENT_IGNORE;
+		}
+		return EVENT_BLOCK;
+	}else if(root["sub_type"] == "honor")
+	{
+		
+		GET_FUNPTR(event_notify_honor)
+			__int32 ret = fun_ptr(root["group_id"].asInt64(),root["honor_type"].asCString(),root["user_id"].asInt64());
+		if(ret == 0)
+		{
+			return EVENT_IGNORE;
+		}
+		return EVENT_BLOCK;
+	}
+	return EVENT_BLOCK;
+}
+
 TEMP_EVENT_FUN(event_friend_request)
 {
 	GET_FUNPTR(event_friend_request)
@@ -286,6 +320,7 @@ CALL_FUN_EVENT(event_group_member_decrease,_,_)
 CALL_FUN_EVENT(event_group_member_increase,_,_)
 CALL_FUN_EVENT(event_group_ban,_,_)
 CALL_FUN_EVENT(event_friend_add,_,_)
+CALL_FUN_EVENT(event_notify,_,_)
 CALL_FUN_EVENT(event_friend_request,_,_)
 CALL_FUN_EVENT(event_group_request,_,_)
 
@@ -307,6 +342,7 @@ void init_event_map()
 	g_message_map["notice"]["group_increase"] = CALL_FUNNAME(event_group_member_increase);
 	g_message_map["notice"]["group_ban"] = CALL_FUNNAME(event_group_ban);
 	g_message_map["notice"]["friend_add"] = CALL_FUNNAME(event_friend_add);
+	g_message_map["notice"]["notify"] = CALL_FUNNAME(event_notify);
 	g_message_map["request"]["friend"] = CALL_FUNNAME(event_friend_request);
 	g_message_map["request"]["group"] = CALL_FUNNAME(event_group_request);
 };

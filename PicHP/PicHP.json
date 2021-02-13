@@ -49,6 +49,18 @@
       "function": "event_friend_add"
     },
     {
+      "type": 202,
+      "function": "event_notify_pock"
+    },
+    {
+      "type": 203,
+      "function": "event_notify_lucky_king"
+    },
+    {
+      "type": 204,
+      "function": "event_notify_honor"
+    },
+    {
       "type": 301,
       "function": "event_friend_request"
     },

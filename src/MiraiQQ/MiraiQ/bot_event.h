@@ -20,6 +20,7 @@ __int32 call_event_group_member_decrease(const Json::Value & ,boost::shared_ptr<
 __int32 call_event_group_member_increase(const Json::Value & ,boost::shared_ptr<Plus>);
 __int32 call_event_group_ban(const Json::Value & ,boost::shared_ptr<Plus>);
 __int32 call_event_friend_add(const Json::Value & ,boost::shared_ptr<Plus>);
+__int32 call_event_notify(const Json::Value & ,boost::shared_ptr<Plus>);
 __int32 call_event_friend_request(const Json::Value & ,boost::shared_ptr<Plus>);
 __int32 call_event_group_request(const Json::Value & ,boost::shared_ptr<Plus>);
 
