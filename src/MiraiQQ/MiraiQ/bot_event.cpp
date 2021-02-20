@@ -214,6 +214,32 @@ TEMP_EVENT_FUN(event_friend_add)
 	return EVENT_BLOCK;
 }
 
+TEMP_EVENT_FUN(event_group_recall)
+{
+	GET_FUNPTR(event_group_recall)
+	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
+	assert(msgid_convert);
+	__int32 ret = fun_ptr(root["group_id"].asInt64(),root["user_id"].asInt64(),root["operator_id"].asInt64(),msgid_convert->get_cq(root["message_id"].asInt()));
+	if(ret == 0)
+	{
+		return EVENT_IGNORE;
+	}
+	return EVENT_BLOCK;
+}
+
+TEMP_EVENT_FUN(event_friend_recall)
+{
+	GET_FUNPTR(event_friend_recall)
+	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
+	assert(msgid_convert);
+	__int32 ret = fun_ptr(root["user_id"].asInt64(),msgid_convert->get_cq(root["message_id"].asInt()));
+	if(ret == 0)
+	{
+		return EVENT_IGNORE;
+	}
+	return EVENT_BLOCK;
+}
+
 TEMP_EVENT_FUN(event_notify)
 {
 	if(root["sub_type"] == "poke")
@@ -320,6 +346,8 @@ CALL_FUN_EVENT(event_group_member_decrease,_,_)
 CALL_FUN_EVENT(event_group_member_increase,_,_)
 CALL_FUN_EVENT(event_group_ban,_,_)
 CALL_FUN_EVENT(event_friend_add,_,_)
+CALL_FUN_EVENT(event_group_recall,_,_)
+CALL_FUN_EVENT(event_friend_recall,_,_)
 CALL_FUN_EVENT(event_notify,_,_)
 CALL_FUN_EVENT(event_friend_request,_,_)
 CALL_FUN_EVENT(event_group_request,_,_)
@@ -342,6 +370,8 @@ void init_event_map()
 	g_message_map["notice"]["group_increase"] = CALL_FUNNAME(event_group_member_increase);
 	g_message_map["notice"]["group_ban"] = CALL_FUNNAME(event_group_ban);
 	g_message_map["notice"]["friend_add"] = CALL_FUNNAME(event_friend_add);
+	g_message_map["notice"]["group_recall"] = CALL_FUNNAME(event_group_recall);
+	g_message_map["notice"]["friend_recall"] = CALL_FUNNAME(event_friend_recall);
 	g_message_map["notice"]["notify"] = CALL_FUNNAME(event_notify);
 	g_message_map["request"]["friend"] = CALL_FUNNAME(event_friend_request);
 	g_message_map["request"]["group"] = CALL_FUNNAME(event_group_request);

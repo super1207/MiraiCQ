@@ -61,6 +61,14 @@
       "function": "event_notify_honor"
     },
     {
+      "type": 205,
+      "function": "event_group_recall"
+    },
+    {
+      "type": 206,
+      "function": "event_friend_recall"
+    },
+    {
       "type": 301,
       "function": "event_friend_request"
     },

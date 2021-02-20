@@ -12,6 +12,8 @@ EXPORTS
 	event_group_member_increase
 	event_group_ban
 	event_friend_add
+	event_group_recall
+	event_friend_recall
 	event_notify_pock
 	event_notify_lucky_king
 	event_notify_honor

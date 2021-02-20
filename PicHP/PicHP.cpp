@@ -2,9 +2,6 @@
 //
 
 #include "stdafx.h"
-#include <string>
-#include <vector>
-#include <boost/algorithm/string.hpp>
 
 #pragma comment(lib, "CQP.lib")
 
@@ -25,7 +22,7 @@ extern "C" __int32 __stdcall CQ_sendLikeV2(__int32 auth_code, __int64 qq, __int3
 
 extern "C" __int32 __stdcall CQ_setGroupKick(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t reject_add_request);
 extern "C" __int32 __stdcall CQ_setGroupBan(__int32 auth_code, __int64 group_id, __int64 qq, __int64 duration);
-extern "C" __int32 __stdcall CQ_setGroupAnonymousBan(__int32 auth_code, __int64 group_id, const char *anonymous, __int64 duration);  //未实现
+extern "C" __int32 __stdcall CQ_setGroupAnonymousBan(__int32 auth_code, __int64 group_id, const char *anonymous, __int64 duration);
 extern "C" __int32 __stdcall CQ_setGroupWholeBan(__int32 auth_code, __int64 group_id, cq_bool_t enable);
 extern "C" __int32 __stdcall CQ_setGroupAdmin(__int32 auth_code, __int64 group_id, __int64 qq, cq_bool_t set);
 extern "C" __int32 __stdcall CQ_setGroupAnonymous(__int32 auth_code, __int64 group_id, cq_bool_t enable);
@@ -156,6 +153,18 @@ extern "C" __int32 __stdcall event_notify_lucky_king(__int64 group_id, __int64 u
 
 /* (拓展)群内荣誉变更事件,honor_type可以为talkative、performer、emotion type = 204 */
 extern "C" __int32 __stdcall event_notify_honor(__int64 group_id, const char * honor_type, __int64 user_id)
+{
+	return 0;
+}
+
+/* (拓展)群聊消息撤回事件,user_id为消息发送者QQ type = 205 */
+extern "C" __int32 __stdcall event_group_recall(__int64 group_id, __int64 user_id, __int64 operator_id,__int32 message_id)
+{
+	return 0;
+}
+
+/* (拓展)私聊消息撤回事件 type = 206 */
+extern "C" __int32 __stdcall event_friend_recall(__int64 user_id, __int32 message_id)
 {
 	return 0;
 }

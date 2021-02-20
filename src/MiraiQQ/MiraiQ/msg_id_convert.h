@@ -10,6 +10,8 @@ public:
 
 	 __int32 to_web(__int32 cq_msg_id);
 
+	 __int32 get_cq(__int32 web_msg_id);
+
 	 static MsgIdConvert * getInstance();
 
 private:

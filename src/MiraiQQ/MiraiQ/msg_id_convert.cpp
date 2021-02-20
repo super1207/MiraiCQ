@@ -24,6 +24,19 @@ __int32 MsgIdConvert::to_cq(__int32 web_msg_id)
 	return gs_current_cq_msg_id;
 }
 
+__int32 MsgIdConvert::get_cq(__int32 web_msg_id)
+{
+	boost::shared_lock<boost::shared_mutex> read_data(rw_mutex);
+	for(size_t i = 0;i < gs_cb.size();++i)
+	{
+		if(gs_cb[i].second == web_msg_id)
+		{
+			return gs_cb[i].first;
+		}
+	}
+	throw std::exception("get_cq:the message_id is not exist!");
+}
+
 __int32 MsgIdConvert::to_web(__int32 cq_msg_id)
 {
 	boost::shared_lock<boost::shared_mutex> read_data(rw_mutex);
