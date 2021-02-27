@@ -186,6 +186,26 @@ authCode：调用API必备的参数
 
 返回值：无意义
 
+###  (拓展)群聊消息撤回事件,user_id为消息发送者QQ（type = 205）
+
+原型：__int32 event_group_recall(__int64 group_id, __int64 user_id, __int64 operator_id,__int32 message_id)
+
+说明：略
+
+参数：略
+
+返回值：无意义
+
+###  (拓展)私聊消息撤回事件（type = 206）
+
+原型：__int32 event_friend_recall(__int64 user_id, __int32 message_id)
+
+说明：略
+
+参数：略
+
+返回值：无意义
+
 ### 加好友请求（type = 301）
 
 原型：与酷Q保持一致
