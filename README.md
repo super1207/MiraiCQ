@@ -14,7 +14,8 @@ clone本项目，双击test.sln文件，点击生成解决方案即可完成编�
 ## 如何运行
 首先，需要启动一个实现了 OneBot 标准的框架，例如 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) <br />
 开启 正向 websocket 接口，端口号默认为 6700 <br />
-运行上一步骤生成的exe文件，将酷Q的xxx.dll与xxx.json放入自动生成的app文件夹中即可加载
+运行上一步骤生成的exe文件，将酷Q的xxx.dll与xxx.json放入自动生成的app文件夹中即可加载 <br />
+[json生成工具](https://github.com/super1207/MiraiCQ_Json_Gen)已经可以用啦，快速生成符合MiraiCQ标准的Json文件！
 ## 快速体验
 此处提供一个快速体验(预览)版本，但是不保证能及时更新: <br />
 [fast_try_0_1.7z](https://super1207.lanzous.com/iZmv9h7ak7g)
