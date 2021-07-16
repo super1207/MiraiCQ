@@ -18,8 +18,7 @@ clone本项目，双击test.sln文件，点击生成解决方案即可完成编�
 [json生成工具](https://github.com/super1207/MiraiCQ_Json_Gen)已经可以用啦，快速生成符合MiraiCQ标准的Json文件！
 ## 快速体验
 此处提供一个快速体验(预览)版本，但是不保证能及时更新: <br />
-[fast_try_0_4.7z](https://super1207.lanzoux.com/iHLVCm8hpqd) <br /><br />
-
+[fast_try_0_5.rar](https://super1207.lanzoui.com/ixbNKrh8lad) <br /><br />
 PicHP是一个私聊复读机的插件示例
 ## 当前缺陷
 <1> 目前并没有完整实现了 OneBot 标准的框架 <br />
