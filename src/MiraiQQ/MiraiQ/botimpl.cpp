@@ -39,9 +39,10 @@ public:
 class BotImpl:public Bot
 {
 public:
-	BotImpl(const std::string & ws_url = "ws://localhost:6700",size_t buffer_size = 1024)
+	BotImpl(const std::string & ws_url = "ws://localhost:6700",const std::string & access_token = "",size_t buffer_size = 1024)
 	{
 		this->ws_url = ws_url;
+		this->access_token = access_token;
 		this->isconnect = false;
 		this->thrd = NULL;
 		c.bot = this;
@@ -74,6 +75,10 @@ public:
 			
 			websocketpp::lib::error_code ec;
 			client::connection_ptr con = c.get_connection(ws_url, ec);
+			if(access_token != "")
+			{
+				con->append_header("Authorization", "Bearer " + access_token);
+			}
 			hdl = con->get_handle();
 			if (ec) 
 			{
@@ -285,6 +290,7 @@ private:
 	websocketpp::connection_hdl  hdl;
 	boost::recursive_mutex mx;
 	std::string ws_url;
+	std::string access_token;
 	myclient c;
 	//0:ready to connect //2:connecting //3:connected //4:disconnecting //5:can't use 
 	mutable boost::atomic<__int32> isconnect; 
@@ -295,9 +301,9 @@ private:
 };
 
 
-Bot * Bot::getInstance(const std::string & ws_url,size_t buffer_size)
+Bot * Bot::getInstance(const std::string & ws_url,const std::string & access_token,size_t buffer_size)
 {
-	return new BotImpl(ws_url,buffer_size);
+	return new BotImpl(ws_url,access_token,buffer_size);
 }
 
 

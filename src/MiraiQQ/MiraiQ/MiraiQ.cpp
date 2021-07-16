@@ -33,6 +33,7 @@ static __int32 gs_is_bot_connect;
 static boost::recursive_mutex gs_mutex;
 static boost::recursive_mutex gs_mutex_data;
 static std::string gs_url;
+static std::string gs_access_token;
 
 
 static boost::asio::io_service gs_io_service;
@@ -84,7 +85,7 @@ std::string MiraiQ::get_bot_url()
 //MIRAI_OK
 //MIRAIQ_BOT_NOT_CONNECT
 //MIRAIQ_BOT_IS_CONNECT
-__int32 MiraiQ::bot_connect(const std::string & url_set)
+__int32 MiraiQ::bot_connect(const std::string & url_set,const std::string & access_token_set)
 {
 	LOCK_AREA
 	{
@@ -94,6 +95,7 @@ __int32 MiraiQ::bot_connect(const std::string & url_set)
 		}
 	}
 	std::string url;
+	std::string access_token;
 	{
 		LOCK_DATA
 		if(url_set == "")
@@ -103,10 +105,18 @@ __int32 MiraiQ::bot_connect(const std::string & url_set)
 		{
 			url = url_set;
 			gs_url = url;
+		}
+		if(access_token_set == "")
+		{
+			access_token = gs_access_token;
+		}else
+		{
+			access_token = access_token_set;
+			gs_access_token = access_token;
 
 		}
 	}
-	boost::shared_ptr<Bot> bot(Bot::getInstance(url));
+	boost::shared_ptr<Bot> bot(Bot::getInstance(url,access_token));
 	if(!bot)
 	{
 		return MIRAIQ_BOT_NOT_CONNECT;

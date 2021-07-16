@@ -37,7 +37,7 @@ public:
 	virtual std::string get_bot_url();
 
 	/* 连接 */
-	virtual __int32 bot_connect(const std::string & url = "");
+	virtual __int32 bot_connect(const std::string & url = "",const std::string & access_token = "");
 
 	/* 断开连接 */
 	virtual __int32 bot_disconnect();

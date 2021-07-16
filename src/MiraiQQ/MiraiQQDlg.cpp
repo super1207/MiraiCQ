@@ -215,10 +215,12 @@ void CMiraiQQDlg::OnBnClickedButton1()
 	}
 
 	CString ws_url;
+	CString access_token;
 	GetDlgItem(IDC_EDIT1)->GetWindowText(ws_url);
+	GetDlgItem(IDC_EDIT2)->GetWindowText(access_token);
 	MiraiQ * mq = MiraiQ::getInstance();
 	assert(mq);
-	if(mq->bot_connect(ws_url.GetBuffer(0)) != MIRAI_OK)
+	if(mq->bot_connect(ws_url.GetBuffer(0),access_token.GetBuffer(0)) != MIRAI_OK)
 	{
 		AfxMessageBox(_T("µÇÂ½Ê§°Ü"));
 		return ;

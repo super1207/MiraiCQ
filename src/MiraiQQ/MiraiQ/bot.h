@@ -74,7 +74,7 @@ public:
 	
 
 
-	static Bot * getInstance(const std::string & ws_url = "ws://localhost:6700",size_t buffer_size = 1024);
+	static Bot * getInstance(const std::string & ws_url = "ws://localhost:6700",const std::string & access_token = "",size_t buffer_size = 1024);
 	virtual ~Bot(){};
 protected:
 	
