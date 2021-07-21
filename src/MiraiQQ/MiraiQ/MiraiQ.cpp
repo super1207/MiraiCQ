@@ -310,6 +310,7 @@ __int32 MiraiQ::deal_a_message()
 	{
 		return 0;
 	}
+	gs_io_service.post(boost::bind(g_message_map["all_event"][""], root,plus));
 	std::string post_type,type2;
 	try
 	{

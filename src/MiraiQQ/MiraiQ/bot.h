@@ -71,6 +71,9 @@ public:
 	Json::Value addLog(  __int32 log_level, const char *category, const char *log_msg) ;
 	Json::Value setFatal(  const char *error_info) ;
 	Json::Value setRestart( ) ; // currently ineffective
+
+	Json::Value sendWs(const std::string & msg,unsigned int timeout,int & ret);
+
 	
 
 

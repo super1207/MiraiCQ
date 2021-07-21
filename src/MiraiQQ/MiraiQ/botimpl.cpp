@@ -182,8 +182,15 @@ public:
 		websocketpp::lib::error_code ec;
 		std::string outstr = Json::FastWriter().write(outroot);
 		BOOST_LOG_TRIVIAL(debug) << outstr;
-		c.send(hdl,outstr,  websocketpp::frame::opcode::text , ec);
-		BOOST_LOG_TRIVIAL(debug) << "send: "<<outroot.toStyledString(); 
+		c.send(hdl,outstr,  websocketpp::frame::opcode::text , ec);	
+		try{
+			std::string gbkmsg;
+			gbkmsg = boost::locale::conv::between(outroot.toStyledString(), "GBK", "UTF-8");
+			BOOST_LOG_TRIVIAL(debug) << "send: "<<gbkmsg; 
+		}catch(const std::exception & e){
+			BOOST_LOG_TRIVIAL(info) <<"error in on_message's to_gbk:"<< e.what();
+			BOOST_LOG_TRIVIAL(debug) << "send: "<<outroot.toStyledString(); 
+		}
 		if (ec) 
 		{
 			BOOST_LOG_TRIVIAL(info) << "send failed because: " << ec.message() ;

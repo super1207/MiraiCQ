@@ -351,3 +351,18 @@ Json::Value Bot::setRestart()
 {
 	return Json::Value();
 }
+
+Json::Value Bot::sendWs(const std::string & msg,unsigned int timeout,int & ret)
+{
+	ret = 0;
+	Json::Value root;
+	Json::Reader reader;
+	if(!reader.parse(msg, root))
+	{
+		ret = -1;
+		return Json::Value();
+	}
+	Json::Value retv = send(root,timeout);
+	if(retv.isNull())ret = -2;
+	return retv;
+}

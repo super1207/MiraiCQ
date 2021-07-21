@@ -102,7 +102,8 @@ public:
 	typedef __int32(  __stdcall * cq_funtype(event_notify_honor))(__int64 group_id, const char * honor_type,__int64 user_id);
 	typedef __int32(  __stdcall * cq_funtype(event_friend_request))(__int32 sub_type, __int32 send_time, __int64 from_qq, const char *msg, const char *response_flag);
 	typedef __int32(  __stdcall * cq_funtype(event_group_request))(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char *msg, const char *response_flag);
-	
+	typedef __int32(  __stdcall * cq_funtype(event_all))(const char *msg);
+
 
 	enum event_id_def 
 	{
@@ -125,7 +126,8 @@ public:
 		cq_funid(event_group_recall,205),
 		cq_funid(event_friend_recall,206),
 		cq_funid(event_friend_request,301),
-		cq_funid(event_group_request,302)
+		cq_funid(event_group_request,302),
+		cq_funid(event_all,1207)
 	};
 
 	Plus();

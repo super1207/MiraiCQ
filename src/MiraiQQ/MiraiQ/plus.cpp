@@ -3,6 +3,12 @@
 
 static __int32 g_ac = 1; 
 
+
+extern "C" char * __stdcall SendWs(int ac,const char * msg,int * retcode,unsigned int timeout);
+extern "C" void __stdcall Free(void * p)
+{
+	free(p);
+}
 #define cq_funtype(x) cq_##x##_funtype
 
 Plus::Plus()
@@ -236,8 +242,11 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	g_ac++;
 	typedef __int32(  __stdcall * fun_ptr_type_1)(__int32);
 	typedef __int32(  __stdcall * fun_ptr_type_2)();
+	typedef __int32(  __stdcall * fun_ptr_type_3)(void *,int);
 	fun_ptr_type_1 fun_ptr1 = (fun_ptr_type_1)GetProcAddress(dll_ptr,"Initialize");
 	fun_ptr_type_2 fun_ptr2 = (fun_ptr_type_2)GetProcAddress(dll_ptr,"AppInfo");
+	fun_ptr_type_3 fun_ptr3 = (fun_ptr_type_3)GetProcAddress(dll_ptr,"Initialize2");
+
 	mx.unlock();
 	
 	if(!fun_ptr1)
@@ -246,8 +255,17 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 		BOOST_LOG_TRIVIAL(info) << "get function " << "Initialize"  << " from " << plusdef.plus_file_name << " failed";
 		return 0;
 	}
+
 	BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize: " << fun_ptr1;
 	fun_ptr1(plus_ac);
+	if(fun_ptr3)
+	{
+		BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize2: " << fun_ptr3;
+		void * f[2];
+		f[0] = Free;
+		f[1] = SendWs;
+		fun_ptr3(f,2);
+	}
 
 	//AppInfo 在打包后不会被调用
 	//if(!fun_ptr2)

@@ -87,6 +87,34 @@ enum{
 	FUN_NOT_EXIST = -3,
 	NET_ERROR = -4
 };
+//0:ok -1:param wrong  -2:ret error or timeout -3:inner error
+extern "C" char * __stdcall SendWs(int ac,const char * msg,int * retcode,unsigned int timeout)
+{
+	try{
+		BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " has being called";
+		int cd = 0;
+		std::pair<bool,Plus::PlusDef> X = MiraiQ::get_plus_ptr()->get_plusdef(ac);
+		if(X.first == false)
+		{
+			if(retcode)*retcode = cd;
+			return NULL;
+		}
+		Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendWs(to_u8(msg),timeout,cd);
+		if(retcode)*retcode = cd;
+		if(cd != 0)return NULL;
+		std::string outstr = to_gbk(Json::FastWriter().write(ret_json));
+		char * ret = (char *)malloc(outstr.size()+1);
+		memcpy(ret,outstr.c_str(),outstr.size()+1);
+		return ret;	
+	}catch(const std::exception & e)
+	{
+		BOOST_LOG_TRIVIAL(info) << "crashed in " << __FUNCTION__ << ":" <<e.what();
+		if(retcode)*retcode = -3;
+		return NULL;
+	}
+}
+
+
 
 // Message
 FFUN1(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg)

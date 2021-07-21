@@ -309,7 +309,17 @@ TEMP_EVENT_FUN(event_group_request)
 	return EVENT_BLOCK;
 }
 
-
+TEMP_EVENT_FUN(event_all)
+{
+	GET_FUNPTR(event_all)
+	std::string outstr = Json::FastWriter().write(root);
+	__int32 ret = fun_ptr(to_gbk(outstr).c_str());
+	if(ret == 0)
+	{
+		return EVENT_IGNORE;
+	}
+	return EVENT_BLOCK;
+}
 
 
 
@@ -351,7 +361,7 @@ CALL_FUN_EVENT(event_friend_recall,_,_)
 CALL_FUN_EVENT(event_notify,_,_)
 CALL_FUN_EVENT(event_friend_request,_,_)
 CALL_FUN_EVENT(event_group_request,_,_)
-
+CALL_FUN_EVENT(event_all,_,_)
 
 #define CALL_FUNNAME(X)  call_##X
 
@@ -375,6 +385,8 @@ void init_event_map()
 	g_message_map["notice"]["notify"] = CALL_FUNNAME(event_notify);
 	g_message_map["request"]["friend"] = CALL_FUNNAME(event_friend_request);
 	g_message_map["request"]["group"] = CALL_FUNNAME(event_group_request);
+	g_message_map["all_event"][""] = CALL_FUNNAME(event_all);
+
 };
 
 
