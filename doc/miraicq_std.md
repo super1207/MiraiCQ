@@ -64,7 +64,7 @@ authCode：调用API必备的参数
 
 ### Initialize2
 
-原型：int32 stdcall Initialize(void ** fp,int32 n);
+原型：int32 stdcall Initialize2(void ** fp,int32 n);
 
 说明： 此函数提供了一个使用onebot所有能力的方法(配合下面的1207号事件)，较为复杂，文档正在写。
 
