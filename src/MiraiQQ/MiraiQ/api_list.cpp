@@ -96,7 +96,7 @@ extern "C" char * __stdcall SendWs(int ac,const char * msg,int * retcode,unsigne
 		std::pair<bool,Plus::PlusDef> X = MiraiQ::get_plus_ptr()->get_plusdef(ac);
 		if(X.first == false)
 		{
-			if(retcode)*retcode = cd;
+			if(retcode)*retcode = -1;
 			return NULL;
 		}
 		Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendWs(to_u8(msg),timeout,cd);
