@@ -6,6 +6,7 @@
 #include "MiraiQQDlg.h"
 #include "MiraiQ/MIraiQ.h"
 #include "MiraiContrlDlg.h"
+#include "jsoncpp/json.h"
 #include <boost/thread/thread.hpp>
 
 #ifdef _DEBUG
@@ -67,6 +68,47 @@ BEGIN_MESSAGE_MAP(CMiraiQQDlg, CDialog)
 END_MESSAGE_MAP()
 
 
+static void ReadConfig(CMiraiQQDlg * it)
+{
+	it->GetDlgItem(IDC_EDIT1)->SetWindowText("ws://localhost:6700");
+	Json::Reader reader;
+	Json::Value root;
+	std::ifstream in("config.json", std::ios::binary);
+	if( !in.is_open() )  
+	{ 
+		return ;
+	}
+	if(reader.parse(in,root))
+	{
+		std::string ws_url = root["ws_url"].asString();
+		std::string access_token = root["access_token"].asString();
+		it->GetDlgItem(IDC_EDIT1)->SetWindowText(ws_url.c_str());
+		it->GetDlgItem(IDC_EDIT2)->SetWindowText(access_token.c_str());
+	}
+	in.close();
+};
+
+static void WriteConfig(CMiraiQQDlg * it)
+{
+	Json::Value root;
+	Json::StyledWriter sw;
+	CString ws_url;
+	CString access_token;
+	it->GetDlgItem(IDC_EDIT1)->GetWindowText(ws_url);
+	it->GetDlgItem(IDC_EDIT2)->GetWindowText(access_token);
+	root["ws_url"] = ws_url.GetBuffer(0);
+	root["access_token"] = access_token.GetBuffer(0);
+	std::ofstream os;
+	os.open("config.json");
+	if(!os.is_open())
+	{
+		return ;
+	}
+	os << sw.write(root);
+	os.close();
+
+};
+
 // CMiraiQQDlg 消息处理程序
 
 BOOL CMiraiQQDlg::OnInitDialog()
@@ -99,7 +141,7 @@ BOOL CMiraiQQDlg::OnInitDialog()
 	ShowWindow(SW_NORMAL);
 
 	// TODO: 在此添加额外的初始化代码
-	GetDlgItem(IDC_EDIT1)->SetWindowText("ws://localhost:6700");
+	ReadConfig(this);
 
 	//AllocConsole();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -225,6 +267,7 @@ void CMiraiQQDlg::OnBnClickedButton1()
 		AfxMessageBox(_T("登陆失败"));
 		return ;
 	}
+	WriteConfig(this);
 	std::string path_name, exe_name;
 	get_program_dir(path_name, exe_name);
 	std::vector<boost::filesystem::path>  dll_path_vec = MiraiQ::get_plus_ptr()->find_plus_file(boost::filesystem::path(path_name)/"app");
