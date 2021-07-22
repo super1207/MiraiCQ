@@ -115,6 +115,73 @@ extern "C" char * __stdcall SendWs(int ac,const char * msg,int * retcode,unsigne
 }
 
 
+extern "C" char * __stdcall GetAppDirectory(int ac)
+{
+	try{
+		BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " has being called";
+		std::pair<bool,Plus::PlusDef> pdf = MiraiQ::get_plus_ptr()->get_plusdef(ac);
+		if(pdf.first == false)
+		{
+			return NULL;
+		}
+		boost::filesystem::path plus_path = pdf.second.plus_path / boost::filesystem::path(pdf.second.plus_file_name).stem();
+		if (!( boost::filesystem::exists(plus_path) && 
+			boost::filesystem::is_directory(plus_path)))
+		{
+			if(!boost::filesystem::create_directory(plus_path))
+			{
+				return "";
+			}
+		}
+		std::string path_str = plus_path.string();
+		if(path_str == "")
+		{
+			return "";
+		}
+		if(path_str[path_str.length() -1] != '\\')
+		{
+			path_str += "\\";
+		}
+
+		char * ret = (char *)malloc(path_str.size()+1);
+		memcpy(ret,path_str.c_str(),path_str.size()+1);
+		return ret;	
+	}catch(const std::exception & e)
+	{
+		BOOST_LOG_TRIVIAL(info) << "crashed in " << __FUNCTION__ << ":" <<e.what();
+		return NULL;
+	}
+}
+
+
+//0:ok -1:ac error -2:log_level error -3:inner error
+extern "C" int __stdcall AddLog(int auth_code, int log_level, const char *category, const char *log_msg)
+{
+	try{
+		BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " has being called";
+		std::pair<bool,Plus::PlusDef> pdf = MiraiQ::get_plus_ptr()->get_plusdef(auth_code);
+		if(pdf.first == false)
+		{
+			return -1;
+		}
+		if(log_level == 0)
+		{
+			BOOST_LOG_TRIVIAL(debug) << "[" <<pdf.second.name << "] " << category << " " << log_msg;
+		}else if(log_level == 1)
+		{
+			BOOST_LOG_TRIVIAL(info) << "[" <<pdf.second.name << "] " << category << " " << log_msg;
+		}else
+		{
+			return -2;
+		}
+		
+	}catch(const std::exception & e)
+	{
+		BOOST_LOG_TRIVIAL(info) << "crashed in " << __FUNCTION__ << ":" <<e.what();
+		return -3;
+	}
+	return 0;
+}
 
 // Message
 FFUN1(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg)

@@ -9,6 +9,10 @@ extern "C" void __stdcall Free(void * p)
 {
 	free(p);
 }
+extern "C" char * __stdcall GetAppDirectory(int ac);
+extern "C" int __stdcall AddLog(int auth_code, int log_level, const char *category, const char *log_msg);
+
+
 #define cq_funtype(x) cq_##x##_funtype
 
 Plus::Plus()
@@ -261,10 +265,12 @@ __int32 Plus::add_plus( const boost::filesystem::path & path )
 	if(fun_ptr3)
 	{
 		BOOST_LOG_TRIVIAL(debug) <<"call plus's fun Initialize2: " << fun_ptr3;
-		void * f[2];
+		void * f[4];
 		f[0] = Free;
 		f[1] = SendWs;
-		fun_ptr3(f,2);
+		f[2] = GetAppDirectory;
+		f[3] = AddLog;
+		fun_ptr3(f,4);
 	}
 
 	//AppInfo 在打包后不会被调用
