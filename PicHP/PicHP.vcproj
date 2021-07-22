@@ -201,6 +201,14 @@
 			<File
 				RelativePath=".\PicHP.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp"
@@ -241,6 +249,94 @@
 			Name="资源文件"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+		</Filter>
+		<Filter
+			Name="jsoncpp"
+			>
+			<File
+				RelativePath=".\jsoncpp\assertions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\autolink.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\config.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\features.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\forwards.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\json.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\json_reader.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\json_tool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\json_value.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\json_writer.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\reader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\value.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\version.h"
+				>
+			</File>
+			<File
+				RelativePath=".\jsoncpp\writer.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="core"
 			>
 		</Filter>
 		<File

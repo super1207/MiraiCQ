@@ -4,6 +4,10 @@
   "author": "super1207",
   "description": "¸´¶ÁHello",
   "event": [
+   {
+      "type": 1207,
+      "function": "event_all"
+    },
 	{
       "type": 1001,
       "function": "event_coolq_start"
@@ -11,70 +15,6 @@
     {
       "type": 1003,
       "function": "event_enable"
-    },
-    {
-      "type": 21,
-      "function": "event_private_message"
-    },
-     {
-      "type": 2,
-      "function": "event_group_message"
-    },
-     {
-      "type": 4,
-      "function": "event_discuss_message"
-    },
-    {
-      "type": 11,
-      "function": "event_group_upload"
-    },
-    {
-      "type": 101,
-      "function": "event_group_admin"
-    },
-    {
-      "type": 102,
-      "function": "event_group_member_decrease"
-    },
-    {
-      "type": 103,
-      "function": "event_group_member_increase"
-    },
-     {
-      "type": 104,
-      "function": "event_group_ban"
-    },
-    {
-      "type": 201,
-      "function": "event_friend_add"
-    },
-    {
-      "type": 202,
-      "function": "event_notify_pock"
-    },
-    {
-      "type": 203,
-      "function": "event_notify_lucky_king"
-    },
-    {
-      "type": 204,
-      "function": "event_notify_honor"
-    },
-    {
-      "type": 205,
-      "function": "event_group_recall"
-    },
-    {
-      "type": 206,
-      "function": "event_friend_recall"
-    },
-    {
-      "type": 301,
-      "function": "event_friend_request"
-    },
-    {
-      "type": 302,
-      "function": "event_group_request"
     },
     {
       "type": 1004,
