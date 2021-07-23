@@ -127,7 +127,7 @@ public:
 		try {
 			c.close( hdl, websocketpp::close::status::normal, "" );
 		}
-		catch (websocketpp::exception const & e)
+		catch (websocketpp::exception const &)
 		{
 			//已经关闭，无需log
 			//std::cout << e.what() << std::endl;
@@ -287,9 +287,9 @@ private:
 		{
 			this->c.run();
 		}
-		catch (websocketpp::exception const & e) 
+		catch (const std::exception & e) 
 		{
-			BOOST_LOG_TRIVIAL(debug) << e.what();
+			BOOST_LOG_TRIVIAL(info) << "websocket error: " << e.what();
 		}
 		isconnect = 5;
 		
