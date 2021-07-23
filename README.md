@@ -1,33 +1,68 @@
 # MiraiCQ
 [![QQ 群](https://img.shields.io/badge/qq%E7%BE%A4-920220179-orange.svg)]()
 ![](https://img.shields.io/badge/OneBot-v11-black?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABwCAMAAADxPgR5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAxQTFRF////29vbr6+vAAAAk1hCcwAAAAR0Uk5T////AEAqqfQAAAKcSURBVHja7NrbctswDATQXfD//zlpO7FlmwAWIOnOtNaTM5JwDMa8E+PNFz7g3waJ24fviyDPgfhz8fHP39cBcBL9KoJbQUxjA2iYqHL3FAnvzhL4GtVNUcoSZe6eSHizBcK5LL7dBr2AUZlev1ARRHCljzRALIEog6H3U6bCIyqIZdAT0eBuJYaGiJaHSjmkYIZd+qSGWAQnIaz2OArVnX6vrItQvbhZJtVGB5qX9wKqCMkb9W7aexfCO/rwQRBzsDIsYx4AOz0nhAtWu7bqkEQBO0Pr+Ftjt5fFCUEbm0Sbgdu8WSgJ5NgH2iu46R/o1UcBXJsFusWF/QUaz3RwJMEgngfaGGdSxJkE/Yg4lOBryBiMwvAhZrVMUUvwqU7F05b5WLaUIN4M4hRocQQRnEedgsn7TZB3UCpRrIJwQfqvGwsg18EnI2uSVNC8t+0QmMXogvbPg/xk+Mnw/6kW/rraUlvqgmFreAA09xW5t0AFlHrQZ3CsgvZm0FbHNKyBmheBKIF2cCA8A600aHPmFtRB1XvMsJAiza7LpPog0UJwccKdzw8rdf8MyN2ePYF896LC5hTzdZqxb6VNXInaupARLDNBWgI8spq4T0Qb5H4vWfPmHo8OyB1ito+AysNNz0oglj1U955sjUN9d41LnrX2D/u7eRwxyOaOpfyevCWbTgDEoilsOnu7zsKhjRCsnD/QzhdkYLBLXjiK4f3UWmcx2M7PO21CKVTH84638NTplt6JIQH0ZwCNuiWAfvuLhdrcOYPVO9eW3A67l7hZtgaY9GZo9AFc6cryjoeFBIWeU+npnk/nLE0OxCHL1eQsc1IciehjpJv5mqCsjeopaH6r15/MrxNnVhu7tmcslay2gO2Z1QfcfX0JMACG41/u0RrI9QAAAABJRU5ErkJggg==)
-## 这是什么
+
+## 目的
+
+* 使用C/C++、易语言来写QQ机器人
+* 实现方便分享的插件式机器人框架
+* 对接OneBotv11标准，使插件长期可用，即使某平台的机器人框架跑路，也不受影响
+
+###  兼容酷Q插件
+
 MiraiCQ 的目的是实现 [onebot](https://github.com/howmanybots/onebot) 标准向原生酷Q标准（[miraicq标准](https://github.com/super1207/MiraiCQ/blob/main/doc/miraicq_std.md)）的转化，使得原来酷Q的插件得以直接运行。<br />
 更重要的是可以使用c++或者易语言来写复读机了 <br />
 onebot_websocket_api        <------->    MiraiCQ        <------->    cq_native_dll <br />
 MiraiCQ 使用websocket正向连接，与实现了onebot标准的机器人框架对接。
 ![](https://ftp.bmp.ovh/imgs/2020/10/bc4e2057663fb481.png)
 
+### 不止是酷Q：可以使用Onebot中描述的所有API，Event
+
+在插件中，可以使用额外的Event，API，来收发onebot原始数据，完成对酷Q之外的功能的使用，详细使用方法参见目录下的 PicHP 插件 (私聊复读)，这也是推荐的使用方式。
+代码一览：
+```cpp #include "../core/stdafx.h"
+#include "../jsoncpp/json.h"
+#include "../core/PicHP.h"
+
+int user_event_message_private(const Json::Value & raw_json,const SbotEventMessagePrivate & base)
+{
+	Json::Value root;
+	root["action"] = "send_private_msg";
+	Json::Value params;
+	params["user_id"] = base.user_id;
+	params["message"] = base.message;
+	root["params"] = params;
+	SBotCore::send_ws(Json::FastWriter().write(root));
+	return 0;
+}
+```
+
 ## 如何编译
 我使用 VS2008 x86 + boost_1_55_0 ,除此之外无需自己安装其他依赖。<br />
 如果你不想亲自编译boost,这里有编译好的版本
 [https://boost.teeks99.com/](https://boost.teeks99.com/) <br />
-clone本项目，双击test.sln文件，点击生成解决方案即可完成编译。
+
 ## 如何运行
 首先，需要启动一个实现了 OneBot 标准的框架，例如 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) <br />
 开启 正向 websocket 接口，端口号默认为 6700 <br />
 运行上一步骤生成的exe文件，将酷Q的xxx.dll与xxx.json放入自动生成的app文件夹中即可加载 <br />
 [json生成工具](https://github.com/super1207/MiraiCQ_Json_Gen)已经可以用啦，快速生成符合MiraiCQ标准的Json文件！
+
 ## 快速体验
 此处提供一个快速体验(预览)版本，但是不保证能及时更新: <br />
-[fast_try_0_6.7z](https://super1207.lanzoui.com/i8bSero37md) <br /><br />
-PicHP是一个私聊复读机的插件示例
+[fast_try_0_7.rar](https://super1207.lanzoui.com/iI1mKrr856d) <br />
+
+注：PicHP是一个私聊复读机的插件示例
+
 ## 当前缺陷
 <1> 目前并没有完整实现了 OneBot 标准的框架 <br />
 <2> 目前酷Q已经无法运作了，缺乏对比验证，很多细节全靠记忆 <br />
-<3> 到处都是Bug...不过群/私聊复读机终于可以复活了！ <br />
+<3> 在PicHP插件中，对事件，API的封装还不够彻底<br />
+<3> UI还很简陋 <br />
+
 ## 问题回馈
-随意反馈，[有空]就改，建议自己改，然后发pr
+随意反馈，欢迎交流，通过 github issue 或通过 QQ群(920220179) 均可
+
 ## 参考与依赖
 感谢他/她们！<br />
 [https://github.com/Mrs4s/go-cqhttp](https://github.com/Mrs4s/go-cqhttp) (运行依赖)  <br />
