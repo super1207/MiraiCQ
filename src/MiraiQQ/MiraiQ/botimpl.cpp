@@ -210,7 +210,13 @@ public:
 					{
 						Json::Value ret_json = ecb->operator [](i);
 						ecb->erase(ecb->begin()+i);
-						BOOST_LOG_TRIVIAL(debug) << "recv: "<<ret_json.toStyledString(); 
+						std::string gbkmsg;
+						try{
+							gbkmsg = boost::locale::conv::between(ret_json.toStyledString(), "GBK", "UTF-8");
+							BOOST_LOG_TRIVIAL(debug) << "recv: "<<gbkmsg; 
+						}catch(const std::exception & e){
+							BOOST_LOG_TRIVIAL(info) <<"error in on_message's to_gbk:"<< e.what();
+						}
 						return ret_json;
 					}
 				}
