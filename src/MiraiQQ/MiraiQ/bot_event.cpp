@@ -30,7 +30,7 @@ std::map<std::string,std::map<std::string,__int32(*)(const Json::Value &,boost::
 TEMP_EVENT_FUN(event_private_message)
 {
 	GET_FUNPTR(event_private_message)
-	std::string msg = to_gbk(root["message"].asString());
+	std::string msg = to_gbk(root["raw_message"].asString());
 	std::string subtype = root["sub_type"].asString();
 	__int32 sub_type;
 	if(subtype == "friend")
@@ -72,7 +72,7 @@ TEMP_EVENT_FUN(event_group_message)
 
 	}
 
-	std::string msg = to_gbk(root["message"].asString());
+	std::string msg = to_gbk(root["raw_message"].asString());
 
 	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
 	assert(msgid_convert);
@@ -84,7 +84,7 @@ TEMP_EVENT_FUN(event_group_message)
 	return EVENT_BLOCK;
 }
 
-/* 目前没有discuss了 */
+/* 脛驴脟掳脙禄脫脨discuss脕脣 */
 TEMP_EVENT_FUN(event_discuss_message)
 {
 	return EVENT_BLOCK;
