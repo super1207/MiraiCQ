@@ -1,4 +1,4 @@
-// PicHP.cpp : ¶¨Òå DLL Ó¦ÓÃ³ÌĞòµÄµ¼³öº¯Êı¡£
+// PicHP.cpp : å®šä¹‰ DLL åº”ç”¨ç¨‹åºçš„å¯¼å‡ºå‡½æ•°ã€‚
 //
 #include "stdafx.h"
 
@@ -10,60 +10,60 @@
 
 static int sg_authCode = 0;
 
-/* ½ÓÊÕauthCode */
+/* æ¥æ”¶authCode */
 extern "C" int __stdcall Initialize(int authCode)
 {
 	sg_authCode = authCode;
 	return 0;
 }
 
-/* ´Ëº¯ÊıÓÃÓÚÊÍ·ÅÏÂÃæSendWs·µ»ØµÄ×Ö·û´®£¬Èô´«ÈëµÄ²ÎÊıÎªNULL,Ôò²»×öÈÎºÎ¶¯×÷ */
+/* æ­¤å‡½æ•°ç”¨äºé‡Šæ”¾ä¸‹é¢SendWsè¿”å›çš„å­—ç¬¦ä¸²ï¼Œè‹¥ä¼ å…¥çš„å‚æ•°ä¸ºNULL,åˆ™ä¸åšä»»ä½•åŠ¨ä½œ */
 typedef  void  (__stdcall * FreeType)(void *);
 static FreeType Free = NULL;
 
 /* 
-   ÃèÊö:
-     ´Ëº¯ÊıÓÃÓÚÖ±½Óµ÷ÓÃonebot¶ËµÄapi
-   ²ÎÊı:
-     retcodeÓÃÓÚ½ÓÊÕµ÷ÓÃÇé¿ö
-       0£¬µ÷ÓÃ³É¹¦
-	   -1£¬²ÎÊı´íÎó
-	   -2£¬ÍøÂç´íÎó£¬»òÕß³¬Ê±
-	   -3£¬¿ò¼ÜÄÚ²¿´íÎó£¬Çë²é¿´ÈÕÖ¾
-     msgÎªÒª·¢ËÍµÄjson×Ö·û´®£¬ÇëÊ¹ÓÃgbk±àÂë
-     timeoutÎª³¬Ê±£¬µ¥Î»ºÁÃë
-   ·µ»Ø:
-     ·µ»ØÎªgbk±àÂëµÄjson×Ö·û´®£¬Èç¹ûretcode²»Îª0,Ôò·µ»ØNULL¡£
-	 ·µ»ØµÄ×Ö·û´®[±ØĞë]Ê¹ÓÃÉÏÃæµÄFreeÊÍ·Å
+   æè¿°:
+     æ­¤å‡½æ•°ç”¨äºç›´æ¥è°ƒç”¨onebotç«¯çš„api
+   å‚æ•°:
+     retcodeç”¨äºæ¥æ”¶è°ƒç”¨æƒ…å†µ
+       0ï¼Œè°ƒç”¨æˆåŠŸ
+	   -1ï¼Œå‚æ•°é”™è¯¯
+	   -2ï¼Œç½‘ç»œé”™è¯¯ï¼Œæˆ–è€…è¶…æ—¶
+	   -3ï¼Œæ¡†æ¶å†…éƒ¨é”™è¯¯ï¼Œè¯·æŸ¥çœ‹æ—¥å¿—
+     msgä¸ºè¦å‘é€çš„jsonå­—ç¬¦ä¸²ï¼Œè¯·ä½¿ç”¨gbkç¼–ç 
+     timeoutä¸ºè¶…æ—¶ï¼Œå•ä½æ¯«ç§’
+   è¿”å›:
+     è¿”å›ä¸ºgbkç¼–ç çš„jsonå­—ç¬¦ä¸²ï¼Œå¦‚æœretcodeä¸ä¸º0,åˆ™è¿”å›NULLã€‚
+	 è¿”å›çš„å­—ç¬¦ä¸²[å¿…é¡»]ä½¿ç”¨ä¸Šé¢çš„Freeé‡Šæ”¾
 
 */
 typedef  char * ( __stdcall * SendWsType)(int ac,const char * msg,int * retcode,unsigned int timeout);
 static SendWsType SendWs = NULL;
 
 /*
-	ÃèÊö:
-	  ´Ëº¯ÊıÓÃÓÚ»ñÈ¡²å¼şÄ¿Â¼µØÖ·
-	·µ»Ø£º
-	  ·µ»ØÎªgbk±àÂëµÄ×Ö·û´®Ä©Î²ÓĞ'\'£¬Èç¹ûµ÷ÓÃÊ§°Ü£¬·µNULL
-	  ·µ»ØµÄ×Ö·û´®[±ØĞë]Ê¹ÓÃÉÏÃæµÄFreeÊÍ·Å
+	æè¿°:
+	  æ­¤å‡½æ•°ç”¨äºè·å–æ’ä»¶ç›®å½•åœ°å€
+	è¿”å›ï¼š
+	  è¿”å›ä¸ºgbkç¼–ç çš„å­—ç¬¦ä¸²æœ«å°¾æœ‰'\'ï¼Œå¦‚æœè°ƒç”¨å¤±è´¥ï¼Œè¿”NULL
+	  è¿”å›çš„å­—ç¬¦ä¸²[å¿…é¡»]ä½¿ç”¨ä¸Šé¢çš„Freeé‡Šæ”¾
 */
 typedef  char * ( __stdcall * GetAppDirectoryType)(int ac);
 static GetAppDirectoryType GetAppDirectory = NULL;
 
 /*
-	ÃèÊö:
-	  ´òÓ¡ÈÕÖ¾
-    ²ÎÊı:
-     log_levelÖ¸Ã÷µÈ¼¶
-       0£¬debug
-	   1£¬info
-     categoryÎªÈÕÖ¾ÖÖÀà£¬Ó¦¸ÃÎªgbk±àÂë
-     log_msgÄÚÈİ£¬Ó¦¸ÃÎªGBK±àÂë
-	·µ»Ø£º
-	  0£¬³É¹¦
-	  -1£¬auth_code´íÎó
-	  -2£¬log_level´íÎó
-	  -3£¬ÄÚ²¿´íÎó
+	æè¿°:
+	  æ‰“å°æ—¥å¿—
+    å‚æ•°:
+     log_levelæŒ‡æ˜ç­‰çº§
+       0ï¼Œdebug
+	   1ï¼Œinfo
+     categoryä¸ºæ—¥å¿—ç§ç±»ï¼Œåº”è¯¥ä¸ºgbkç¼–ç 
+     log_msgå†…å®¹ï¼Œåº”è¯¥ä¸ºGBKç¼–ç 
+	è¿”å›ï¼š
+	  0ï¼ŒæˆåŠŸ
+	  -1ï¼Œauth_codeé”™è¯¯
+	  -2ï¼Œlog_levelé”™è¯¯
+	  -3ï¼Œå†…éƒ¨é”™è¯¯
 */
 typedef int ( __stdcall * AddLogType)(int auth_code, int log_level, const char *category, const char *log_msg);
 static AddLogType AddLog = NULL;
@@ -102,10 +102,10 @@ std::string SBotCore::send_ws(const std::string & js_str,unsigned int timeout)
 	return retstr;
 }
 
-/* ´ËÊÂ¼şÓÃÓÚ»ñÈ¡º¯Êı£¬fÎªº¯ÊıÖ¸ÕëÊı×é£¬nÎªÊı×é´óĞ¡(Ä¿Ç°ºãÎª2) */
+/* æ­¤äº‹ä»¶ç”¨äºè·å–å‡½æ•°ï¼Œfä¸ºå‡½æ•°æŒ‡é’ˆæ•°ç»„ï¼Œnä¸ºæ•°ç»„å¤§å°(ç›®å‰æ’ä¸º2) */
 extern "C" int __stdcall Initialize2(void ** f,int n)
 {
-	if(n == 4)
+	if(n >= 4)
 	{
 		Free = (FreeType)f[0];
 		SendWs = (SendWsType)f[1];
@@ -611,7 +611,7 @@ static int deal_eventjson(const Json::Value & root)
 	return 0;
 }
 
-/* ½ÓÊÕËùÓĞwsÏÂ·¢µÄÊÂ¼ş£¬msgÎªgbk±àÂëµÄjson×Ö·û´® type = 1207 */
+/* æ¥æ”¶æ‰€æœ‰wsä¸‹å‘çš„äº‹ä»¶ï¼Œmsgä¸ºgbkç¼–ç çš„jsonå­—ç¬¦ä¸² type = 1207 */
 extern "C" int __stdcall event_all(const char * jsonmsg)
 {
 
