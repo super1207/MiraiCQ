@@ -58,7 +58,7 @@ int user_event_message_private(const Json::Value & raw_json,const SbotEventMessa
 <1> 目前并没有完整实现了 OneBot 标准的框架 <br />
 <2> 目前酷Q已经无法运作了，缺乏对比验证，很多细节全靠记忆 <br />
 <3> 在PicHP插件中，对事件，API的封装还不够彻底<br />
-<3> UI还很简陋 <br />
+<4> UI还很简陋 <br />
 
 ## 问题回馈
 随意反馈，欢迎交流，通过 github issue 或通过 QQ群(920220179) 均可
