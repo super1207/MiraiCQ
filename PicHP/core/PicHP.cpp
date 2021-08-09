@@ -141,8 +141,8 @@ static int deal_event_message_private(const Json::Value & root,const SbotEventMe
 	bot_event_base.message_id = root.get("message_id",defint).asInt();
 
 	bot_event_base.user_id = root.get("user_id",defint).asInt64();
-
-	bot_event_base.message = root.get("message",defstr).asString();
+	
+	bot_event_base.message = root.get("raw_message",Json::Value("")).asString();
 
 	bot_event_base.raw_message = root.get("raw_message",defstr).asString();
 
@@ -202,7 +202,7 @@ static int deal_event_message_group(const Json::Value & root,const SbotEventMess
 	bot_event_base.anonymous.name = js_anonymous.get("name",defstr).asString();
 	bot_event_base.anonymous.flag = js_anonymous.get("flag",defstr).asString();
 
-	bot_event_base.message = root.get("message",defstr).asString();
+	bot_event_base.message = root.get("raw_message",defstr).asString();
 
 	bot_event_base.raw_message = root.get("raw_message",defstr).asString();
 
