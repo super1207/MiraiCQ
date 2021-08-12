@@ -1,6 +1,5 @@
 #pragma once
 
-
 // CMiraiContrlDlg 对话框
 
 class CMiraiContrlDlg : public CDialog
@@ -10,6 +9,7 @@ class CMiraiContrlDlg : public CDialog
 public:
 	CMiraiContrlDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CMiraiContrlDlg();
+	virtual BOOL OnInitDialog();
 
 // 对话框数据
 	enum { IDD = IDD_MIRAICONTRLDLG };
@@ -22,4 +22,6 @@ public:
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedButton4();
 	afx_msg void OnClose();
+	afx_msg LRESULT onShowTask(WPARAM wParam,LPARAM lParam);//托盘
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 };
