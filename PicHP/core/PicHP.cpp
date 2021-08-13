@@ -3,6 +3,7 @@
 #include "stdafx.h"
 
 #include <string>
+#include <vector>
 
 #include "../jsoncpp/json.h"
 
@@ -117,6 +118,75 @@ extern "C" int __stdcall Initialize2(void ** f,int n)
 	
 }
 
+static std::string& replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value)
+{
+	for (std::string::size_type pos(0); pos != std::string::npos; pos += new_value.length())
+	{
+		if ((pos = str.find(old_value, pos)) != std::string::npos)
+			str.replace(pos, old_value.length(), new_value);
+		else   break;
+	}
+	return   str;
+}
+
+/* 用于将json数组格式的消息转化为字符串格式消息,转化失败返回"" */
+static std::string CvtJsonToStrMsg(const Json::Value& jsonArr)
+{
+	std::string retStr;
+	Json::Value defstr = Json::Value("");
+	if (!jsonArr.isArray())
+	{
+		return "";
+	}
+	try
+	{
+		for(size_t i = 0;i < jsonArr.size();++i)
+		{
+		/*for (const auto& node : jsonArr)
+		{*/
+			std::string type = jsonArr[i].get("type", Json::Value("")).asString();
+			if (type == "")
+			{
+				return "";
+			}
+			if (type == "text")
+			{
+				std::string temStr = jsonArr[i].get("data", defstr).get("text", defstr).asString();
+				replace_all_distinct(temStr, "&", "&amp;");
+				replace_all_distinct(temStr, "[", "&#91;");
+				replace_all_distinct(temStr, "]", "&#93;");
+				replace_all_distinct(temStr, ",", "&#44;");
+				retStr.append(temStr);
+			}
+			else
+			{
+				std::string cqStr = "[CQ:" + type;
+				Json::Value datObj = jsonArr[i].get("data", defstr);
+				if (!datObj.isObject())
+				{
+					return "";
+				}
+				Json::Value::Members member = datObj.getMemberNames();
+				for (std::vector<std::string>::iterator iter = member.begin(); iter != member.end(); iter++)
+				{
+					cqStr.append("," + (*iter) + "=" + datObj[(*iter)].asString());
+				}
+				cqStr.append("]");
+				retStr.append(cqStr);
+
+			}
+		}
+		return retStr;
+
+	}
+	catch (const std::exception& e)
+	{
+		SBotCore::add_debug_log("CvtJsonToStrMsg", e.what());
+		return "";
+	}
+
+}
+
 static int deal_event_message_private(const Json::Value & root,const SbotEventMessageBase & base)
 {
 	Json::Value defstr = "";
@@ -142,9 +212,21 @@ static int deal_event_message_private(const Json::Value & root,const SbotEventMe
 
 	bot_event_base.user_id = root.get("user_id",defint).asInt64();
 	
-	bot_event_base.message = root.get("raw_message",Json::Value("")).asString();
+	bot_event_base.raw_message = root.get("raw_message", defstr).asString();
 
-	bot_event_base.raw_message = root.get("raw_message",defstr).asString();
+	Json::Value msg = root.get("message", defstr);
+	if (msg.isArray())
+	{
+		bot_event_base.message = CvtJsonToStrMsg(msg);
+	}
+	else
+	{
+		bot_event_base.message = msg.asString();
+	}
+	if (bot_event_base.message == "")
+	{
+		bot_event_base.message = bot_event_base.raw_message;
+	}
 
 	bot_event_base.font = root.get("font",defint).asInt();
 
@@ -202,9 +284,21 @@ static int deal_event_message_group(const Json::Value & root,const SbotEventMess
 	bot_event_base.anonymous.name = js_anonymous.get("name",defstr).asString();
 	bot_event_base.anonymous.flag = js_anonymous.get("flag",defstr).asString();
 
-	bot_event_base.message = root.get("raw_message",defstr).asString();
+	bot_event_base.raw_message = root.get("raw_message", defstr).asString();
 
-	bot_event_base.raw_message = root.get("raw_message",defstr).asString();
+	Json::Value msg = root.get("message", defstr);
+	if (msg.isArray())
+	{
+		bot_event_base.message = CvtJsonToStrMsg(msg);
+	}
+	else
+	{
+		bot_event_base.message = msg.asString();
+	}
+	if (bot_event_base.message == "")
+	{
+		bot_event_base.message = bot_event_base.raw_message;
+	}
 
 	bot_event_base.font = root.get("font",defint).asInt();
 
@@ -630,6 +724,114 @@ extern "C" int __stdcall event_all(const char * jsonmsg)
 	}
 
 	return 0;
+}
+
+static std::vector<std::string> tokenize(const std::string& s, char c) {
+	std::string::const_iterator end = s.end();
+	std::string::const_iterator start = end;
+
+	std::vector<std::string> v;
+	for (std::string::const_iterator it = s.begin(); it != end; ++it) {
+		if (*it != c) {
+			if (start == end)
+				start = it;
+			continue;
+		}
+		if (start != end) {
+			v.push_back(std::string(start, it));
+			start = end;
+		}
+	}
+	if (start != end)
+		v.push_back(std::string(start, end));
+	return v;
+}
+
+
+
+/* 用于将字符串格式的消息转化为json数组格式,转化失败返回null */
+Json::Value CvtStrMsgToJson(const std::string& strMsg)
+{
+	Json::Value jsonArr = Json::arrayValue;
+	std::vector<std::string> strVec;
+	bool iscq = false;
+	for(size_t i = 0;i < strMsg.size();++i)
+	{
+		if (strMsg[i] == '[')
+		{
+			iscq = true;
+			strVec.push_back(std::string(1, '['));
+		}
+		else
+		{
+			if (iscq && strMsg[i] == ' ')
+			{
+				continue;
+			}
+			if (strVec.size() == 0)
+			{
+				strVec.push_back("");
+			}
+			strVec[strVec.size() - 1].append(std::string(1, strMsg[i]));
+			if (strMsg[i] == ']')
+			{
+				iscq = false;
+				strVec.push_back("");
+			}
+		}
+	}
+	for(size_t i = 0;i < strVec.size();++i)
+	{
+		if (strVec[i] == "")
+		{
+			continue;
+		}
+		if (strVec[i][0] != '[')
+		{
+			Json::Value node;
+			node["type"] = "text";
+			Json::Value datNode;
+			std::string t = strVec[i];
+			replace_all_distinct(t, "&amp;", "&");
+			replace_all_distinct(t, "&#91;", "[");
+			replace_all_distinct(t, "&#93;", "]");
+			replace_all_distinct(t, "&#44;", ",");
+			datNode["text"] = t;
+			node["data"] = datNode;
+			jsonArr.append(node);
+		}
+		else
+		{
+			Json::Value node;
+			Json::Value datNode = Json::objectValue;
+			std::vector<std::string> strNode = tokenize(std::string(strVec[i].begin() + 1, strVec[i].end() - 1), ',');
+			try
+			{
+				node["type"] = tokenize(strNode.at(0), ':').at(1);
+				for (size_t i = 1; i < strNode.size(); ++i)
+				{
+					size_t pos = strNode.at(i).find_first_of("=");
+					std::string type = strNode.at(i).substr(0, pos);
+					std::string dat = strNode.at(i).substr(pos + 1);
+					std::string t = dat;
+					replace_all_distinct(t, "&amp;", "&");
+					replace_all_distinct(t, "&#91;", "[");
+					replace_all_distinct(t, "&#93;", "]");
+					replace_all_distinct(t, "&#44;", ",");
+					datNode[type] = t;
+				}
+				node["data"] = datNode;
+				jsonArr.append(node);
+
+			}
+			catch (const std::exception& e)
+			{
+				SBotCore::add_debug_log("CvtStrMsgToJson", e.what());
+				return Json::Value();
+			}
+		}
+	}
+	return jsonArr;
 }
 
 

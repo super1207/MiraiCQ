@@ -498,3 +498,6 @@ int user_event_notice_notify_honor(const Json::Value & raw_json,const SbotEventN
 int user_event_request_friend(const Json::Value & raw_json,const SbotEventRequestFriend & base);
 
 int user_event_request_group(const Json::Value & raw_json,const SbotEventRequestGroup & base);
+
+/* 用于将字符串格式的消息转化为json数组格式,转化失败返回null */
+Json::Value CvtStrMsgToJson(const std::string& strMsg);
