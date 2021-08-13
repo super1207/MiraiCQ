@@ -12,7 +12,7 @@
 
 ###  兼容酷Q插件
 
-大多数原来酷Q插件可以直接运行在MiraiCQ上，详见 [兼容细节]()。 </a> <br />
+大多数原来酷Q插件可以直接运行在MiraiCQ上，详见 [兼容细节](https://github.com/super1207/MiraiCQ/blob/main/doc/CQ%E5%85%BC%E5%AE%B9%E7%BB%86%E8%8A%82.md)。 </a> <br />
 
 ### 不止是酷Q：可以使用Onebot中描述的所有API，Event
 
