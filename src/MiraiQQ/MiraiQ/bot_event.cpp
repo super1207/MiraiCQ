@@ -25,12 +25,90 @@ std::map<std::string,std::map<std::string,__int32(*)(const Json::Value &,boost::
 	if(!fun_ptr){return EVENT_BLOCK;}
 
 
+static std::string& replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value)
+{
+	for (std::string::size_type pos(0); pos != std::string::npos; pos += new_value.length())
+	{
+		if ((pos = str.find(old_value, pos)) != std::string::npos)
+			str.replace(pos, old_value.length(), new_value);
+		else   break;
+	}
+	return   str;
+}
 
+/* 用于将json数组格式的消息转化为字符串格式消息,转化失败返回"" */
+static std::string CvtJsonToStrMsg(const Json::Value& jsonArr)
+{
+	std::string retStr;
+	Json::Value defstr = Json::Value("");
+	if (!jsonArr.isArray())
+	{
+		return "";
+	}
+	try
+	{
+		for(size_t i = 0;i < jsonArr.size();++i)
+		{
+		/*for (const auto& node : jsonArr)
+		{*/
+			std::string type = jsonArr[i].get("type", Json::Value("")).asString();
+			if (type == "")
+			{
+				return "";
+			}
+			if (type == "text")
+			{
+				std::string temStr = jsonArr[i].get("data", defstr).get("text", defstr).asString();
+				replace_all_distinct(temStr, "&", "&amp;");
+				replace_all_distinct(temStr, "[", "&#91;");
+				replace_all_distinct(temStr, "]", "&#93;");
+				replace_all_distinct(temStr, ",", "&#44;");
+				retStr.append(temStr);
+			}
+			else
+			{
+				std::string cqStr = "[CQ:" + type;
+				Json::Value datObj = jsonArr[i].get("data", defstr);
+				if (!datObj.isObject())
+				{
+					return "";
+				}
+				Json::Value::Members member = datObj.getMemberNames();
+				for (std::vector<std::string>::iterator iter = member.begin(); iter != member.end(); iter++)
+				{
+					cqStr.append("," + (*iter) + "=" + datObj[(*iter)].asString());
+				}
+				cqStr.append("]");
+				retStr.append(cqStr);
+
+			}
+		}
+		return retStr;
+
+	}
+	catch (const std::exception&)
+	{
+		return "";
+	}
+
+}
 
 TEMP_EVENT_FUN(event_private_message)
 {
 	GET_FUNPTR(event_private_message)
-	std::string msg = to_gbk(root["raw_message"].asString());
+	std::string msg;
+	if(root["message"].isString())
+	{
+		msg = to_gbk(root["message"].asString());
+	}
+	else
+	{
+		msg = to_gbk(CvtJsonToStrMsg(root["message"]));
+	}
+	if(msg == "")
+	{
+		msg = to_gbk(root["raw_message"].asString());
+	}
 	std::string subtype = root["sub_type"].asString();
 	__int32 sub_type;
 	if(subtype == "friend")
@@ -72,7 +150,19 @@ TEMP_EVENT_FUN(event_group_message)
 
 	}
 
-	std::string msg = to_gbk(root["raw_message"].asString());
+	std::string msg;
+	if(root["message"].isString())
+	{
+		msg = to_gbk(root["message"].asString());
+	}
+	else
+	{
+		msg = to_gbk(CvtJsonToStrMsg(root["message"]));
+	}
+	if(msg == "")
+	{
+		msg = to_gbk(root["raw_message"].asString());
+	}
 
 	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
 	assert(msgid_convert);
