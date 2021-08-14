@@ -52,7 +52,20 @@ CMiraiQQApp::CMiraiQQApp()
 
 CMiraiQQApp theApp;
 
-
+//得到执行的exe的名字和路径(windows)
+static void get_program_dir(std::string &path_name, std::string &exe_name)
+{
+	char exe_path[MAX_PATH];
+	if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) == 0)
+	{
+		return ;
+		//throw logic_error("GetModuleFileNameA错误");
+	}
+	std::string exe_path_string = exe_path;
+	size_t pos = exe_path_string.find_last_of('\\', exe_path_string.length());
+	path_name = exe_path_string.substr(0, pos);
+	exe_name = exe_path_string.substr(pos + 1);
+}
 // CMiraiQQApp 初始化
 
 BOOL CMiraiQQApp::InitInstance()
@@ -79,19 +92,20 @@ BOOL CMiraiQQApp::InitInstance()
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 	m_pMainWnd = NULL;
 
-
+	std::string path_name,exe_name;
+	get_program_dir(path_name,exe_name);
 	boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());
 	boost::log::register_simple_formatter_factory< boost::log::trivial::severity_level, char >("Severity");
 	logging::add_common_attributes();
 	boost::log::add_file_log(  
 		keywords::auto_flush = true,  
-		keywords::file_name =  "log/sign_%Y-%m-%d_%H-%M-%S.%N.log",  
+		keywords::file_name =  path_name + "/log/sign_%Y-%m-%d_%H-%M-%S.%N.log",  
 		keywords::rotation_size = 10 * 1024 * 1024,  
 		keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),  
 		boost::log::keywords::format = "[%TimeStamp%](%Severity%): %Message%", 
 		keywords::min_free_space=3 * 1024 * 1024  
 		);  
-	if( boost::filesystem::exists("debug.txt"))
+	if( boost::filesystem::exists(path_name + "/debug.txt"))
 	{
 		logging::core::get()->set_filter(logging::trivial::severity>=logging::trivial::trace);
 	}else

@@ -33,6 +33,8 @@ void CMiraiPlugsDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CMiraiPlugsDlg, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CMiraiPlugsDlg::OnNMClickList1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMiraiPlugsDlg::OnBnClickedButton2)
+	ON_WM_PAINT()
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -89,8 +91,11 @@ void CMiraiPlugsDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	//设置描述
 	CEdit * des_edit = (CEdit*)GetDlgItem(IDC_EDIT1);
 	des_edit->SetWindowText(plusdef.description.c_str());
-	GetDlgItem(IDC_STATIC1)->SetWindowText(plusdef.author.c_str());
-	GetDlgItem(IDC_STATIC2)->SetWindowText(plusdef.version.c_str());
+	static char sz[] = "                                                                ";
+	GetDlgItem(IDC_STATIC33)->SetWindowText(sz);
+	GetDlgItem(IDC_STATIC35)->SetWindowText(sz);
+	GetDlgItem(IDC_STATIC33)->SetWindowText(plusdef.author.c_str());
+	GetDlgItem(IDC_STATIC35)->SetWindowText(plusdef.version.c_str());
 	*pResult = 0;
 }
 
@@ -109,4 +114,37 @@ void CMiraiPlugsDlg::OnBnClickedButton2()
 	int int_ac =  boost::lexical_cast<__int32>(ac_str);
 	CPlusMenuDlg dlg(int_ac);
 	dlg.DoModal();
+}
+
+void CMiraiPlugsDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: 在此处添加消息处理程序代码
+	//设置蓝色背景色
+	CRect rect;
+	GetClientRect(rect);
+	dc.FillSolidRect(rect,RGB(0,245,255)); 
+	
+	// 不为绘图消息调用 CDialog::OnPaint()
+}
+
+HBRUSH CMiraiPlugsDlg::OnCtlColor( CDC* pDC, CWnd* pWnd, UINT nCtlColor )
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  在此更改 DC 的任何属性
+	if (pWnd->GetDlgCtrlID() == IDC_STATIC31 ||
+		pWnd->GetDlgCtrlID() == IDC_STATIC32 ||
+		pWnd->GetDlgCtrlID() == IDC_STATIC33 ||
+		pWnd->GetDlgCtrlID() == IDC_STATIC34 ||
+		pWnd->GetDlgCtrlID() == IDC_STATIC35 ||
+		pWnd->GetDlgCtrlID() == IDC_STATIC36 )
+	{
+		//pDC->SetBkMode(TRANSPARENT);   
+		pDC->SetBkColor(RGB(0,245,255));   
+		return (HBRUSH)GetStockObject(HOLLOW_BRUSH);
+	}
+
+	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
+	return hbr;
 }

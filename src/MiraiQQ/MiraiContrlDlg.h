@@ -24,4 +24,10 @@ public:
 	afx_msg void OnClose();
 	afx_msg LRESULT onShowTask(WPARAM wParam,LPARAM lParam);//мпел
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnPaint();
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton8();
+	afx_msg void OnBnClickedButton5();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };

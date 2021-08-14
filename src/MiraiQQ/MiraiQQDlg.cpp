@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CMiraiQQDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_BUTTON1, &CMiraiQQDlg::OnBnClickedButton1)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -141,6 +142,12 @@ BOOL CMiraiQQDlg::OnInitDialog()
 	ShowWindow(SW_NORMAL);
 
 	// TODO: 在此添加额外的初始化代码
+
+
+	//设置MiraiCQ字体
+	static CFont font;
+	font.CreatePointFont(250,"微软雅黑");
+	GetDlgItem(IDC_STATIC3)->SetFont(&font);
 	ReadConfig(this);
 
 	//AllocConsole();
@@ -184,7 +191,12 @@ void CMiraiQQDlg::OnPaint()
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
-	{
+	{ 
+		//设置蓝色背景色
+		CRect rect;
+		CPaintDC dc(this);
+		GetClientRect(rect);
+		dc.FillSolidRect(rect,RGB(0,245,255)); 
 		CDialog::OnPaint();
 	}
 }
@@ -295,4 +307,31 @@ void CMiraiQQDlg::OnBnClickedButton1()
 
 	CMiraiQQDlg::OnOK();
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+HBRUSH CMiraiQQDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// TODO:  在此更改 DC 的任何属性
+	if (pWnd->GetDlgCtrlID() == IDC_STATIC1)
+	{
+		pDC->SetBkMode(TRANSPARENT);   
+		pDC->SetTextColor(RGB(0,0,0));   
+		return (HBRUSH)GetStockObject(HOLLOW_BRUSH);
+	}else if (pWnd->GetDlgCtrlID() == IDC_STATIC2)
+	{
+		pDC->SetBkMode(TRANSPARENT);   
+		pDC->SetTextColor(RGB(0,0,0));   
+		return (HBRUSH)GetStockObject(HOLLOW_BRUSH);
+	}else if(pWnd->GetDlgCtrlID() == IDC_STATIC3)
+	{
+		pDC->SetBkMode(TRANSPARENT);   
+		pDC->SetTextColor(RGB(0,0,0));   
+		return (HBRUSH)GetStockObject(HOLLOW_BRUSH);
+
+	}
+
+	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
+	return hbr;
 }

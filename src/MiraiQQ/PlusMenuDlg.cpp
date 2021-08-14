@@ -30,6 +30,7 @@ void CPlusMenuDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPlusMenuDlg, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CPlusMenuDlg::OnNMClickList1)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -73,8 +74,17 @@ void CPlusMenuDlg::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 		MiraiQ::get_plus_ptr()->get_plusdef(ac).second.menu.at(nId).function_ptr
 		);
 	((void(__stdcall *)())ptr)();
-	
-
-
 	*pResult = 0;
+}
+
+void CPlusMenuDlg::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: 在此处添加消息处理程序代码
+	//设置蓝色背景色
+	CRect rect;
+	GetClientRect(rect);
+	dc.FillSolidRect(rect,RGB(0,245,255)); 
+
+	// 不为绘图消息调用 CDialog::OnPaint()
 }

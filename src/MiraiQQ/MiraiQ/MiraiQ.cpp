@@ -285,10 +285,11 @@ void MiraiQ::call_cq_stop_fun()
 			if(fun_ptr)
 			{
 				BOOST_LOG_TRIVIAL(debug) << "call plus's fun:event_coolq_stop: " <<fun_ptr;
-				gs_io_service.post(fun_ptr);
+				fun_ptr();
+				//gs_io_service.post(fun_ptr);
 			}
 	}
-	boost::this_thread::sleep_for(boost::chrono::seconds(5));
+	//boost::this_thread::sleep_for(boost::chrono::seconds(5));
 
 }
 
