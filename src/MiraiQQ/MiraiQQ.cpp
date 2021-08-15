@@ -15,6 +15,10 @@
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
+
+#include <boost/log/sinks/text_ostream_backend.hpp>
+
+
 #include <boost/filesystem.hpp>
 
 namespace logging = boost::log;
@@ -40,6 +44,19 @@ END_MESSAGE_MAP()
 
 
 // CMiraiQQApp 构造
+class UpperCaseStreamBuf : public std::streambuf {
+protected:
+	virtual int_type overflow(int_type c) {
+		if (c != EOF) {
+			if(c == '\n')
+			{
+				SetLog('\r');
+			}
+			SetLog(c);
+		}
+		return c;
+	}
+};
 
 CMiraiQQApp::CMiraiQQApp()
 {
@@ -67,9 +84,32 @@ static void get_program_dir(std::string &path_name, std::string &exe_name)
 	exe_name = exe_path_string.substr(pos + 1);
 }
 // CMiraiQQApp 初始化
+static void init_logging()
+{
+	boost::shared_ptr< logging::core > core = logging::core::get();
+	static UpperCaseStreamBuf upper_case_stream_buf;
+	// Create a backend and attach a couple of streams to it
+	boost::shared_ptr< sinks::text_ostream_backend > backend =
+		boost::make_shared< sinks::text_ostream_backend >();
+	boost::shared_ptr<std::ostream > ptr = boost::make_shared<std::ostream>(new UpperCaseStreamBuf());
+	//std::ostream out(&upper_case_stream_buf);
+	backend->add_stream(
+		ptr);
 
+	// Enable auto-flushing after each log record written
+	backend->auto_flush(true);
+
+	// Wrap it into the frontend and register in the core.
+	// The backend requires synchronization in the frontend.
+	typedef sinks::synchronous_sink< sinks::text_ostream_backend > sink_t;
+	boost::shared_ptr< sink_t > sink(new sink_t(backend));
+	core->add_sink(sink);
+}
 BOOL CMiraiQQApp::InitInstance()
 {
+	//AllocConsole();
+	//FILE *stream = 0;
+	//freopen_s(&stream, "CONOUT$", "w", stdout);
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。否则，将无法创建窗口。
@@ -112,6 +152,7 @@ BOOL CMiraiQQApp::InitInstance()
 	{
 		logging::core::get()->set_filter(logging::trivial::severity>=logging::trivial::info);
 	}
+	init_logging();
 	
 
 	{

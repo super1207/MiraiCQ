@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MiraiLogDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MiraiPlugsDlg.cpp"
 				>
 			</File>
@@ -255,6 +259,10 @@
 			</File>
 			<File
 				RelativePath=".\MiraiContrlDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MiraiLogDlg.h"
 				>
 			</File>
 			<File

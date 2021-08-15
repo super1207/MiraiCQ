@@ -5,7 +5,9 @@
 #include "MiraiQQ.h"
 #include "MiraiContrlDlg.h"
 #include "MiraiPlugsDlg.h"
+#include "gobal_value.h"
 #include "MiraiQ/MIraiQ.h"
+#include "MiraiLogDlg.h"
 
 #include <boost/thread/thread.hpp>
 
@@ -200,15 +202,27 @@ void CMiraiContrlDlg::OnBnClickedButton1()
 
 void CMiraiContrlDlg::OnBnClickedButton8()
 {
-	std::string path_name,exe_name;
-	get_program_dir(path_name,exe_name);
-	WinExec(("explorer.exe " + path_name + "\\log\\").c_str() , SW_SHOWNORMAL);
+	static CMiraiLogDlg dlg;
+	static bool isfirst = true;
+	if(isfirst)
+	{
+		isfirst = false;
+		dlg.Create(IDD_MIRAILOGDLG, this);
+		dlg.ShowWindow(SW_SHOW);
+	}else
+	{
+		dlg.ShowWindow(SW_SHOW);
+	}
+	
+	//std::string path_name,exe_name;
+	//get_program_dir(path_name,exe_name);
+	//WinExec(("explorer.exe " + path_name + "\\log\\").c_str() , SW_SHOWNORMAL);
 	// TODO: 在此添加控件通知处理程序代码
 }
 
 void CMiraiContrlDlg::OnBnClickedButton5()
 {
-	AfxMessageBox("MiraiCQ\nv0.1.1");
+	AfxMessageBox("MiraiCQ\nv0.1.1\nhttps://github.com/super1207/MiraiCQ");
 	// TODO: 在此添加控件通知处理程序代码
 }
 

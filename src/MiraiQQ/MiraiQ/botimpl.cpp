@@ -181,7 +181,7 @@ public:
 		//send
 		websocketpp::lib::error_code ec;
 		std::string outstr = Json::FastWriter().write(outroot);
-		BOOST_LOG_TRIVIAL(debug) << outstr;
+		//BOOST_LOG_TRIVIAL(debug) << outstr;
 		c.send(hdl,outstr,  websocketpp::frame::opcode::text , ec);	
 		try{
 			std::string gbkmsg;
@@ -239,15 +239,7 @@ private:
 		{
 			return ;
 		}
-		//utf8 -> gbk
-		std::string gbkmsg;
-		try{
-			gbkmsg = boost::locale::conv::between(msg->get_payload(), "GBK", "UTF-8");
-		}catch(const std::exception & e){
-			BOOST_LOG_TRIVIAL(info) <<"error in on_message's to_gbk:"<< e.what();
-			return ;
-		}
-		BOOST_LOG_TRIVIAL(debug) << "message: " << gbkmsg << std::endl;
+		
 
 		Json::Value root;
 		Json::Reader reader;
@@ -262,6 +254,18 @@ private:
 				if(root["post_type"].asString() != "")  //event
 				{
 					c->bot->cb->push_back(root);
+					{
+						//utf8 -> gbk
+						std::string gbkmsg;
+						try{
+							gbkmsg = boost::locale::conv::between(root.toStyledString(), "GBK", "UTF-8");
+						}catch(const std::exception & e){
+							BOOST_LOG_TRIVIAL(info) <<"error in on_message's to_gbk:"<< e.what();
+							return ;
+						}
+						BOOST_LOG_TRIVIAL(debug) << "message: " << gbkmsg << std::endl;
+					}
+					
 				}else //api reply
 				{
 					c->bot->ecb->push_back(root);
