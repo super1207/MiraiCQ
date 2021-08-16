@@ -14,6 +14,7 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
+#include <boost/filesystem.hpp>
 
 
 #include <boost/log/sinks/text_ostream_backend.hpp>
@@ -134,6 +135,9 @@ BOOL CMiraiQQApp::InitInstance()
 
 	std::string path_name,exe_name;
 	get_program_dir(path_name,exe_name);
+	boost::filesystem::create_directory(path_name+"/data");
+	boost::filesystem::create_directory(path_name+"/data/image");
+	boost::filesystem::create_directory(path_name+"/app");
 	boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());
 	boost::log::register_simple_formatter_factory< boost::log::trivial::severity_level, char >("Severity");
 	logging::add_common_attributes();

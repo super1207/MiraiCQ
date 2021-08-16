@@ -52,8 +52,7 @@ int user_event_message_private(const Json::Value & raw_json,const SbotEventMessa
 
 ## 快速体验
 此处提供一个快速体验(预览)版本，如果你不想编译MiraiCQ，可以直接从这里下载二进制文件。但是不保证能及时更新: <br />
-[fast_try_0_11.zip](https://super1207.lanzoui.com/ib1Vxsmtixa) <br />
-[fast_try_0_12.zip](https://super1207.lanzoui.com/ivZtwsnynbe) (不稳定版本,带Log UI) <br />
+[fast_try_0_13.zip](https://super1207.lanzoui.com/is0jgspqd3a) <br />
 
 注：PicHP是一个私聊复读机的插件示例
 

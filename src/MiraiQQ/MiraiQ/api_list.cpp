@@ -183,11 +183,84 @@ extern "C" int __stdcall AddLog(int auth_code, int log_level, const char *catego
 	return 0;
 }
 
+
+static std::vector<std::string> tokenize(const std::string& s, char c) {
+	std::string::const_iterator end = s.end();
+	std::string::const_iterator start = end;
+
+	std::vector<std::string> v;
+	for (std::string::const_iterator it = s.begin(); it != end; ++it) {
+		if (*it != c) {
+			if (start == end)
+				start = it;
+			continue;
+		}
+		if (start != end) {
+			v.push_back(std::string(start, it));
+			start = end;
+		}
+	}
+	if (start != end)
+		v.push_back(std::string(start, end));
+	return v;
+}
+
+static std::string& replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value)
+{
+	for (std::string::size_type pos(0); pos != std::string::npos; pos += new_value.length())
+	{
+		if ((pos = str.find(old_value, pos)) != std::string::npos)
+			str.replace(pos, old_value.length(), new_value);
+		else   break;
+	}
+	return   str;
+}
+
+//得到执行的exe的名字和路径(windows)
+static void get_program_dir(std::string &path_name, std::string &exe_name)
+{
+	char exe_path[MAX_PATH];
+	if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) == 0)
+	{
+		return ;
+		//throw logic_error("GetModuleFileNameA错误");
+	}
+	std::string exe_path_string = exe_path;
+	size_t pos = exe_path_string.find_last_of('\\', exe_path_string.length());
+	path_name = exe_path_string.substr(0, pos);
+	exe_name = exe_path_string.substr(pos + 1);
+}
+
+static std::string FixCQImg(const char * msg)
+{
+	if(!msg)
+	{
+		return "";
+	}
+	if(strstr(msg,"[CQ:image,file=") == NULL || 
+		strstr(msg,"[CQ:image,file=file:///") != NULL ||
+		strstr(msg,"[CQ:image,file=http://") != NULL ||
+		strstr(msg,"[CQ:image,file=https://") != NULL||
+		strstr(msg,"[CQ:image,file=base64://") != NULL)
+	{
+		return msg;
+	}
+	std::string retStr = msg;
+	std::string path_name,exe_name;
+	get_program_dir(path_name,exe_name);
+	replace_all_distinct(path_name, "&", "&amp;");
+	replace_all_distinct(path_name, "[", "&#91;");
+	replace_all_distinct(path_name, "]", "&#93;");
+	replace_all_distinct(path_name, ",", "&#44;");
+	replace_all_distinct(retStr,"[CQ:image,file=","[CQ:image,file=file:///" + path_name+"/data/image/");
+	return retStr;
+}
+
 // Message
 FFUN1(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg)
 {
 	CHECK_AC(auth_code,pdf)
-		std::string  gbkmsg = to_u8(msg?msg:"");
+		std::string  gbkmsg = to_u8(FixCQImg(msg));
 	Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendPrivateMsg(qq,gbkmsg.c_str());
 	CHECK_RET(ret_json,retcode)
 		MsgIdConvert * cvt = MsgIdConvert::getInstance();
@@ -197,7 +270,7 @@ FFUN1(__int32, sendPrivateMsg, __int32 auth_code, __int64 qq, const char *msg)
 FFUN1(__int32, sendGroupMsg, __int32 auth_code, __int64 group_id, const char *msg)
 {
 	CHECK_AC(auth_code,pdf)
-		std::string  gbkmsg = to_u8((msg?msg:""));
+		std::string  gbkmsg = to_u8(FixCQImg(msg));
 	Json::Value ret_json =  MiraiQ::get_bot_ptr()->sendGroupMsg(group_id,gbkmsg.c_str());
 	CHECK_RET(ret_json,retcode)
 		MsgIdConvert * cvt = MsgIdConvert::getInstance();
