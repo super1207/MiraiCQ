@@ -41,6 +41,7 @@ int user_event_message_private(const Json::Value & raw_json,const SbotEventMessa
 我使用 VS2008 x86 + boost_1_55_0 ,除此之外无需自己安装其他依赖。<br />
 如果你不想亲自编译boost,这里有编译好的版本
 [https://boost.teeks99.com/](https://boost.teeks99.com/) <br />
+
 ### 编译插件
 用自己喜欢的visual studio打开PicHP示例插件即可编译。<br/>
 当然，你也可以你也可以选择以前酷Q的sdk来写插件(不推荐)。
@@ -55,6 +56,10 @@ int user_event_message_private(const Json::Value & raw_json,const SbotEventMessa
 [fast_try_0_13.zip](https://super1207.lanzoui.com/is0jgspqd3a) <br />
 
 注：PicHP是一个私聊复读机的插件示例
+
+## 寻找插件
+
+您可以在[此处](https://github.com/super1207/MiraiCQ/blob/main/doc/NativeHub.md)寻找已经经过测试的插件
 
 ## 聊聊其它
 的确，这个项目看起来很简陋，实际上也的确如此。项目最开始的目的是复用酷Q插件。但是，我逐渐意识到很多问题:
