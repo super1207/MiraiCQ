@@ -169,7 +169,12 @@ static std::string CvtJsonToStrMsg(const Json::Value& jsonArr)
 				Json::Value::Members member = datObj.getMemberNames();
 				for (std::vector<std::string>::iterator iter = member.begin(); iter != member.end(); iter++)
 				{
-					cqStr.append("," + (*iter) + "=" + datObj[(*iter)].asString());
+					std::string dat = datObj[(*iter)].asString();
+					replace_all_distinct(dat, "&", "&amp;");
+					replace_all_distinct(dat, "[", "&#91;");
+					replace_all_distinct(dat, "]", "&#93;");
+					replace_all_distinct(dat, ",", "&#44;");
+					cqStr.append("," + (*iter) + "=" + dat);
 				}
 				cqStr.append("]");
 				retStr.append(cqStr);

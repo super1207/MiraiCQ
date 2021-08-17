@@ -108,7 +108,7 @@ public:
 			}
 			return true;
 		}
-		catch (websocketpp::exception const & e)
+		catch (std::exception const & e)
 		{
 			BOOST_LOG_TRIVIAL(info) << "could not create connection because: " << e.what();
 			isconnect = 5;
@@ -127,7 +127,7 @@ public:
 		try {
 			c.close( hdl, websocketpp::close::status::normal, "" );
 		}
-		catch (websocketpp::exception const &)
+		catch (std::exception const &)
 		{
 			//已经关闭，无需log
 			//std::cout << e.what() << std::endl;

@@ -76,7 +76,12 @@ static std::string CvtJsonToStrMsg(const Json::Value& jsonArr)
 				Json::Value::Members member = datObj.getMemberNames();
 				for (std::vector<std::string>::iterator iter = member.begin(); iter != member.end(); iter++)
 				{
-					cqStr.append("," + (*iter) + "=" + datObj[(*iter)].asString());
+					std::string dat = datObj[(*iter)].asString();
+					replace_all_distinct(dat, "&", "&amp;");
+					replace_all_distinct(dat, "[", "&#91;");
+					replace_all_distinct(dat, "]", "&#93;");
+					replace_all_distinct(dat, ",", "&#44;");
+					cqStr.append("," + (*iter) + "=" + dat);
 				}
 				cqStr.append("]");
 				retStr.append(cqStr);
@@ -93,22 +98,173 @@ static std::string CvtJsonToStrMsg(const Json::Value& jsonArr)
 
 }
 
+static std::vector<std::string> tokenize(const std::string& s, char c) {
+	std::string::const_iterator end = s.end();
+	std::string::const_iterator start = end;
+
+	std::vector<std::string> v;
+	for (std::string::const_iterator it = s.begin(); it != end; ++it) {
+		if (*it != c) {
+			if (start == end)
+				start = it;
+			continue;
+		}
+		if (start != end) {
+			v.push_back(std::string(start, it));
+			start = end;
+		}
+	}
+	if (start != end)
+		v.push_back(std::string(start, end));
+	return v;
+}
+
+
+
+/* 用于将字符串格式的消息转化为json数组格式,转化失败返回null */
+Json::Value CvtStrMsgToJson(const std::string& strMsg)
+{
+	Json::Value jsonArr = Json::arrayValue;
+	std::vector<std::string> strVec;
+	bool iscq = false;
+	for (size_t i = 0; i < strMsg.size(); ++i)
+	{
+		if (strMsg[i] == '[')
+		{
+			iscq = true;
+			strVec.push_back(std::string(1, '['));
+		}
+		else
+		{
+			if (iscq && strMsg[i] == ' ')
+			{
+				continue;
+			}
+			if (strVec.size() == 0)
+			{
+				strVec.push_back("");
+			}
+			strVec[strVec.size() - 1].append(std::string(1, strMsg[i]));
+			if (strMsg[i] == ']')
+			{
+				iscq = false;
+				strVec.push_back("");
+			}
+		}
+	}
+	for (size_t i = 0; i < strVec.size(); ++i)
+	{
+		if (strVec[i] == "")
+		{
+			continue;
+		}
+		if (strVec[i][0] != '[')
+		{
+			Json::Value node;
+			node["type"] = "text";
+			Json::Value datNode;
+			std::string t = strVec[i];
+			replace_all_distinct(t, "&amp;", "&");
+			replace_all_distinct(t, "&#91;", "[");
+			replace_all_distinct(t, "&#93;", "]");
+			replace_all_distinct(t, "&#44;", ",");
+			datNode["text"] = t;
+			node["data"] = datNode;
+			jsonArr.append(node);
+		}
+		else
+		{
+			Json::Value node;
+			Json::Value datNode = Json::objectValue;
+			std::vector<std::string> strNode = tokenize(std::string(strVec[i].begin() + 1, strVec[i].end() - 1), ',');
+			try
+			{
+				node["type"] = tokenize(strNode.at(0), ':').at(1);
+				for (size_t i = 1; i < strNode.size(); ++i)
+				{
+					size_t pos = strNode.at(i).find_first_of("=");
+					std::string type = strNode.at(i).substr(0, pos);
+					std::string dat = strNode.at(i).substr(pos + 1);
+					std::string t = dat;
+					replace_all_distinct(t, "&amp;", "&");
+					replace_all_distinct(t, "&#91;", "[");
+					replace_all_distinct(t, "&#93;", "]");
+					replace_all_distinct(t, "&#44;", ",");
+					datNode[type] = t;
+				}
+				node["data"] = datNode;
+				jsonArr.append(node);
+
+			}
+			catch (const std::exception&)
+			{
+				return Json::Value();
+			}
+		}
+	}
+	return jsonArr;
+}
+
+static bool IsFileExistent(const boost::filesystem::path& path) 
+{ 
+	return boost::filesystem::is_regular_file(path); 
+}
+
+static void DealCqMsg(Json::Value & root)
+{
+	Json::Value jsonArr = root["message"];
+	Json::Value defstr = Json::Value("");
+	if(jsonArr.isNull())
+	{
+		root["message"] = "";
+		return ;
+	}
+	if(jsonArr.isString())
+	{
+		jsonArr = CvtStrMsgToJson(jsonArr.asString());
+		if(jsonArr.isNull())
+		{
+			root["message"] = "";
+			return ;
+		}
+	}
+	std::string retStr;
+	if(!jsonArr.isArray())
+	{
+		root["message"] = "";
+		return ;
+	}
+	for(size_t i = 0;i < jsonArr.size();++i)
+	{
+		std::string type = jsonArr[i].get("type", Json::Value("")).asString();
+		if(type == "image")
+		{
+			std::string url = jsonArr[i].get("data", defstr).get("url", defstr).asString();
+			std::string file = jsonArr[i].get("data", defstr).get("file", defstr).asString();
+			if(url == "" || file == "")
+			{
+				continue;
+			}
+			std::string fileimg = file + ".cqimg";
+			std::string inifile = "data/image/" + fileimg;
+			if(!IsFileExistent(inifile))
+			{
+				WritePrivateProfileString("image","url",url.c_str(),inifile.c_str()); 
+			}
+			Json::Value jdat;
+			jdat["file"] = file;
+			jsonArr[i]["data"] = jdat;
+
+		}
+			
+	}
+	root["message"] = to_gbk(CvtJsonToStrMsg(jsonArr));
+}
+
 TEMP_EVENT_FUN(event_private_message)
 {
 	GET_FUNPTR(event_private_message)
-	std::string msg;
-	if(root["message"].isString())
-	{
-		msg = to_gbk(root["message"].asString());
-	}
-	else
-	{
-		msg = to_gbk(CvtJsonToStrMsg(root["message"]));
-	}
-	if(msg == "")
-	{
-		msg = to_gbk(root["raw_message"].asString());
-	}
+	std::string  msg = root["message"].asString();
 	std::string subtype = root["sub_type"].asString();
 	__int32 sub_type;
 	if(subtype == "friend")
@@ -121,9 +277,7 @@ TEMP_EVENT_FUN(event_private_message)
 	{
 		sub_type = 1;
 	}
-	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
-	assert(msgid_convert);
-	__int32 ret = fun_ptr(sub_type,msgid_convert->to_cq(root["message_id"].asInt()),root["user_id"].asInt64(),msg.c_str(),root["font"].asInt());
+	__int32 ret = fun_ptr(sub_type,root["message_id"].asInt(),root["user_id"].asInt64(),msg.c_str(),root["font"].asInt());
 	if(ret == 0)
 	{
 		return EVENT_IGNORE;
@@ -150,23 +304,9 @@ TEMP_EVENT_FUN(event_group_message)
 
 	}
 
-	std::string msg;
-	if(root["message"].isString())
-	{
-		msg = to_gbk(root["message"].asString());
-	}
-	else
-	{
-		msg = to_gbk(CvtJsonToStrMsg(root["message"]));
-	}
-	if(msg == "")
-	{
-		msg = to_gbk(root["raw_message"].asString());
-	}
+	std::string  msg = root["message"].asString();
 
-	MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();
-	assert(msgid_convert);
-	__int32 ret = fun_ptr(1,msgid_convert->to_cq(root["message_id"].asInt()),root["group_id"].asInt64(),root["user_id"].asInt64(),from_anonymous_base64.c_str(),msg.c_str(),root["font"].asInt());
+	__int32 ret = fun_ptr(1,root["message_id"].asInt(),root["group_id"].asInt64(),root["user_id"].asInt64(),from_anonymous_base64.c_str(),msg.c_str(),root["font"].asInt());
 	if(ret == 0)
 	{
 		return EVENT_IGNORE;
@@ -415,8 +555,24 @@ TEMP_EVENT_FUN(event_all)
 
 
 
-#define CALL_FUN_EVENT(X,M1,M2)  __int32 call_##X (const Json::Value & root,boost::shared_ptr<Plus> plus) \
+#define CALL_FUN_EVENT(X,M1,M2)  __int32 call_##X (const Json::Value & root_,boost::shared_ptr<Plus> plus) \
 { \
+	Json::Value root = root_;\
+	try{\
+		if(root["post_type"].asString() == "message")\
+		{\
+			DealCqMsg(root);\
+			{\
+				MsgIdConvert * msgid_convert = MsgIdConvert::getInstance();\
+				assert(msgid_convert);\
+				root["message_id"] = msgid_convert->to_cq(root["message_id"].asInt());\
+			}\
+		}\
+	}\
+	catch(const std::exception & e)\
+	{\
+		BOOST_LOG_TRIVIAL(info) <<"crashed on call fun temp_call_" << #X << ":" << e.what();\
+	}\
 	std::map<__int32,Plus::PlusDef> plus_map = plus->get_plus_map();\
 	std::map<__int32,Plus::PlusDef>::iterator iter;\
 	for(iter = plus_map.begin();iter != plus_map.end();++iter)\
@@ -425,7 +581,8 @@ TEMP_EVENT_FUN(event_all)
 		{\
 			continue;\
 		}\
-		__int32 ret;try{ret = temp_call_##X(iter,root);}\
+		__int32 ret;try{\
+			ret = temp_call_##X(iter,root);}\
 		catch(const std::exception & e){\
 		BOOST_LOG_TRIVIAL(info) <<"crashed on call fun temp_call_" << #X << ":" << e.what();}\
 	}\
