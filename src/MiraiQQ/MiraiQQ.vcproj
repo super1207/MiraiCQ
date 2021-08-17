@@ -160,8 +160,8 @@
 				ModuleDefinitionFile="define.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				TargetMachine="1"
 			/>
 			<Tool
