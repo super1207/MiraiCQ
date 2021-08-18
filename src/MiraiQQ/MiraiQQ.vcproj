@@ -396,6 +396,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MiraiQ\binpack.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MiraiQ\binpack.h"
 				>
 			</File>
@@ -417,6 +421,14 @@
 			</File>
 			<File
 				RelativePath=".\MiraiQ\botimpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\httphelp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\httphelp.h"
 				>
 			</File>
 			<File

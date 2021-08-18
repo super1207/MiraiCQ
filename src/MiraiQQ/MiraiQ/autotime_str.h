@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __AUTOTIME_STR_H__QRQMAGMLJXKTEEQV
+#define __AUTOTIME_STR_H__QRQMAGMLJXKTEEQV
+
 #include <vector>
 #include <ctime>
 #include <boost/thread/mutex.hpp>
@@ -13,3 +15,5 @@ private:
 	time_t ts;
 	boost::mutex mx;
 };
+
+#endif

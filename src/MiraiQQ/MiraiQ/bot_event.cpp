@@ -1,12 +1,17 @@
+#include <afx.h>
+#include <atlimage.h>
 #include "bot_event.h"
 #include "bot.h"
 #include "plus.h"
 #include "binpack.h"
 #include "base64.h"
 #include "msg_id_convert.h"
-
+#include "httphelp.h"
 
 #include <boost/locale/encoding.hpp>
+#include <atlstr.h>
+#include <boost\cast.hpp>
+#include <boost\lexical_cast.hpp> 
 
 
 #define to_gbk(U8) boost::locale::conv::between((U8), "GBK", "UTF-8")
@@ -17,7 +22,7 @@ std::map<std::string,std::map<std::string,__int32(*)(const Json::Value &,boost::
 #define EVENT_IGNORE 0
 #define EVENT_BLOCK 1
 
-#define TEMP_EVENT_FUN(x) static __int32 temp_call_##x##(const std::map<__int32,Plus::PlusDef>::iterator & iter,const Json::Value & root)
+#define TEMP_EVENT_FUN(x) static __int32 temp_call_##x##(const std::map<__int32,Plus::PlusDef>::iterator & iter,const Json::Value & root,const Json::Value & root_)
 #define EVENT_FUN_ID(x) Plus::cq_##x##_id
 #define EVENT_FUN_TYPE(x) Plus::cq_##x##_funtype
 #define GET_FUNPTR(FUNTYPE) \
@@ -210,6 +215,105 @@ static bool IsFileExistent(const boost::filesystem::path& path)
 	return boost::filesystem::is_regular_file(path); 
 }
 
+static std::string GetPhotoType(const std::string & path)	
+{
+	FILE *fp = fopen(path.c_str(), "rb");
+	if(!fp)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "File can`t open:" << path;
+		return "";
+	}
+	char buffer[32];
+	size_t n = fread(buffer, 1, 30, fp);
+	fclose(fp);
+	if(n != 30)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "n not 30" << n;
+		return "";
+	}
+	if ((unsigned char)buffer[0] == 0xff && (unsigned char)buffer[1] == 0xd8)
+	{
+		return "jpg";
+	}
+	else if (!memcmp(&buffer[0], "GIF89a", 6))
+	{
+		return "gif";
+	}else if (!memcmp(&buffer[0], "GIF87a", 6))
+	{
+		return "gif";
+	}
+	else if (!memcmp(&buffer[1], "PNG", 3))
+	{
+		return "png" ;
+	}
+	else if((unsigned char)buffer[0] == 0x42 && (unsigned char)buffer[1] == 0x4d)
+	{
+		return "bmp";
+	}
+	BOOST_LOG_TRIVIAL(debug) << "can`t match any";
+	return "";
+}
+
+static bool GetImg(const std::string & url,const std::string & file,int & width,int & height,std::string & md5Str,ULONGLONG & sz)
+{
+	std::string filepath = "data\\image\\" + file;
+	std::string ct;
+	if(!HttpGet(url,filepath,ct,5000))
+	{
+		return false;;
+	}
+	std::string tp = GetPhotoType(filepath);
+	if(tp == "")
+	{
+		return false;
+	}
+	try
+	{
+		boost::filesystem::rename(filepath,filepath + "." + tp);
+	}
+	catch(const std::exception &)
+	{
+		return false;
+	}
+
+	CString strFilePath  = (filepath + "." + tp).c_str();  
+	CFileStatus fileStatus;  
+	if (CFile::GetStatus(strFilePath, fileStatus))  
+	{  
+		sz = fileStatus.m_size;  
+	}else
+	{
+		BOOST_LOG_TRIVIAL(debug) << "get image file size error";
+		return false;
+	}
+
+	CImage image;
+	if(image.Load((filepath + "." + tp).c_str()) != S_OK)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "img load error";
+		return false;
+	}
+	width = image.GetWidth();
+	height = image.GetHeight();
+	try
+	{
+		md5Str = boost::to_upper_copy(std::string(file.begin(),file.begin()+32));
+	}
+	catch(const std::exception &)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "get image md5 error";
+		image.Destroy();
+		return false;
+	}
+	image.Destroy();
+	if(md5Str.length() != 32)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "get image md5 error";
+		return false;
+	}
+	return true;
+}
+
 static void DealCqMsg(Json::Value & root)
 {
 	Json::Value jsonArr = root["message"];
@@ -249,7 +353,26 @@ static void DealCqMsg(Json::Value & root)
 			std::string inifile = "data/image/" + fileimg;
 			if(!IsFileExistent(inifile))
 			{
-				WritePrivateProfileString("image","url",url.c_str(),inifile.c_str()); 
+				int width = 0,height = 0;
+				ULONGLONG sz;
+				std::string md5Str;
+				if(!GetImg(url,file,width,height,md5Str,sz))
+				{
+					BOOST_LOG_TRIVIAL(debug) << "get img info error";
+				}else
+				{
+					WritePrivateProfileStringA("image","md5",md5Str.c_str(),inifile.c_str()); 
+					WritePrivateProfileStringA("image","width",boost::lexical_cast<std::string>(width).c_str(),inifile.c_str()); 
+					WritePrivateProfileStringA("image","height",boost::lexical_cast<std::string>(height).c_str(),inifile.c_str()); 
+					WritePrivateProfileStringA("image","size",boost::lexical_cast<std::string>(sz).c_str(),inifile.c_str());
+				}
+
+				BOOL isOk = WritePrivateProfileStringA("image","url",url.c_str(),inifile.c_str()); 
+				if(isOk != TRUE)
+				{
+					BOOST_LOG_TRIVIAL(debug) << "cqimg read error，check data\\image";
+				}
+				WritePrivateProfileStringA("image","addtime",boost::lexical_cast<std::string>(time(0)).c_str(),inifile.c_str());
 			}
 			Json::Value jdat;
 			jdat["file"] = file;
@@ -314,7 +437,6 @@ TEMP_EVENT_FUN(event_group_message)
 	return EVENT_BLOCK;
 }
 
-/* Ä¿Ç°Ã»ÓÐdiscussÁË */
 TEMP_EVENT_FUN(event_discuss_message)
 {
 	return EVENT_BLOCK;
@@ -542,7 +664,7 @@ TEMP_EVENT_FUN(event_group_request)
 TEMP_EVENT_FUN(event_all)
 {
 	GET_FUNPTR(event_all)
-	std::string outstr = Json::FastWriter().write(root);
+	std::string outstr = Json::FastWriter().write(root_);
 	__int32 ret = fun_ptr(to_gbk(outstr).c_str());
 	if(ret == 0)
 	{
@@ -582,7 +704,8 @@ TEMP_EVENT_FUN(event_all)
 			continue;\
 		}\
 		__int32 ret;try{\
-			ret = temp_call_##X(iter,root);}\
+			temp_call_event_all(iter,root,root_);\
+			ret = temp_call_##X(iter,root,root_);}\
 		catch(const std::exception & e){\
 		BOOST_LOG_TRIVIAL(info) <<"crashed on call fun temp_call_" << #X << ":" << e.what();}\
 	}\

@@ -8,8 +8,11 @@
 #include "gobal_value.h"
 #include "MiraiQ/MIraiQ.h"
 #include "MiraiLogDlg.h"
+#include "httphelp.h"
 
 #include <boost/thread/thread.hpp>
+#include <boost\cast.hpp>
+#include <boost\lexical_cast.hpp> 
 
 #include <atlimage.h>
 
@@ -64,7 +67,7 @@ BOOL CMiraiContrlDlg::OnInitDialog()
 	nid.hIcon=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_MAINFRAME));
 	strcpy_s(nid.szTip,"MiraiCQ");
 	Shell_NotifyIcon(NIM_ADD,&nid); 
-	SetTimer(1,1000,NULL);
+	SetTimer(1,500,NULL);
 	
 	return 0;
 
@@ -91,10 +94,28 @@ void CMiraiContrlDlg::OnBnClickedButton3()
 	// TODO: 在此添加控件通知处理程序代码
 }
 
+//得到执行的exe的名字和路径(windows)
+static void get_program_dir(std::string &path_name, std::string &exe_name)
+{
+	char exe_path[MAX_PATH];
+	if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) == 0)
+	{
+		return ;
+		//throw logic_error("GetModuleFileNameA错误");
+	}
+	std::string exe_path_string = exe_path;
+	size_t pos = exe_path_string.find_last_of('\\', exe_path_string.length());
+	path_name = exe_path_string.substr(0, pos);
+	exe_name = exe_path_string.substr(pos + 1);
+}
+
+static CImage user_image;
+
 void CMiraiContrlDlg::OnBnClickedButton4()
 {
 	static CFont fontok,fontno;
 	static int i = 0;
+	static int isnewcon = 0;
 	if(i == 0)
 	{
 		++i;
@@ -105,13 +126,61 @@ void CMiraiContrlDlg::OnBnClickedButton4()
 	{
 		GetDlgItem(IDC_STATIC_STATUS)->SetFont(&fontok);
 		GetDlgItem(IDC_STATIC_STATUS)->SetWindowText("已连接");
+		if(isnewcon == 0)
+		{
+			isnewcon = 1;
+			__int64 qq = 0;
+			try
+			{
+				Json::Value ret_json = MiraiQ::get_bot_ptr()->getLoginQQ();
+				qq = ret_json["data"]["user_id"].asInt64();
+			}catch(const std::exception & )
+			{
+
+			}
+			if(qq != 0)
+			{
+				std::string url = "http://q1.qlogo.cn/g?b=qq&nk="+boost::lexical_cast<std::string>(qq)+"&s=640";
+				std::string ct;
+				if(HttpGet(url,"user.jpg",ct,5000))
+				{
+					if(!user_image.IsNull())
+					{
+						user_image.Destroy();
+					}
+					std::string path_name,exe_name;
+					get_program_dir(path_name,exe_name);
+					user_image.Load((path_name+"//user.jpg").c_str());
+					if (!user_image.IsNull())  
+					{  
+						{
+							int height, width;
+							CRect rect1;
+							height = user_image.GetHeight();
+							width = user_image.GetWidth();
+							CRect rect;
+							GetDlgItem( IDC_STATIC11 )->GetClientRect(&rect);
+							CDC* pDC = GetDlgItem( IDC_STATIC11 ) ->GetDC();
+							HDC hDC = pDC ->GetSafeHdc();
+							SetStretchBltMode(hDC,STRETCH_HALFTONE); 
+							rect1 = CRect(rect.TopLeft(), CSize(rect.Width()+1,rect.Height()+1));
+							user_image.StretchBlt(hDC,rect1,SRCCOPY);
+							ReleaseDC(pDC);
+						}
+					}
+				}
+			}
+		}
+		isnewcon = 1;
 		//AfxMessageBox("websocket已经成功连接");
 	}else
 	{
 		GetDlgItem(IDC_STATIC_STATUS)->SetFont(&fontno);
 		GetDlgItem(IDC_STATIC_STATUS)->SetWindowText("已断开");
+		isnewcon = 0;
 		//AfxMessageBox("websocket没有成功链接");
 	}
+	
 	// TODO: 在此添加控件通知处理程序代码
 }
 
@@ -144,20 +213,6 @@ void CMiraiContrlDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	CDialog::OnSysCommand(nID, lParam);
 }
-//得到执行的exe的名字和路径(windows)
-static void get_program_dir(std::string &path_name, std::string &exe_name)
-{
-	char exe_path[MAX_PATH];
-	if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) == 0)
-	{
-		return ;
-		//throw logic_error("GetModuleFileNameA错误");
-	}
-	std::string exe_path_string = exe_path;
-	size_t pos = exe_path_string.find_last_of('\\', exe_path_string.length());
-	path_name = exe_path_string.substr(0, pos);
-	exe_name = exe_path_string.substr(pos + 1);
-}
 
 void CMiraiContrlDlg::OnPaint()
 {
@@ -167,27 +222,24 @@ void CMiraiContrlDlg::OnPaint()
 	CRect rect;
 	GetClientRect(rect);
 	dc.FillSolidRect(rect,RGB(0,245,255)); 
-	CImage image;
-	std::string path_name,exe_name;
-	get_program_dir(path_name,exe_name);
-	image.Load((path_name+"//user.jpg").c_str());  
-	if (!image.IsNull())  
+
+	if (!user_image.IsNull())  
 	{  
 		{
 			int height, width;
 			CRect rect1;
-			height = image.GetHeight();
-			width = image.GetWidth();
+			height = user_image.GetHeight();
+			width = user_image.GetWidth();
 			CRect rect;
 			GetDlgItem( IDC_STATIC11 )->GetClientRect(&rect);
 			CDC* pDC = GetDlgItem( IDC_STATIC11 ) ->GetDC();
 			HDC hDC = pDC ->GetSafeHdc();
 			SetStretchBltMode(hDC,STRETCH_HALFTONE); 
 			rect1 = CRect(rect.TopLeft(), CSize(rect.Width()+1,rect.Height()+1));
-			image.StretchBlt(hDC,rect1,SRCCOPY);
+			user_image.StretchBlt(hDC,rect1,SRCCOPY);
 			ReleaseDC(pDC);
 		}
-	} 
+	}
 	// 不为绘图消息调用 CDialog::OnPaint()
 }
 

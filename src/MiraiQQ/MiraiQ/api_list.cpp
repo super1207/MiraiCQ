@@ -5,6 +5,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/locale/encoding.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/filesystem.hpp>
 
 
 #include "bot.h"
@@ -15,6 +16,7 @@
 #include "base64.h"
 #include "MIraiQ.h"
 #include "msg_id_convert.h"
+#include "httphelp.h"
 
 
 static autotime_str g_autotime_str;
@@ -678,13 +680,73 @@ FFUN1(const char *, getRecordV2, __int32 auth_code, const char *file, const char
 		std::string ret_str = ret_json["data"]["file"].asString();
 	RET_STR(ret_str)
 }
+
+static std::string GetPhotoType(const std::string & path)	
+{
+	FILE *fp = fopen(path.c_str(), "rb");
+	if(!fp)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "File can`t open:" << path;
+		return "";
+	}
+	char buffer[32];
+	size_t n = fread(buffer, 1, 30, fp);
+	fclose(fp);
+	if(n != 30)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "n not 30" << n;
+		return "";
+	}
+	if ((unsigned char)buffer[0] == 0xff && (unsigned char)buffer[1] == 0xd8)
+	{
+		return "jpg";
+	}
+	else if (!memcmp(&buffer[0], "GIF89a", 6))
+	{
+		return "gif";
+	}else if (!memcmp(&buffer[0], "GIF87a", 6))
+	{
+		return "gif";
+	}
+	else if (!memcmp(&buffer[1], "PNG", 3))
+	{
+		return "png" ;
+	}
+	else if((unsigned char)buffer[0] == 0x42 && (unsigned char)buffer[1] == 0x4d)
+	{
+		return "bmp";
+	}
+	BOOST_LOG_TRIVIAL(debug) << "can`t match any";
+	return "";
+}
+
 FFUN1(const char *, getImage, __int32 auth_code, const char *file)
 {
 	CHECK_PTRAC(auth_code,pdf)
-		Json::Value ret_json = MiraiQ::get_bot_ptr()->getImage(file);
-	CHECK_PTRRET(ret_json,retcode)
-		std::string ret_str = ret_json["data"]["file"].asString();
-	RET_STR(ret_str)
+		if(!file)
+		{
+			return "";
+		}
+		std::string path_name,exe_name;
+		get_program_dir(path_name,exe_name);
+		std::string imgpath = path_name + std::string("\\data\\image\\") + file;
+		if(boost::filesystem::is_regular_file(imgpath+".jpg"))
+		{
+			RET_STR((imgpath+".jpg"))
+		}
+		else if (boost::filesystem::is_regular_file(imgpath+".png"))
+		{
+			RET_STR((imgpath+".png"))
+		}
+		else if (boost::filesystem::is_regular_file(imgpath+".gif"))
+		{
+			RET_STR((imgpath+".gif"))
+		}
+		else if (boost::filesystem::is_regular_file(imgpath+".bmp"))
+		{
+			RET_STR((imgpath+".bmp"))
+		}
+		return "";
 }
 FFUN1(__int32, canSendImage, __int32 auth_code)
 {
