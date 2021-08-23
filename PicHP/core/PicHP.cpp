@@ -769,10 +769,6 @@ Json::Value CvtStrMsgToJson(const std::string& strMsg)
 		}
 		else
 		{
-			if (iscq && strMsg[i] == ' ')
-			{
-				continue;
-			}
 			if (strVec.size() == 0)
 			{
 				strVec.push_back("");

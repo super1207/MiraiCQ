@@ -141,10 +141,6 @@ Json::Value CvtStrMsgToJson(const std::string& strMsg)
 		}
 		else
 		{
-			if (iscq && strMsg[i] == ' ')
-			{
-				continue;
-			}
 			if (strVec.size() == 0)
 			{
 				strVec.push_back("");
@@ -297,19 +293,21 @@ static bool GetImg(const std::string & url,const std::string & file,int & width,
 	height = image.GetHeight();
 	try
 	{
+		/* 暂时只有go-cqhttp后端才能获取md5 */
 		md5Str = boost::to_upper_copy(std::string(file.begin(),file.begin()+32));
 	}
 	catch(const std::exception &)
 	{
 		BOOST_LOG_TRIVIAL(debug) << "get image md5 error";
-		image.Destroy();
-		return false;
+		/* image.Destroy(); */
+		/* return false; */
 	}
 	image.Destroy();
 	if(md5Str.length() != 32)
 	{
 		BOOST_LOG_TRIVIAL(debug) << "get image md5 error";
-		return false;
+		md5Str = "";
+		/* return false; */
 	}
 	return true;
 }
