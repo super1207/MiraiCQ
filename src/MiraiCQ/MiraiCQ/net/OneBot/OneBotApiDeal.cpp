@@ -15,8 +15,8 @@ MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& 
 	auto id_json = (*ret_json).get("message_id",Json::nullValue);
 	if (!id_json.isNull() && id_json.isInt())
 	{
-		/* ÔÚ´Ë×ª»»message_id */
-		int id = id_json.isInt();
+		/* åœ¨æ­¤è½¬æ¢message_id */
+		int id = id_json.asInt();
 		std::lock_guard<std::mutex> lk(mx_msg_id_vec);
 		for (auto i : msg_id_vec)
 		{
@@ -39,8 +39,8 @@ MiraiNet::NetStruct OneBotApiDeal::deal_recv(const Json::Value & root, std::mute
 		auto id_json = data_json.get("message_id", Json::nullValue);
 		if (!id_json.isNull() && id_json.isInt())
 		{
-			/* ÔÚ´Ë×ª»»message_id */
-			int id = id_json.isInt();
+			/* åœ¨æ­¤è½¬æ¢message_id */
+			int id = id_json.asInt();
 			std::lock_guard<std::mutex> lk(mx_msg_id_vec);
 			++curr_msg_id;
 			if (curr_msg_id == INT32_MAX)
@@ -48,7 +48,7 @@ MiraiNet::NetStruct OneBotApiDeal::deal_recv(const Json::Value & root, std::mute
 				curr_msg_id = 2;
 			}
 			msg_id_vec.push_back({ curr_msg_id ,id });
-			/* ÏŞÖÆmsg_idµÄ»º´æ */
+			/* é™åˆ¶msg_idçš„ç¼“å­˜ */
 			if (msg_id_vec.size() > 4096)
 			{
 				msg_id_vec.pop_front();
