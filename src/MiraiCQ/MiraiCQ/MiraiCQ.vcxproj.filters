@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="export">
+      <UniqueIdentifier>{cfaf0b27-8717-44ef-8574-059ffe693020}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="log">
+      <UniqueIdentifier>{55a8d733-2121-4bdf-891f-d8919921f09f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tool">
+      <UniqueIdentifier>{95b3fd2f-2133-4894-b9a8-56979f4f2360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{d66a49fa-c97b-4cb3-8e85-eec9b65087b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdpart">
+      <UniqueIdentifier>{5d7af027-4dc4-4b66-89d6-cf168cbdda18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdpart\jsoncpp">
+      <UniqueIdentifier>{7f1ecee7-ead7-4323-8137-d6360aea565e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="net\OneBot">
+      <UniqueIdentifier>{a0f04ad4-9bdd-4cfb-bb4c-ba3a8e1190c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plus">
+      <UniqueIdentifier>{1f708222-9ed6-4bba-b72c-9a57b68e0f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="center">
+      <UniqueIdentifier>{0b381cab-1efe-42f8-84a0-fe223fbe3b14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdpart\base64">
+      <UniqueIdentifier>{f823343e-e5c9-4bb1-a996-1382898f917f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{6b988444-e431-4e87-b896-5979eea6c043}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test.cpp">
+      <Filter>export</Filter>
+    </ClCompile>
+    <ClCompile Include="log\MiraiLog.cpp">
+      <Filter>log</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\PathTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="net\MiraiNet.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\StrTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\jsoncpp\json_reader.cpp">
+      <Filter>thirdpart\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\jsoncpp\json_value.cpp">
+      <Filter>thirdpart\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\jsoncpp\json_writer.cpp">
+      <Filter>thirdpart\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="net\OneBot\OneBotImpl.cpp">
+      <Filter>net\OneBot</Filter>
+    </ClCompile>
+    <ClCompile Include="net\OneBot\OneBotEventDeal.cpp">
+      <Filter>net\OneBot</Filter>
+    </ClCompile>
+    <ClCompile Include="net\OneBot\OneBotApiDeal.cpp">
+      <Filter>net\OneBot</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\TimeTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="plus\MiraiPlus.cpp">
+      <Filter>plus</Filter>
+    </ClCompile>
+    <ClCompile Include="center\center.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
+    <ClCompile Include="center\cqpexport.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
+    <ClCompile Include="center\api.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
+    <ClCompile Include="center\event.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\BinTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\base64\base64.cpp">
+      <Filter>thirdpart\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\ImgTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="config\config.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="log\MiraiLog.h">
+      <Filter>log</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\PathTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="net\MiraiNet.h">
+      <Filter>net</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\StrTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OneBot\OneBotImpl.h">
+      <Filter>net\OneBot</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OneBot\OneBotEventDeal.h">
+      <Filter>net\OneBot</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OneBot\OneBotApiDeal.h">
+      <Filter>net\OneBot</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\TimeTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="plus\MiraiPlus.h">
+      <Filter>plus</Filter>
+    </ClInclude>
+    <ClInclude Include="center\center.h">
+      <Filter>center</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\BinTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\ImgTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="config\config.h">
+      <Filter>config</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cqpexport.def">
+      <Filter>center</Filter>
+    </None>
+  </ItemGroup>
+</Project>

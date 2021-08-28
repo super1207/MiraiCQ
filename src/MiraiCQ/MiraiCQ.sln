@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiraiCQ", "MiraiCQ\MiraiCQ.vcxproj", "{B5F83780-0BEE-45BF-B3E8-54715796CF96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5F83780-0BEE-45BF-B3E8-54715796CF96}.Debug|x86.ActiveCfg = Debug|Win32
+		{B5F83780-0BEE-45BF-B3E8-54715796CF96}.Debug|x86.Build.0 = Debug|Win32
+		{B5F83780-0BEE-45BF-B3E8-54715796CF96}.Release|x86.ActiveCfg = Release|Win32
+		{B5F83780-0BEE-45BF-B3E8-54715796CF96}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7DD1B4D-B169-450C-9E4C-97DCEF8E499B}
+	EndGlobalSection
+EndGlobal
