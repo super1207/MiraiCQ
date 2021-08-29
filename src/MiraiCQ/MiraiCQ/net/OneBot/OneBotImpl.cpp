@@ -60,7 +60,14 @@ bool OneBotNetImpl::connect()noexcept
 		TimeTool::sleep(0);
 		if (TimeTool::get_tick_count() - start_time > 5000)
 		{
-			dis_connect();
+			try
+			{
+				client.get_con_from_hdl(hdl)->close(websocketpp::close::status::value(), "byebye");
+			}
+			catch (const std::exception& e)
+			{
+				MiraiLog::get_instance()->add_debug_log("OneBotClose", e.what());
+			}
 			return false;
 		}
 	}
@@ -191,18 +198,6 @@ bool OneBotNetImpl::connect_()
 bool OneBotNetImpl::is_connect() noexcept
 {
 	return is_run;
-}
-
-void OneBotNetImpl::dis_connect() noexcept
-{
-	try
-	{
-		client.get_con_from_hdl(hdl)->close(websocketpp::close::status::value(), "byebye");
-	}
-	catch(const std::exception & e)
-	{
-		MiraiLog::get_instance()->add_debug_log("OneBotClose", e.what());
-	}
 }
 
 MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout) noexcept

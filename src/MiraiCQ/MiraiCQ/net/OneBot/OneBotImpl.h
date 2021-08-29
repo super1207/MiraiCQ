@@ -21,7 +21,6 @@ public:
 	~OneBotNetImpl()override;
 	virtual bool connect()noexcept override;
 	virtual bool is_connect()noexcept override;
-	virtual void dis_connect()noexcept override;
 	virtual NetStruct call_fun(NetStruct senddat, int timeout)noexcept override;
 private:
 	struct CallStuct

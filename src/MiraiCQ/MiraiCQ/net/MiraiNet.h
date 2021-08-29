@@ -28,11 +28,6 @@ public:
 	virtual bool is_connect()noexcept = 0;
 
 	/*
-	* 描述：断开连接
-	*/
-	virtual void dis_connect()noexcept = 0;
-
-	/*
 	* 描述：调用net函数
 	* 参数`senddat`：net参数
 	* 参数`timeout`：超时，单位ms
