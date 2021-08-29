@@ -1003,7 +1003,10 @@ std::string Center::CQ_getImage(int auth_code, const char* file)
 			if (!PathTool::is_file_exist(img_dir + file))
 			{
 				/* 下载图片 */
-				ImgTool::download_img(url, img_dir + file);
+				if (ImgTool::download_img(url, img_dir + file + ".tmp"))
+				{
+					PathTool::rename(img_dir + file + ".tmp", img_dir + file);
+				}
 			}
 			/* 图片下载完成，删除正在下载的标记 */
 			std::lock_guard<std::mutex> lock(mx);

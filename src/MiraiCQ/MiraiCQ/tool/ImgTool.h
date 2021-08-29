@@ -12,7 +12,20 @@ public:
 		unsigned int size = 0;
 		std::string type = "";
 	};
+	/*
+	* 描述：获得图片信息
+	* 参数`url`：图片的url
+	* 参数`info`：输出图片信息
+	* 返回值：成功返回`true`，失败返回`false`
+	*/
 	static bool get_info(const std::string& url, ImgInfo & info);
+
+	/*
+	* 描述：下载图片
+	* 参数`url`：图片的url
+	* 参数`save_path`：图片保存路径
+	* 返回值：成功返回`true`，失败返回`false`
+	*/
 	static bool download_img(const std::string& url, const std::string& save_path) noexcept;
 	
 

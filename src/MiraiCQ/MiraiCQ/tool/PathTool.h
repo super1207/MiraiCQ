@@ -61,7 +61,7 @@ public:
 	static std::vector<std::string> get_path_file(const std::string & path) noexcept;
 
 	/*
-	* 描述：获取目录下得所有文件
+	* 描述：重命名文件
 	* 参数`old_name`：旧路径
 	* 参数`new_name`：新路径
 	* 返回值：成功返回`true`

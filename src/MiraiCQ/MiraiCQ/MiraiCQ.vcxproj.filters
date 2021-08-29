@@ -103,6 +103,9 @@
     <ClCompile Include="config\config.cpp">
       <Filter>config</Filter>
     </ClCompile>
+    <ClCompile Include="tool\InputTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -143,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="config\config.h">
       <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\InputTool.h">
+      <Filter>tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

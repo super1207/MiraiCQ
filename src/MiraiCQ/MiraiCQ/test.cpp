@@ -1,12 +1,10 @@
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <stdio.h>
-#include <signal.h>
-#include <memory>
-#include <iostream>
 #include "config/config.h"
 #include "log/MiraiLog.h"
 #include "tool/TimeTool.h"
-#include "tool/StrTool.h"
+#include "tool/InputTool.h"
 #include "center/center.h"
 
 std::atomic_bool printLog = true;
@@ -151,9 +149,14 @@ static std::vector<std::string> tokenize(const std::string& s, char c) {
 	return v;
 }
 
+static void PrintUnkowCmd()
+{
+	printf("未知的命令\n");
+	printf("使用`ls`来查看所有插件\n使用`log`来开关log\n输入`q`可以安全退出程序\n>>>");
+}
+
 int main()
 {
-	//signal(SIGINT, intHandler);
 	MiraiLog::get_instance()->add_backend_sinks([&](const MiraiLog::Level& lv, const std::string& category, const std::string& dat, void* user_ptr) {
 		if (!printLog)
 		{
@@ -187,18 +190,16 @@ int main()
 			TimeTool::sleep(0);
 		}
 	}
-	char buf[1024];
 	int last_ac = 1000;
 	std::string name = "";
 	/* 这里延时用于等待打印lifecycle，保证视觉良好 */
 	TimeTool::sleep(1000);
 	printf("使用`ls`来查看所有插件\n使用`log`来开关log\n输入`q`可以安全退出程序\n>>>");
 	printLog = !printLog;
-	while (fgets(buf,1024,stdin) != NULL)
+	while (true)
 	{
-		buf[strlen(buf) - 1] = '\0';
-		std::string cmd = buf;
-		if (cmd == "ls")
+		std::vector<std::string> LineVec = InputTool::get_line();
+		if (LineVec.size() == 1 && LineVec[0] == "ls")
 		{
 			last_ac = 1000;
 			std::string ac_str = GetAllAC("\n");
@@ -211,14 +212,21 @@ int main()
 			}
 			printf("\n>>>");
 		}
-		else if(cmd.length() > 3 && cmd.substr(0,3) == "cd ")
+		else if (LineVec.size() == 2 && LineVec[0] == "cd")
 		{
-			std::string n_str = cmd.substr(3);
-			int ac = atoi(n_str.c_str());
+			int ac;
+			try
+			{
+				ac = std::stoi(LineVec[1]);
+			}
+			catch (const std::exception&)
+			{
+				PrintUnkowCmd();
+			}
 			name = GetName(ac);
 			last_ac = ac;
 			printf("使用`call <数字>`来调用插件[%s]的一个菜单:\n\n", name.c_str());
-			for (int i = 0;;++i)
+			for (int i = 0;; ++i)
 			{
 				std::string name = GetMenuName(ac, i);
 				if (name != "")
@@ -231,24 +239,30 @@ int main()
 				}
 			}
 			printf("\n>>>");
-
 		}
-		else if (cmd.length() > 5 && cmd.substr(0, 5) == "call ")
+		else if (LineVec.size() == 2 && LineVec[0] == "call")
 		{
-			std::string n_str = cmd.substr(5);
-			int n = atoi(n_str.c_str());
+			int n;
+			try
+			{
+				n = std::stoi(LineVec[1]);
+			}
+			catch (const std::exception&)
+			{
+				PrintUnkowCmd();
+			}
 			CallMenuFun(last_ac, n);
 			printf("\n>>>");
 		}
-		else if (cmd == "log")
+		else if (LineVec.size() == 1 && LineVec[0] == "log")
 		{
 			printLog = !printLog;
-			if(printLog)
+			if (printLog)
 				printf("log已经打开,再次输入`log`来关闭log\n>>>");
 			else
 				printf("log已经关闭,再次输入`log`来开启log\n>>>");
 		}
-		else if (cmd == "q")
+		else if (LineVec.size() == 1 && LineVec[0] == "q")
 		{
 			printLog = true;
 			auto center = Center::get_instance();
@@ -256,14 +270,11 @@ int main()
 			HANDLE hself = GetCurrentProcess();
 			TerminateProcess(hself, 0);
 		}
-		else
+		else if(LineVec.size() != 0)
 		{
-			if (cmd != "")
-			{
-				printf("未知的命令\n");
-				printf("使用`ls`来查看所有插件\n使用`log`来开关log\n输入`q`可以安全退出程序\n>>>");
-			}		
+			PrintUnkowCmd();
 		}
 	}
+	
 	return 0;
 }
