@@ -34,6 +34,7 @@ int InitBot()
 			TimeTool::sleep(5000);
 			if (!net->is_connect())
 			{
+				printLog = true;
 				MiraiLog::get_instance()->add_debug_log("Net", "连接断开,正在重连...");
 				auto new_net = MiraiNet::get_instance(net->get_config("net_type"));
 				if (!new_net)
@@ -54,12 +55,12 @@ int InitBot()
 		}
 
 	}).detach();
-	if (!Center::get_instance()->load_all_plus())
+	if (Center::get_instance()->load_all_plus() < 0)
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "插件加载失败");
 		return -1;
 	}
-	if (!Center::get_instance()->enable_all_plus())
+	if (Center::get_instance()->enable_all_plus() < 0)
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "插件启动失败");
 		return -1;
