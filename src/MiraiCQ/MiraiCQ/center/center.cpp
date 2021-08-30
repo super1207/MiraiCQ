@@ -14,7 +14,7 @@ Center::Center()
 {
 }
 
-Center* Center::get_instance() noexcept
+Center* Center::get_instance() 
 {
 	static Center center;
 	return &center;
@@ -33,39 +33,13 @@ Center::~Center()
 	TerminateProcess(hself, 0);*/
 }
 
-void Center::set_net(std::weak_ptr<MiraiNet> net) noexcept
+void Center::set_net(std::weak_ptr<MiraiNet> net) 
 {
 	unique_lock<shared_mutex> lk(mx_net);
 	this->net = net;
 }
 
-//bool Center::re_connect() noexcept
-//{
-//	auto net = this->net.lock();
-//	if (!net)
-//	{
-//		return false;
-//	}
-//	if (net->is_connect())
-//	{
-//		return true;
-//	}
-//
-//	auto new_net = MiraiNet::get_instance(net->get_config("net_type"));
-//	if (!new_net)
-//	{
-//		return false;
-//	}
-//	new_net->set_all_config(net->get_all_config());
-//	if (!new_net->connect())
-//	{
-//		return false;
-//	}
-//	net.reset(new_net);
-//	return true;
-//}
-
-int Center::load_all_plus() noexcept
+int Center::load_all_plus() 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
@@ -97,7 +71,7 @@ int Center::load_all_plus() noexcept
 	return success_num;
 }
 
-int Center::enable_all_plus() noexcept
+int Center::enable_all_plus() 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
@@ -119,7 +93,7 @@ int Center::enable_all_plus() noexcept
 	return success_num;
 }
 
-int Center::del_all_plus() noexcept
+int Center::del_all_plus() 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
@@ -148,7 +122,7 @@ int Center::del_all_plus() noexcept
 	return success_num;
 }
 
-bool Center::run() noexcept
+bool Center::run() 
 {
 	/* 已经在运行，直接返回true */
 	if (is_run)
@@ -178,7 +152,8 @@ bool Center::run() noexcept
 				net = this->net.lock();
 				if (!net)
 				{
-					break;
+					TimeTool::sleep(0);
+					continue;
 				}
 			}
 			
@@ -196,7 +171,15 @@ bool Center::run() noexcept
 				}
 				/* 将事件放入线程池 */
 				pool->enqueue([this,evt]() {
-					this->deal_event(evt);
+					try
+					{
+						this->deal_event(evt);
+					}
+					catch (const std::exception& e)
+					{
+						MiraiLog::get_instance()->add_debug_log("Center", string("在事件处理中发生未知异常") + e.what());
+					}
+					
 				});
 			}
 		}
@@ -212,7 +195,7 @@ bool Center::run() noexcept
 	return true;
 }
 
-std::vector<int> Center::get_ac_vec() noexcept
+std::vector<int> Center::get_ac_vec() 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
@@ -225,7 +208,7 @@ std::vector<int> Center::get_ac_vec() noexcept
 	return ret_vec;
 }
 
-std::shared_ptr<Center::PlusInfo> Center::get_plus_by_ac(int ac) noexcept
+std::shared_ptr<Center::PlusInfo> Center::get_plus_by_ac(int ac) 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
@@ -245,7 +228,7 @@ std::shared_ptr<Center::PlusInfo> Center::get_plus_by_ac(int ac) noexcept
 	return info;
 }
 
-std::string Center::get_menu_name_by_ac(int ac, int pos) noexcept
+std::string Center::get_menu_name_by_ac(int ac, int pos) 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
@@ -265,7 +248,7 @@ std::string Center::get_menu_name_by_ac(int ac, int pos) noexcept
 	
 }
 
-void Center::call_menu_fun_by_ac(int ac, int pos) noexcept
+void Center::call_menu_fun_by_ac(int ac, int pos) 
 {
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);

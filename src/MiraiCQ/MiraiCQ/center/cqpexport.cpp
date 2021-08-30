@@ -8,7 +8,7 @@
 
 static thread_local std::string ret_str;
 
-static int call_int_api(std::function<int(Center *)> fun_ptr) noexcept
+static int call_int_api(std::function<int(Center *)> fun_ptr) 
 {
 	auto center_ptr = Center::get_instance();
 	try
@@ -22,7 +22,7 @@ static int call_int_api(std::function<int(Center *)> fun_ptr) noexcept
 	}
 }
 
-static int64_t call_int64_api(std::function<int64_t(Center*)> fun_ptr) noexcept
+static int64_t call_int64_api(std::function<int64_t(Center*)> fun_ptr) 
 {
 	auto center_ptr = Center::get_instance();
 	try
@@ -36,7 +36,7 @@ static int64_t call_int64_api(std::function<int64_t(Center*)> fun_ptr) noexcept
 	}
 }
 
-static const char * call_str_api(std::function<std::string(Center *)> fun_ptr) noexcept
+static const char * call_str_api(std::function<std::string(Center *)> fun_ptr) 
 {
 	auto center_ptr = Center::get_instance();
 	try

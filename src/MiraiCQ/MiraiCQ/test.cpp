@@ -101,7 +101,6 @@ const char* GetAllAC(const char* gap)
 
 const char* GetName(int ac)
 {
-	static thread_local std::string retStr;
 	auto center = Center::get_instance();
 	std::string err_msg;
 	auto info = center->get_plus_by_ac(ac);
@@ -115,7 +114,6 @@ const char* GetName(int ac)
 
 const char* GetMenuName(int ac, int pos)
 {
-	static thread_local std::string retStr;
 	auto center = Center::get_instance();
 	auto name = center->get_menu_name_by_ac(ac, pos);
 	retStr = name;
@@ -195,7 +193,7 @@ int main()
 	/* 这里延时用于等待打印lifecycle，保证视觉良好 */
 	TimeTool::sleep(1000);
 	printf("使用`ls`来查看所有插件\n使用`log`来开关log\n输入`q`可以安全退出程序\n>>>");
-	printLog = !printLog;
+	/* printLog = !printLog; */
 	while (true)
 	{
 		std::vector<std::string> LineVec = InputTool::get_line();

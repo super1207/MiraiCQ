@@ -19,13 +19,13 @@ public:
 	* 描述：连接net
 	* 返回值：连接成功返回true，否则返回false
 	*/
-	virtual bool connect()noexcept = 0;
+	virtual bool connect() = 0;
 
 	/*
 	* 描述：判断net是否连接
 	* 返回值：已经连接成功返回true，否则返回false
 	*/
-	virtual bool is_connect()noexcept = 0;
+	virtual bool is_connect() = 0;
 
 	/*
 	* 描述：调用net函数
@@ -33,42 +33,42 @@ public:
 	* 参数`timeout`：超时，单位ms
 	* 返回值：返回调用结果
 	*/
-	virtual NetStruct call_fun(NetStruct senddat,int timeout)noexcept = 0;
+	virtual NetStruct call_fun(NetStruct senddat,int timeout) = 0;
 	
 	/*
 	* 描述：设置config，若已经存在则覆盖
 	* 参数`key`：键
 	* 参数`value`：值
 	*/
-	void set_config(const std::string & key, const std::string& value)noexcept;
+	void set_config(const std::string & key, const std::string& value);
 
 	/*
 	* 描述：设置config，若已经存在则覆盖
 	* 参数`key`：键
 	* 参数`value`：值
 	*/
-	void set_all_config(const std::map<std::string, std::string> & all_config)noexcept;
+	void set_all_config(const std::map<std::string, std::string> & all_config);
 
 	/*
 	* 描述：获得config
 	* 参数`key`：键
 	* 返回值：值，若键不存在则返回`""`
 	*/
-	std::string get_config(const std::string& key)noexcept;
+	std::string get_config(const std::string& key);
 
 	/*
 	* 描述：获得所有config
 	* 返回值：所有config
 	*/
-	std::map<std::string, std::string> get_all_config() noexcept;
+	std::map<std::string, std::string> get_all_config() ;
 
 	/*
 	* 描述：获得事件，并清空事件数组
 	* 返回值：事件数组
 	*/
-	std::vector<NetStruct> get_event()noexcept;
+	std::vector<NetStruct> get_event();
 
-	static std::shared_ptr<MiraiNet> get_instance(const std::string & type) noexcept;
+	static std::shared_ptr<MiraiNet> get_instance(const std::string & type) ;
 	
 protected:
 	MiraiNet();
@@ -76,7 +76,7 @@ protected:
 	* 描述：添加事件到事件数组
 	* 参数：事件
 	*/
-	void add_event(NetStruct event)noexcept;
+	void add_event(NetStruct event);
 
 private:
 	std::shared_mutex mx_config_map;

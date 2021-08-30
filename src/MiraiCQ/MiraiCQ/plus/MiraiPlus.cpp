@@ -20,7 +20,7 @@ MiraiPlus::~MiraiPlus()
 {
 }
 
-bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) noexcept
+bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) 
 {
 	err_msg.clear();
 	std::string bin_path = PathTool::get_exe_dir() + "";
@@ -241,7 +241,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) no
 	return true;
 }
 
-bool MiraiPlus::enable_plus(int ac, std::string & err_msg) noexcept
+bool MiraiPlus::enable_plus(int ac, std::string & err_msg) 
 {
 	err_msg.clear();
 	auto plus = get_plus(ac);
@@ -296,7 +296,7 @@ bool MiraiPlus::enable_plus(int ac, std::string & err_msg) noexcept
 	return true;
 }
 
-bool MiraiPlus::disable_plus(int ac, std::string & err_msg) noexcept
+bool MiraiPlus::disable_plus(int ac, std::string & err_msg) 
 {
 	err_msg.clear();
 	auto plus = get_plus(ac);
@@ -329,7 +329,7 @@ bool MiraiPlus::disable_plus(int ac, std::string & err_msg) noexcept
 	return true;
 }
 
-bool MiraiPlus::is_enable(int ac) noexcept
+bool MiraiPlus::is_enable(int ac) 
 {
 	auto plus = get_plus(ac);
 	if (!plus)
@@ -339,7 +339,7 @@ bool MiraiPlus::is_enable(int ac) noexcept
 	return plus->is_enable;
 }
 
-bool MiraiPlus::del_plus(int ac) noexcept
+bool MiraiPlus::del_plus(int ac) 
 {
 	auto plus = get_plus(ac);
 	if (!plus)
@@ -366,7 +366,7 @@ bool MiraiPlus::del_plus(int ac) noexcept
 	return true;
 }
 
-std::shared_ptr<MiraiPlus::PlusDef> MiraiPlus::get_plus(int ac) noexcept
+std::shared_ptr<MiraiPlus::PlusDef> MiraiPlus::get_plus(int ac) 
 {
 	shared_lock<shared_mutex> lock(mx_plus_map);
 	auto iter = plus_map.find(ac);
@@ -379,13 +379,13 @@ std::shared_ptr<MiraiPlus::PlusDef> MiraiPlus::get_plus(int ac) noexcept
 	
 }
 
-std::map<int, std::shared_ptr<MiraiPlus::PlusDef>> MiraiPlus::get_all_plus() noexcept
+std::map<int, std::shared_ptr<MiraiPlus::PlusDef>> MiraiPlus::get_all_plus() 
 {
 	shared_lock<shared_mutex> lock(mx_plus_map);
 	return plus_map;
 }
 
-std::vector<std::pair<int,std::weak_ptr<MiraiPlus::PlusDef>>> MiraiPlus::get_all_ac() noexcept
+std::vector<std::pair<int,std::weak_ptr<MiraiPlus::PlusDef>>> MiraiPlus::get_all_ac() 
 {
 	shared_lock<shared_mutex> lock(mx_plus_map);
 	std::vector<std::pair<int, std::weak_ptr<MiraiPlus::PlusDef>>> ret_vec;
@@ -396,7 +396,7 @@ std::vector<std::pair<int,std::weak_ptr<MiraiPlus::PlusDef>>> MiraiPlus::get_all
 	return ret_vec;
 }
 
-MiraiPlus* MiraiPlus::get_instance() noexcept
+MiraiPlus* MiraiPlus::get_instance() 
 {
 	static MiraiPlus mirai_plus;
 	return &mirai_plus;
@@ -407,7 +407,7 @@ MiraiPlus::PlusDef::~PlusDef()
 
 }
 
-const std::shared_ptr<const MiraiPlus::PlusDef::Event> MiraiPlus::PlusDef::get_event_fun(int type) noexcept
+const std::shared_ptr<const MiraiPlus::PlusDef::Event> MiraiPlus::PlusDef::get_event_fun(int type) 
 {
 	for (const auto& fun : event_vec)
 	{
@@ -419,17 +419,17 @@ const std::shared_ptr<const MiraiPlus::PlusDef::Event> MiraiPlus::PlusDef::get_e
 	return nullptr;
 }
 
-std::vector<std::shared_ptr<const MiraiPlus::PlusDef::Menu>> MiraiPlus::PlusDef::get_menu_vec() noexcept
+std::vector<std::shared_ptr<const MiraiPlus::PlusDef::Menu>> MiraiPlus::PlusDef::get_menu_vec() 
 {
 	return menu_vec;
 }
 
-std::string MiraiPlus::PlusDef::get_name() noexcept
+std::string MiraiPlus::PlusDef::get_name() 
 {
 	return this->name;
 }
 
-std::string MiraiPlus::PlusDef::get_filename() noexcept
+std::string MiraiPlus::PlusDef::get_filename() 
 {
 	return this->filename;
 }

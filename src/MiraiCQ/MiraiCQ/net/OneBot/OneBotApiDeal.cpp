@@ -1,4 +1,4 @@
-#include "OneBotApiDeal.h"
+﻿#include "OneBotApiDeal.h"
 #include "../../tool/StrTool.h"
 
 OneBotApiDeal::OneBotApiDeal()

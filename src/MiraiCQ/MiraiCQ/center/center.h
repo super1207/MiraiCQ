@@ -20,26 +20,26 @@ public:
 		bool is_enable;
 		bool is_load;
 	};
-	static Center * get_instance() noexcept;
+	static Center * get_instance() ;
 	~Center();
 	/**************************来自export的调用**********************************/
 	/* 初始化Center */
-	void set_net(std::weak_ptr<MiraiNet> net) noexcept;
-	//bool re_connect() noexcept;
+	void set_net(std::weak_ptr<MiraiNet> net) ;
+	//bool re_connect() ;
 	/* 加载所有插件,返回加载成功的插件数量 */
-	int load_all_plus() noexcept;
+	int load_all_plus() ;
 	/* 启动所有插件，返回启动成功的插件数量 */
-	int enable_all_plus() noexcept;
+	int enable_all_plus() ;
 	/* 卸载所有插件，返回卸载成功的插件数量 */
-	int del_all_plus() noexcept;
+	int del_all_plus() ;
 	/* 运行Center */
-	bool run() noexcept;
+	bool run() ;
 	/* 获取所有插件的ac */
-	std::vector<int> get_ac_vec() noexcept;
+	std::vector<int> get_ac_vec() ;
 	/* 通过ac获得插件信息 */
-	std::shared_ptr<PlusInfo> get_plus_by_ac(int ac) noexcept;
-	std::string get_menu_name_by_ac(int ac, int pos)noexcept;
-	void call_menu_fun_by_ac(int ac, int pos)noexcept;
+	std::shared_ptr<PlusInfo> get_plus_by_ac(int ac) ;
+	std::string get_menu_name_by_ac(int ac, int pos);
+	void call_menu_fun_by_ac(int ac, int pos);
 	/**************************来自插件的调用**********************************/
 	int CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg) ;
 	int CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg) ;
@@ -85,7 +85,7 @@ private:
 private:
 	Center();
 	void normal_cal_plus_fun(int fun_type,std::function<int(const void * fun_ptr,void * user_data)> fun_ptr, void* user_data);
-	void deal_event(MiraiNet::NetStruct evt) noexcept;
+	void deal_event(MiraiNet::NetStruct evt) ;
 	void deal_type_message(Json::Value& evt);
 	void deal_type_notice(Json::Value& evt);
 	void deal_type_notice_group_upload(Json::Value& evt);

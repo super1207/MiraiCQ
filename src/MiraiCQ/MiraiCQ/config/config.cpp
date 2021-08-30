@@ -11,13 +11,13 @@ Config::~Config()
 {
 }
 
-Config* Config::get_instance() noexcept
+Config* Config::get_instance() 
 {
 	static Config cfg;
 	return &cfg;
 }
 
-std::string Config::get_ws_url() noexcept
+std::string Config::get_ws_url() 
 {
 	std::string config_path = PathTool::get_exe_dir() + "config\\";
 	PathTool::create_dir(config_path);
@@ -31,7 +31,7 @@ std::string Config::get_ws_url() noexcept
 	return url;
 }
 
-std::string Config::get_access_token() noexcept
+std::string Config::get_access_token() 
 {
 	std::string config_path = PathTool::get_exe_dir() + "config\\";
 	PathTool::create_dir(config_path);

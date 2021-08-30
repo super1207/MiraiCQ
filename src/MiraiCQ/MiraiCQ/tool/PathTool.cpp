@@ -6,7 +6,7 @@
 using namespace std;
 namespace  fs = std::filesystem;
 
-bool PathTool::is_dir_exist(const string& dir) noexcept
+bool PathTool::is_dir_exist(const string& dir) 
 {
 	try
 	{
@@ -18,7 +18,7 @@ bool PathTool::is_dir_exist(const string& dir) noexcept
 	}
 }
 
-bool PathTool::is_file_exist(const string& file) noexcept
+bool PathTool::is_file_exist(const string& file) 
 {
 	try
 	{
@@ -30,7 +30,7 @@ bool PathTool::is_file_exist(const string& file) noexcept
 	}
 }
 
-bool PathTool::create_dir(const string& dir) noexcept
+bool PathTool::create_dir(const string& dir) 
 {
 	try
 	{
@@ -48,7 +48,7 @@ bool PathTool::create_dir(const string& dir) noexcept
 	}
 }
 
-bool PathTool::del_dir(const string& dir) noexcept
+bool PathTool::del_dir(const string& dir) 
 {
 	try
 	{
@@ -67,7 +67,7 @@ bool PathTool::del_dir(const string& dir) noexcept
 	
 }
 
-bool PathTool::del_file(const std::string& file) noexcept
+bool PathTool::del_file(const std::string& file) 
 {
 	try
 	{
@@ -85,7 +85,7 @@ bool PathTool::del_file(const std::string& file) noexcept
 	}
 }
 
-string PathTool::get_exe_dir() noexcept
+string PathTool::get_exe_dir() 
 {
 	string ret_str;
 	char path_str[MAX_PATH + 1] = { 0 };
@@ -102,7 +102,7 @@ string PathTool::get_exe_dir() noexcept
 	return ret_str;
 }
 
-string PathTool::get_exe_name() noexcept
+string PathTool::get_exe_name() 
 {
 	string ret_str;
 	char path_str[MAX_PATH + 1] = { 0 };
@@ -119,7 +119,7 @@ string PathTool::get_exe_name() noexcept
 	return ret_str;
 }
 
-std::vector<std::string> PathTool::get_path_file(const std::string& path) noexcept
+std::vector<std::string> PathTool::get_path_file(const std::string& path) 
 {
 	vector<string> ret_vec;
 	try
@@ -139,7 +139,7 @@ std::vector<std::string> PathTool::get_path_file(const std::string& path) noexce
 	return ret_vec;
 }
 
-bool PathTool::rename(const std::string& old_name, const std::string& new_name) noexcept
+bool PathTool::rename(const std::string& old_name, const std::string& new_name) 
 {
 	try
 	{

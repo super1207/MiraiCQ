@@ -177,7 +177,7 @@ bool ImgTool::get_info(const std::string& url, ImgInfo& info)
 	return  true;
 }
 
-bool ImgTool::download_img(const std::string& url, const std::string& save_path) noexcept
+bool ImgTool::download_img(const std::string& url, const std::string& save_path) 
 {
     using namespace httplib;
     std::string host;

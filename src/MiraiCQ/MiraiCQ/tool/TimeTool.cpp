@@ -2,7 +2,7 @@
 
 #include "Windows.h"
 
-void TimeTool::sleep(unsigned long ms) noexcept
+void TimeTool::sleep(unsigned long ms) 
 {
 	if (ms == 0)
 	{
@@ -15,7 +15,7 @@ void TimeTool::sleep(unsigned long ms) noexcept
 	
 }
 
-unsigned long long TimeTool::get_tick_count() noexcept
+unsigned long long TimeTool::get_tick_count() 
 {
 	return GetTickCount64();
 }

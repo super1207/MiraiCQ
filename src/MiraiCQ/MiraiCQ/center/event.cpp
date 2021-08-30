@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void Center::deal_event(MiraiNet::NetStruct evt) noexcept
+void Center::deal_event(MiraiNet::NetStruct evt) 
 {
 	assert(evt);
 	const std::string print_utf8_str = evt->toStyledString();

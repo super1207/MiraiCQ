@@ -19,9 +19,9 @@ class OneBotNetImpl :public MiraiNet
 public:
 	OneBotNetImpl();
 	~OneBotNetImpl()override;
-	virtual bool connect()noexcept override;
-	virtual bool is_connect()noexcept override;
-	virtual NetStruct call_fun(NetStruct senddat, int timeout)noexcept override;
+	virtual bool connect() override;
+	virtual bool is_connect() override;
+	virtual NetStruct call_fun(NetStruct senddat, int timeout) override;
 private:
 	struct CallStuct
 	{

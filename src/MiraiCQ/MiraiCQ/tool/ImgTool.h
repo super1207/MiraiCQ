@@ -26,7 +26,7 @@ public:
 	* 参数`save_path`：图片保存路径
 	* 返回值：成功返回`true`，失败返回`false`
 	*/
-	static bool download_img(const std::string& url, const std::string& save_path) noexcept;
+	static bool download_img(const std::string& url, const std::string& save_path) ;
 	
 
 private:

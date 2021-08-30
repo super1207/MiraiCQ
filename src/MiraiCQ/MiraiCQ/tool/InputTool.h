@@ -6,7 +6,7 @@
 class InputTool
 {
 public:
-	static std::vector<std::string> get_line() noexcept;
+	static std::vector<std::string> get_line() ;
 private:
 	InputTool();
 	~InputTool();

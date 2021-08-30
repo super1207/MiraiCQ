@@ -35,7 +35,7 @@ OneBotNetImpl::~OneBotNetImpl()
 	
 }
 
-bool OneBotNetImpl::connect()noexcept
+bool OneBotNetImpl::connect()
 {
 	if (is_run)
 	{
@@ -195,12 +195,12 @@ bool OneBotNetImpl::connect_()
 	return false;
 }
 
-bool OneBotNetImpl::is_connect() noexcept
+bool OneBotNetImpl::is_connect() 
 {
 	return is_run;
 }
 
-MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout) noexcept
+MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout) 
 {
 	if (!senddat)
 	{

@@ -6,9 +6,9 @@ class Config
 {
 public:
 	/* ªÒ»°≈‰÷√ µ¿˝ */
-	static Config * get_instance() noexcept;
-	std::string get_ws_url() noexcept;
-	std::string get_access_token() noexcept;
+	static Config * get_instance() ;
+	std::string get_ws_url() ;
+	std::string get_access_token() ;
 private:
 	Config();
 	~Config();

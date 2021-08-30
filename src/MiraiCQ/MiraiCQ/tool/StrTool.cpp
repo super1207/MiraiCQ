@@ -5,7 +5,7 @@
 #include <vector>
 #include <regex>
 
-std::string StrTool::tolower(const std::string& str) noexcept
+std::string StrTool::tolower(const std::string& str) 
 {
 	std::string ret;
 	for (const auto ch : str)
@@ -15,7 +15,7 @@ std::string StrTool::tolower(const std::string& str) noexcept
 	return ret;
 }
 
-std::string StrTool::to_ansi(const std::string& utf8_str) noexcept
+std::string StrTool::to_ansi(const std::string& utf8_str) 
 {
 	int len = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), utf8_str.size(), NULL, 0);
 	std::wstring unicode_buf(len, L'\0');
@@ -26,7 +26,7 @@ std::string StrTool::to_ansi(const std::string& utf8_str) noexcept
 	return ansi_buf;
 }
 
-std::string StrTool::to_utf8(const std::string& ansi_str) noexcept
+std::string StrTool::to_utf8(const std::string& ansi_str) 
 {
 	int len = MultiByteToWideChar(CP_ACP, 0, ansi_str.c_str(), ansi_str.size(), NULL, 0);
 	std::wstring unicode_buf(len, L'\0');
@@ -37,7 +37,7 @@ std::string StrTool::to_utf8(const std::string& ansi_str) noexcept
 	return utf8_buf;
 }
 
-std::string StrTool::gen_uuid() noexcept
+std::string StrTool::gen_uuid() 
 {
 	char buf[64] = { 0 };
 	GUID guid;
@@ -54,7 +54,7 @@ std::string StrTool::gen_uuid() noexcept
 	return buf;
 }
 
-int StrTool::gen_ac() noexcept
+int StrTool::gen_ac() 
 {
 	static std::mutex mx;
 	static int ac = 0;
@@ -63,17 +63,17 @@ int StrTool::gen_ac() noexcept
 	return ac;
 }
 
-bool StrTool::end_with(const std::string& str, const std::string& end_str) noexcept
+bool StrTool::end_with(const std::string& str, const std::string& end_str) 
 {
 	return str.rfind(end_str) == str.length() - end_str.length();
 }
 
-std::string StrTool::remove_suffix(const std::string& file_str) noexcept
+std::string StrTool::remove_suffix(const std::string& file_str) 
 {
 	return file_str.substr(0, file_str.rfind('.', file_str.length()));
 }
 
-std::string StrTool::get_str_from_json(const Json::Value& json, const std::string& key, const std::string& default_value) noexcept
+std::string StrTool::get_str_from_json(const Json::Value& json, const std::string& key, const std::string& default_value) 
 {
 	auto json_value = json.get(key, Json::nullValue);
 	if (json_value.isString())
@@ -83,7 +83,7 @@ std::string StrTool::get_str_from_json(const Json::Value& json, const std::strin
 	return default_value;
 }
 
-int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, int default_value) noexcept
+int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, int default_value) 
 {
 	auto json_value = json.get(key, Json::nullValue);
 	if (json_value.isInt())
@@ -93,7 +93,7 @@ int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, 
 	return default_value;
 }
 
-int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string& key, int64_t default_value) noexcept
+int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string& key, int64_t default_value) 
 {
 	auto json_value = json.get(key, Json::nullValue);
 	if (json_value.isInt())
@@ -103,7 +103,7 @@ int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string&
 	return default_value;
 }
 
-bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key, bool default_value) noexcept
+bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key, bool default_value) 
 {
 	auto json_value = json.get(key, Json::nullValue);
 	if (json_value.isBool())
@@ -113,7 +113,7 @@ bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key
 	return default_value;
 }
 
-Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str) noexcept
+Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str) 
 {
 	using namespace std;
 	regex r("(\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\],]+)");
@@ -166,7 +166,7 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str) noexcept
 	return jsonarr;
 }
 
-std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr) noexcept
+std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr) 
 {
 	std::string ret_str;
 	if (!jsonarr.isArray())
@@ -245,7 +245,7 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr) noexcept
 
 }
 
-void StrTool::replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value) noexcept
+void StrTool::replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value) 
 {
 	for (std::string::size_type pos(0); pos != std::string::npos; pos += new_value.length())
 	{
@@ -260,7 +260,7 @@ void StrTool::replace_all_distinct(std::string& str, const std::string& old_valu
 	}
 }
 
-std::string StrTool::get_str_from_ini(const std::string& file, const std::string& section, const std::string& key, const std::string& default_value) noexcept
+std::string StrTool::get_str_from_ini(const std::string& file, const std::string& section, const std::string& key, const std::string& default_value) 
 {
 	std::string retStr;
 	char* buf = (char*)malloc(4096);

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-std::vector<std::string> InputTool::get_line() noexcept
+std::vector<std::string> InputTool::get_line() 
 {
 	string line;
 	getline(cin, line);
