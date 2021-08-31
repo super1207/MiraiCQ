@@ -120,6 +120,22 @@ public:
 	*/
 	static std::string get_str_from_ini(const std::string& file, const std::string& section, const std::string& key, const std::string& default_value) ;
 
+	/*
+	* 描述： 使用正则来匹配
+	* 参数`content`：要匹配的内容
+	* 参数`pattern`：正则表达式
+	* 返回值：匹配得到的数组
+	*/
+	static std::vector<std::string> match(const std::string& content, const std::string& pattern);
+
+	/*
+	* 描述： 使用正则来匹配所有
+	* 参数`content`：要匹配的内容
+	* 参数`pattern`：正则表达式
+	* 返回值：匹配得到的数组
+	*/
+	static std::vector<std::vector<std::string>> match_all(const std::string& content, const std::string& pattern);
+
 private:
 	StrTool();
 };

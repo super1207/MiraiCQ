@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <Windows.h>
-#include <regex>
 #include "../log/MiraiLog.h"
 #include "../tool/PathTool.h"
 #include "../tool/StrTool.h"
@@ -313,16 +312,15 @@ void Center::deal_type_meta_event(Json::Value& evt)
 
 static std::string get_md5_from_imgurl(const std::string & url)
 {
-	std::regex r("http.*?-([a-zA-Z0-9]{32}).*");
-	std::smatch sm;
-	if (std::regex_search(url, sm, r))
+	auto ret_vec = StrTool::match(url, "http.*?-([a-zA-Z0-9]{32}).*");
+	if (ret_vec.size() >= 2)
 	{
-		if (sm.size() == 2)
-		{
-			return sm[1].str();
-		}
+		return ret_vec[1];
 	}
-	return "";
+	else
+	{
+		return "";
+	}
 }
 
 static bool deal_json_array(Json::Value & json_arr)

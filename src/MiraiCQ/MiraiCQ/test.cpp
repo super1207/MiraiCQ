@@ -6,6 +6,8 @@
 #include "tool/TimeTool.h"
 #include "tool/InputTool.h"
 #include "center/center.h"
+#include <iostream>
+#include <string>
 
 std::atomic_bool printLog = true;
 static thread_local std::string retStr;
@@ -85,7 +87,7 @@ const char* GetAllAC(const char* gap)
 		return "";
 	}
 	retStr.clear();
-	for (size_t i = 0;i < ac_vec.size(); ++i)
+	for (size_t i = 0; i < ac_vec.size(); ++i)
 	{
 		if (i == 0)
 		{
@@ -179,7 +181,7 @@ int main()
 		default:
 			break;
 		}
-	},NULL);
+	}, NULL);
 	if (InitBot() != 0)
 	{
 		printf("启动失败\n1:检查config目录下的配置文件\n2:检查app目录中有无插件\n3:检查CQP.dll是否存在\n");
@@ -268,11 +270,11 @@ int main()
 			HANDLE hself = GetCurrentProcess();
 			TerminateProcess(hself, 0);
 		}
-		else if(LineVec.size() != 0)
+		else if (LineVec.size() != 0)
 		{
 			PrintUnkowCmd();
 		}
 	}
-	
+
 	return 0;
 }

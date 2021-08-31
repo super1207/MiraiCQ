@@ -1,7 +1,8 @@
 #include "InputTool.h"
 
 #include <iostream>
-#include <regex>
+
+#include "StrTool.h"
 
 using namespace std;
 
@@ -9,14 +10,11 @@ std::vector<std::string> InputTool::get_line()
 {
 	string line;
 	getline(cin, line);
-	regex r("[\\S]+");
-	smatch sm;
-	string::const_iterator searchStart(line.cbegin());
 	std::vector<std::string> dat_vec;
-	while (regex_search(searchStart, line.cend(), sm, r))
+	auto ret_vec = StrTool::match_all(line, "[\\S]+");
+	for (auto& i : ret_vec)
 	{
-		dat_vec.push_back(sm[0].str());
-		searchStart = sm.suffix().first;
+		dat_vec.push_back(i.at(0));
 	}
 	return dat_vec;
 }

@@ -1,7 +1,8 @@
 #include "ImgTool.h"
 
 #include <httplib/httplib.h>
-#include <regex>
+#include "StrTool.h"
+
 
 static ImgTool::ImgInfo parse_img(const std::string& body)
 {
@@ -118,17 +119,14 @@ bool ImgTool::get_info(const std::string& url, ImgInfo& info)
     std::string get_url;
     try
     {
-        std::regex r("((http://|https://)(.*?)(/.*))");
-        std::smatch sm;
-        if (std::regex_search(url, sm, r)) {
-            if (sm.size() != 5)
-            {
-                return false;
-            }
-            host = "http://" + sm[3].str();
-            get_url = sm[4].str();
+        auto ret_vec = StrTool::match(url, "((http://|https://)(.*?)(/.*))");
+        if (ret_vec.size() >= 5)
+        {
+            host = "http://" + ret_vec[3];
+            get_url = ret_vec[4];
         }
-        else {
+        else
+        {
             return false;
         }
         httplib::Client cli(host);
@@ -184,17 +182,14 @@ bool ImgTool::download_img(const std::string& url, const std::string& save_path)
     std::string get_url;
     try
     {
-        std::regex r("((http://|https://)(.*?)(/.*))");
-        std::smatch sm;
-        if (std::regex_search(url, sm, r)) {
-            if (sm.size() != 5)
-            {
-                return false;
-            }
-            host = "http://" + sm[3].str();
-            get_url = sm[4].str();
+        auto ret_vec = StrTool::match(url, "((http://|https://)(.*?)(/.*))");
+        if (ret_vec.size() >= 5)
+        {
+            host = "http://" + ret_vec[3];
+            get_url = ret_vec[4];
         }
-        else {
+        else
+        {
             return false;
         }
         httplib::Client cli(host);

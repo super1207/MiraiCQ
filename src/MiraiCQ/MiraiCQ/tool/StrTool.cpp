@@ -3,7 +3,7 @@
 #include <objbase.h>
 #include <mutex>
 #include <vector>
-#include <regex>
+#include <libpcre/pcre.h>
 
 std::string StrTool::tolower(const std::string& str) 
 {
@@ -116,16 +116,13 @@ bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key
 Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str) 
 {
 	using namespace std;
-	regex r("(\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\],]+)");
-	smatch sm;
-	string::const_iterator searchStart(cq_str.cbegin());
 	std::vector<std::string> dat_vec;
-	Json::Value jsonarr = Json::arrayValue;
-	while(regex_search(searchStart, cq_str.cend(), sm, r))
+	auto all_vec = match_all(cq_str, "(\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\],]+)");
+	for (auto& i : all_vec)
 	{
-		dat_vec.push_back(sm[0].str());
-		searchStart = sm.suffix().first;
+		dat_vec.push_back(i.at(0));
 	}
+	Json::Value jsonarr = Json::arrayValue;
 	for (auto& dat : dat_vec)
 	{
 		if (dat[0] == '[')
@@ -136,13 +133,10 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 			node["type"] = dat.substr(4, pos1 - 4);
 			Json::Value dat_node = Json::objectValue;
 			
-			regex r("[:,]([^\\[\\],]+?)=([^\\[\\],]*?)(?=[\\],])");
-			smatch sm;
-			string::const_iterator searchStart(dat.cbegin());
-			while (regex_search(searchStart, dat.cend(), sm, r))
+			auto all_vec = match_all(dat, "[:,]([^\\[\\],]+?)=([^\\[\\],]*?)(?=[\\],])");
+			for (auto& i : all_vec)
 			{
-				dat_node[sm[1].str()] = sm[2].str();
-				searchStart = sm.suffix().first;
+				dat_node[i.at(1)] = i.at(2);
 			}
 			node["data"] = dat_node;
 			jsonarr.append(node);
@@ -271,11 +265,55 @@ std::string StrTool::get_str_from_ini(const std::string& file, const std::string
 	DWORD n = GetPrivateProfileStringA(section.c_str(), key.c_str(), default_value.c_str(), buf, 4096, file.c_str());
 	if (n == 0)
 	{
+		free(buf);
 		return default_value;
 	}
 	retStr = buf;
 	free(buf);
 	return retStr;
+}
+
+std::vector<std::string> StrTool::match(const std::string& content, const std::string& pattern)
+{
+	auto all = match_all(content, pattern);
+	if (all.size() > 0)
+	{
+		return all[0];
+	}
+	return std::vector<std::string>();
+}
+
+std::vector<std::vector<std::string>> StrTool::match_all(const std::string& content, const std::string& pattern)
+{
+	const char* error;
+	int  erroffset;
+	int  ovector[3 * 14];
+	std::vector<std::vector<std::string>> ret_vec;
+	pcre* re = pcre_compile(pattern.c_str(), 0, &error, &erroffset, NULL);
+	if (!re)
+	{
+		return {};
+	}
+	int offsetcount;
+	offsetcount = pcre_exec(re, NULL, content.c_str(), content.length(), 0, 0, ovector, 3 * 14);
+	while (offsetcount > 0)
+	{
+		
+		std::vector <std::string> temp_vec;
+		for (int i = 0; i < offsetcount; ++i)
+		{
+			const char* result = 0;
+			if (pcre_get_substring(content.c_str(), ovector, offsetcount, i, &result) >= 0) {
+				temp_vec.push_back(result);
+				pcre_free_substring(result);
+
+			}
+		}
+		ret_vec.push_back(temp_vec);
+		offsetcount = pcre_exec(re, NULL, content.c_str(), content.length(), ovector[1], 0, ovector, 3 * 14);
+	}
+	pcre_free(re);
+	return ret_vec;
 }
 
 StrTool::StrTool()
