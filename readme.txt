@@ -1,42 +1,39 @@
 MiraiCQ-Cli
 
-Èí¼þËµÃ÷£º
-	1£º±¾Èí¼þµÄ±àÐ´³õÖÔÎª¼æÈÝ¿áQ²å¼þ£¬³ý´ËÖ®Íâ£¬»¹»áÌá¹©Ò»Ð©¶îÍâµÄ¹¦ÄÜ¡£
-	2£º¶à¸ö²å¼þ¹²ÓÃÒ»Ì×ÏûÏ¢ÏµÍ³£¬ÔÚÊÕ·¢Í¼Æ¬ÎÄ¼þÊ±£¬¿ÉÒÔÏÔÖø½ÚÊ¡ÍøÂç¿ªÏú¡£
-	3£ºÎªÍøÂç´¦ÀíÄÜÁ¦½ÏÂé·³µÄ±à³ÌÓïÑÔÌá¹©±ãÀûµÄ·½Ê½À´¿ª·¢ÁÄÌì²å¼þ¡£
-	4£º¶Ô½Ó`OneBot v11`»ò`Mirai Http Api`£¨ÔÝÎ´ÊµÏÖ£©£¬Èí¼þ³¤ÆÚ¿ÉÓÃ¡£
+è½¯ä»¶è¯´æ˜Žï¼š
+	1ï¼šæœ¬è½¯ä»¶çš„ç¼–å†™åˆè¡·ä¸ºå…¼å®¹é…·Qæ’ä»¶ï¼Œé™¤æ­¤ä¹‹å¤–ï¼Œè¿˜ä¼šæä¾›ä¸€äº›é¢å¤–çš„åŠŸèƒ½ã€‚
+	2ï¼šå¤šä¸ªæ’ä»¶å…±ç”¨ä¸€å¥—æ¶ˆæ¯ç³»ç»Ÿï¼Œåœ¨æ”¶å‘å›¾ç‰‡æ–‡ä»¶æ—¶ï¼Œå¯ä»¥æ˜¾è‘—èŠ‚çœç½‘ç»œå¼€é”€ã€‚
+	3ï¼šä¸ºç½‘ç»œå¤„ç†èƒ½åŠ›è¾ƒéº»çƒ¦çš„ç¼–ç¨‹è¯­è¨€æä¾›ä¾¿åˆ©çš„æ–¹å¼æ¥å¼€å‘èŠå¤©æ’ä»¶ã€‚
+	4ï¼šå¯¹æŽ¥`OneBot v11`æˆ–`Mirai Http Api`ï¼ˆæš‚æœªå®žçŽ°ï¼‰ï¼Œè½¯ä»¶é•¿æœŸå¯ç”¨ã€‚
 
-ÃüÁîÐÐ°æ±¾µÄMiraiCQÏà±ÈÓÚÖ®Ç°µÄMFC GUI°æ±¾£º
-	1£º¸ü¼ÓÎÈ¶¨£¬¸ßÐ§£¬Õ¼ÓÃ×ÊÔ´¸üÉÙ¡£
-	2£º¸üºÏÀíµÄÍ¼Æ¬ÊÕ·¢»úÖÆ¡£
-	3£ºÖ§³Ö²å¼þº¯ÊýÓÅÏÈ¼¶£¬ÊÂ¼þÀ¹½Ø¡£
-	4£º´Ë°æ±¾Îª½ñºó³¤ÆÚÓÅ»¯£¬Î¬»¤µÄ°æ±¾£¨Ö®Ç°µÄMFC GUI°æ±¾ÈÔÈ»¿ÉÓÃ£¬¼ûÆäËü·ÖÖ§£©¡£
+å‘½ä»¤è¡Œç‰ˆæœ¬çš„MiraiCQç›¸æ¯”äºŽä¹‹å‰çš„MFC GUIç‰ˆæœ¬ï¼š
+	1ï¼šæ›´åŠ ç¨³å®šï¼Œé«˜æ•ˆï¼Œå ç”¨èµ„æºæ›´å°‘ã€‚
+	2ï¼šæ›´åˆç†çš„å›¾ç‰‡æ”¶å‘æœºåˆ¶ã€‚
+	3ï¼šæ”¯æŒæ’ä»¶å‡½æ•°ä¼˜å…ˆçº§ï¼Œäº‹ä»¶æ‹¦æˆªã€‚
+	4ï¼šæ­¤ç‰ˆæœ¬ä¸ºä»ŠåŽé•¿æœŸä¼˜åŒ–ï¼Œç»´æŠ¤çš„ç‰ˆæœ¬ï¼ˆä¹‹å‰çš„MFC GUIç‰ˆæœ¬ä»ç„¶å¯ç”¨ï¼Œè§å…¶å®ƒåˆ†æ”¯ï¼‰ã€‚
 
-ÏÂÔØµØÖ·£º
+ä¸‹è½½åœ°å€ï¼š
 	https://github.com/super1207/MiraiCQ/releases
 
-Ê¹ÓÃ·½·¨£º
-	1£º½«Ô­¿áQ²å¼þµÄdllºÍjson·ÅÈëappÎÄ¼þ¼Ð¡£
-	2£º¿ªÆô`OneBot`ÊµÏÖ¶ËµÄ`wesocket`ÕýÏòÁ¬½Ó£¨ÏêÏ¸ËµÃ÷Çë²ÎÕÕ´ËÏîÄ¿£ºhttps://github.com/Mrs4s/go-cqhttp£©¡£
-	3£ºÐÞ¸Ä`config\congig.ini`ÎÄ¼þÖÐµÄ`ws_url`ºÍ`access_token`Ïî¡£
-	4£ºÔËÐÐ`MiraiCQ.exe`¡£
+ä½¿ç”¨æ–¹æ³•ï¼š
+	1ï¼šå°†åŽŸé…·Qæ’ä»¶çš„dllå’Œjsonæ”¾å…¥appæ–‡ä»¶å¤¹ã€‚
+	2ï¼šå¼€å¯`OneBot`å®žçŽ°ç«¯çš„`wesocket`æ­£å‘è¿žæŽ¥ï¼ˆè¯¦ç»†è¯´æ˜Žè¯·å‚ç…§æ­¤é¡¹ç›®ï¼šhttps://github.com/Mrs4s/go-cqhttpï¼‰ã€‚
+	3ï¼šä¿®æ”¹`config\congig.ini`æ–‡ä»¶ä¸­çš„`ws_url`å’Œ`access_token`é¡¹ã€‚
+	4ï¼šè¿è¡Œ`MiraiCQ.exe`ã€‚
 
-ÔËÐÐ»·¾³£º
-	`Windows 7 with  sp1`¡¢`Windows Server 2016`»ò¸ü¸ß°æ±¾µÄWindowsÏµÍ³¡£
-	`wine`£¨ÔÝÎ´²âÊÔ£©¡£
+è¿è¡ŒçŽ¯å¢ƒï¼š
+	`Windows 7 with  sp1`ã€`Windows Server 2016`æˆ–æ›´é«˜ç‰ˆæœ¬çš„Windowsç³»ç»Ÿã€‚
+	`wine`ï¼ˆæš‚æœªæµ‹è¯•ï¼‰ã€‚
 
-±àÒë·½·¨£º
-	1£º°²×°VS2019£¬°²×°Ê±¹´Ñ¡`Ê¹ÓÃC++µÄ×ÀÃæ¿ª·¢`¡£
-	2£ºÊ¹ÓÃVS2019´ò¿ª`MiraiCQ.sln`£¬Ö±½Ó±àÒë¡£
+ç¼–è¯‘æ–¹æ³•ï¼š
+	1ï¼šå®‰è£…VS2019ï¼Œå®‰è£…æ—¶å‹¾é€‰`ä½¿ç”¨C++çš„æ¡Œé¢å¼€å‘`ã€‚
+	2ï¼šä½¿ç”¨VS2019æ‰“å¼€`MiraiCQ.sln`ï¼Œç›´æŽ¥ç¼–è¯‘ã€‚
 
-¿ªÔ´ËµÃ÷£º
-	±¾Èí¼þ(²»°üÀ¨²å¼þ£¬²å¼þÊÇ·ñÃâ·ÑÈ¡¾öÓÚ²å¼þ×÷Õß)ÓÀ¾ÃÃâ·ÑÊ¹ÓÃ£¬Äú¿ÉÒÔÍ¨¹ýÈÎºÎºÏ·¨·½Ê½Ê¹ÓÃ±¾Èí¼þ¡£
-	±¾Èí¼þÊ¹ÓÃ`GNU Affero General Public License v3.0`¿ªÔ´£¬ÈôÒªÓÃÓÚÆäËüÓÃÍ¾£¬Çë×ÐÏ¸ÔÄ¶Á¿ªÔ´Ð­Òé¡£
-	¿ªÔ´µØÖ·£ºhttps://github.com/super1207/MiraiCQ
+å¼€æºè¯´æ˜Žï¼š
+	æœ¬è½¯ä»¶(ä¸åŒ…æ‹¬æ’ä»¶ï¼Œæ’ä»¶æ˜¯å¦å…è´¹å–å†³äºŽæ’ä»¶ä½œè€…)æ°¸ä¹…å…è´¹ä½¿ç”¨ï¼Œæ‚¨å¯ä»¥é€šè¿‡ä»»ä½•åˆæ³•æ–¹å¼ä½¿ç”¨æœ¬è½¯ä»¶ã€‚
+	æœ¬è½¯ä»¶ä½¿ç”¨`GNU Affero General Public License v3.0`å¼€æºï¼Œè‹¥è¦ç”¨äºŽå…¶å®ƒç”¨é€”ï¼Œè¯·ä»”ç»†é˜…è¯»å¼€æºåè®®ã€‚
+	å¼€æºåœ°å€ï¼šhttps://github.com/super1207/MiraiCQ
 
-½»Á÷ÓëÎÊÌâ·´À¡£º
-	1£ºhttps://github.com/super1207/MiraiCQ/issues
-	2£ºQQÈº£º920220179
-
-Èí¼þ×÷Õß£ºsuper1207
-Ê±¼ä£º¶þÁãÒ»¾ÅÄê¾ÅÔÂÒ»ÈÕ
+äº¤æµä¸Žé—®é¢˜åé¦ˆï¼š
+	1ï¼šhttps://github.com/super1207/MiraiCQ/issues
+	2ï¼šQQç¾¤ï¼š920220179
