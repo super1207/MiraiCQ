@@ -210,6 +210,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 	MiraiNet::NetStruct api_json;
 	try
 	{
+		/* onebot中的msg_id可以为负数，但是cq里面只能为递增的正数，所以，需要进行一些处理 */
 		api_json = OneBotApiDeal::deal_api(*senddat, mx_msg_id_vec, msg_id_vec, curr_msg_id);
 	}
 	catch (std::exception& e)
@@ -259,7 +260,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 		return MiraiNet::NetStruct();
 	}
 
-	
+	/* 说明用户并不想获得api调用结果，所以，直接返回，不等待结果 */
 	if (timeout <= 0)
 	{
 		lock_guard<mutex> lock(mx_call_map);
@@ -285,6 +286,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 			break;
 		}
 	}
+	/* 在timeout时间内没有得到结果，说明超时了 */
 	if (!ret_json)
 	{
 		//err_msg = "timeout error";

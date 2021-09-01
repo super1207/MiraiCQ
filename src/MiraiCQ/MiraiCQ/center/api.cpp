@@ -59,6 +59,7 @@ static TER_TYPE normal_call(
 		auto ret = fun2(Json::nullValue);
 		return ret;
 	}
+	/* 如果需要访问onebot实现端，则插件必须开启 */
 	MiraiNet::NetStruct json(new Json::Value);
 	fun1(json);
 	auto net = net_.lock();
@@ -91,6 +92,7 @@ static TER_TYPE normal_call(
 			return RETERR(TP10086<TER_TYPE>());
 		}
 	}
+	/* 不需要从返回的json中获取数据 */
 	auto ret = fun2(data_json);
 	return ret;
 }
@@ -101,23 +103,26 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 	auto json_arr = StrTool::cq_str_to_jsonarr(cq_str);
 	if (!json_arr.isArray())
 	{
-		return -1;
+		/* 转换失败 */
+		return Json::arrayValue;
 	}
 	auto utf8_json_str = StrTool::to_utf8(Json::FastWriter().write(json_arr));
 	Json::Value root;
 	Json::Reader reader;
 	if (!reader.parse(utf8_json_str, json_arr))
 	{
+		/* 转换失败 */
 		return Json::arrayValue;
 	}
 	for (auto & node : json_arr)
 	{
 		/* 由StrTool::cq_str_to_jsonarr 转换而来的json一定有type */
-		if (node["type"].asString() == "image")
+		if (node["type"].asString() == "image") /* 修改图片cq码，以符合onebot实现端的要求 */
 		{
 			auto file = StrTool::get_str_from_json(node["data"], "file", "");
 			if (file == "")
 			{
+				/* 没有file字段，说明是不规范的cq码，直接忽略（不做修改） */
 				continue;
 			}
 			file = PathTool::get_exe_dir() +"data\\image\\" + StrTool::to_ansi(file);
@@ -132,6 +137,7 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				}
 				continue;
 			}
+			/* 如果文件存在，则读取文件，然后以base64的方式发给onebot实现端 */
 			std::ifstream ifs;
 			ifs.open(file, std::ios::binary | std::ios::ate);
 			if (!ifs.is_open())
@@ -153,7 +159,7 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 
 		}
 	}
-	auto s = json_arr.toStyledString();
+	/* auto s = json_arr.toStyledString(); */
 	return json_arr;
 	
 }
@@ -174,8 +180,8 @@ int Center::CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg)
 	{
 		(*json)["action"] = "send_private_msg";
 		(*json)["params"]["user_id"] = qq;
-		MiraiLog::get_instance()->add_debug_log("Center", "CQ_sendPrivateMsg发送的Msg:\n" + std::string(msg ? msg : ""));
-		(*json)["params"]["message"] = deal_cq_str(msg ? msg : "");
+		MiraiLog::get_instance()->add_debug_log("Center", "CQ_sendPrivateMsg发送的Msg:\n" + std::string(msg));
+		(*json)["params"]["message"] = deal_cq_str(msg);
 		
 	}, [&](const Json::Value& data_json) 
 	{
@@ -200,8 +206,8 @@ int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg)
 	{
 		(*json)["action"] = "send_group_msg";
 		(*json)["params"]["group_id"] = group_id;
-		MiraiLog::get_instance()->add_debug_log("Center", "CQ_sendGroupMsg发送的Msg:\n" + std::string(msg ? msg : ""));
-		(*json)["params"]["message"] = deal_cq_str(msg ? msg : "");
+		MiraiLog::get_instance()->add_debug_log("Center", "CQ_sendGroupMsg发送的Msg:\n" + std::string(msg));
+		(*json)["params"]["message"] = deal_cq_str(msg);
 
 	}, [&](const Json::Value& data_json)
 	{
@@ -1004,13 +1010,25 @@ std::string Center::CQ_getImage(int auth_code, const char* file)
 			/* 如果图片已经存在，就不用真正下载了 */
 			if (!PathTool::is_file_exist(img_dir + file))
 			{
-				/* 下载图片 */
-				if (ImgTool::download_img(url, img_dir + file + ".tmp"))
+				try
 				{
-					PathTool::rename(img_dir + file + ".tmp", img_dir + file);
+					/* 下载图片 */
+					if (ImgTool::download_img(url, img_dir + file + ".tmp"))
+					{
+						PathTool::rename(img_dir + file + ".tmp", img_dir + file);
+					}
+					else
+					{
+						MiraiLog::get_instance()->add_debug_log("Center", "图片下载失败");
+					}
 				}
+				catch (const std::exception& e)
+				{
+					MiraiLog::get_instance()->add_debug_log("Center", "图片下载失败");
+				}
+				
 			}
-			/* 图片下载完成，删除正在下载的标记 */
+			/* 图片下载完成(包括失败)，删除正在下载的标记 */
 			std::lock_guard<std::mutex> lock(mx);
 			downing_set.erase(file);
 		}

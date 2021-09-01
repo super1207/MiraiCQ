@@ -362,6 +362,7 @@ static bool deal_json_array(Json::Value & json_arr)
 			if (md5_str == "")
 			{
 				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取md5:"+url);
+				/* MiraiCQ要使用md5作为文件名的一部分，如果没有获取到md5，则无法继续处理下去 */
 				node = Json::nullValue;
 				continue;
 			}
@@ -401,10 +402,6 @@ static bool deal_json_array(Json::Value & json_arr)
 			Json::Value v;
 			v["file"] = cqimg_name;
 			node["data"] = v;
-			/* Test  CQ_getImage_T:
-				std::string full_path = CQ_getImage_T(1, cqimg_name.c_str());
-				MiraiLog::get_instance()->add_debug_log("TestCQ_GetImage", full_path);
-			*/
 		}
 	}
 	return true;

@@ -1,5 +1,6 @@
 ﻿#include "OneBotApiDeal.h"
 #include "../../tool/StrTool.h"
+#include "../../log/MiraiLog.h"
 
 OneBotApiDeal::OneBotApiDeal()
 {
@@ -13,12 +14,13 @@ MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& 
 {
 	auto ret_json = MiraiNet::NetStruct(new Json::Value(root));
 	auto id_json = (*ret_json).get("message_id",Json::nullValue);
+	/* 只有撤回消息之类的api才有msg_id,所以，如果没有msg_id，则不做处理 */
 	if (!id_json.isNull() && id_json.isInt())
 	{
 		/* 在此转换message_id */
 		int id = id_json.asInt();
 		std::lock_guard<std::mutex> lk(mx_msg_id_vec);
-		for (auto i : msg_id_vec)
+		for (auto &  i : msg_id_vec)
 		{
 			if (i.first == id)
 			{
@@ -26,6 +28,9 @@ MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& 
 				break;
 			}
 		}
+		/* 执行到这里，说明没有找到对应的msg_id */
+		MiraiLog::get_instance()->add_debug_log("ApiCall", "没有找到对应的message_id");
+		return nullptr;
 	}
 	return ret_json;
 }
