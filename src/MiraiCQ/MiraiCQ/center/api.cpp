@@ -174,7 +174,8 @@ int Center::CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg)
 	{
 		(*json)["action"] = "send_private_msg";
 		(*json)["params"]["user_id"] = qq;
-		(*json)["params"]["message"] = deal_cq_str(msg);
+		MiraiLog::get_instance()->add_debug_log("Center", "CQ_sendPrivateMsg发送的Msg:\n" + std::string(msg ? msg : ""));
+		(*json)["params"]["message"] = deal_cq_str(msg ? msg : "");
 		
 	}, [&](const Json::Value& data_json) 
 	{
@@ -199,7 +200,8 @@ int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg)
 	{
 		(*json)["action"] = "send_group_msg";
 		(*json)["params"]["group_id"] = group_id;
-		(*json)["params"]["message"] = deal_cq_str(msg);
+		MiraiLog::get_instance()->add_debug_log("Center", "CQ_sendGroupMsg发送的Msg:\n" + std::string(msg ? msg : ""));
+		(*json)["params"]["message"] = deal_cq_str(msg ? msg : "");
 
 	}, [&](const Json::Value& data_json)
 	{

@@ -234,7 +234,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 	{
 		lock_guard<mutex> lock(mx_call_map);
 		call_map[echo] = call_struct;
-		MiraiLog::get_instance()->add_debug_log("map size", std::to_string(call_map.size()));
+		/* MiraiLog::get_instance()->add_debug_log("map size", std::to_string(call_map.size())); */
 	}
 
 	try

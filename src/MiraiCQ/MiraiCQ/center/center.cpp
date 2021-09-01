@@ -274,6 +274,24 @@ void Center::normal_cal_plus_fun(int fun_type, std::function<int(const void* fun
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
 	auto all_ac = plus->get_all_ac();
+	/* 按函数优先级从小到大排序 */
+	std::sort(all_ac.begin(), all_ac.end(), [&](decltype(all_ac[0]) & p1,decltype(all_ac[0]) & p2) {
+		auto s1 = p1.second.lock();
+		auto s2 = p1.second.lock();
+		/* 插件不存在，不排序 */
+		if (!s1 || !s2)
+		{
+			return false;
+		}
+		auto fun1 = s1->get_event_fun(fun_type);
+		auto fun2 = s1->get_event_fun(fun_type);
+		/* 事件不存在，不排序 */
+		if (!fun1 || !fun2)
+		{
+			return false;
+		}
+		return fun1->priority < fun1->priority;
+	});
 	for (auto ac : all_ac)
 	{
 		/* 获得插件的共享指针 */

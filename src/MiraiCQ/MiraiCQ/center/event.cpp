@@ -18,7 +18,7 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 	assert(evt);
 	const std::string print_utf8_str = evt->toStyledString();
 	const std::string print_ansi_str = StrTool::to_ansi(print_utf8_str);
-	MiraiLog::get_instance()->add_debug_log("Center", print_ansi_str);
+	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:\n" + print_ansi_str);
 	Json::Value ansi_json;
 	Json::Reader reader;
 	if (!reader.parse(print_ansi_str, ansi_json))
@@ -426,7 +426,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr转换失败");
 		return;
 	}
-	MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:"+ cq_str);
+	MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:\n"+ cq_str);
 	std::string sub_type_str = StrTool::get_str_from_json(evt, "sub_type", "");
 	int subtype_int;
 	if (sub_type_str == "friend")
@@ -489,7 +489,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr转换失败");
 		return;
 	}
-	MiraiLog::get_instance()->add_debug_log("Center", "传入GroupEvent的Msg:" + cq_str);
+	MiraiLog::get_instance()->add_debug_log("Center", "传入GroupEvent的Msg:\n" + cq_str);
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
 	int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
