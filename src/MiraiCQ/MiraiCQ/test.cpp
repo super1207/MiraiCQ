@@ -6,6 +6,7 @@
 #include "tool/TimeTool.h"
 #include "tool/InputTool.h"
 #include "center/center.h"
+#include "tool/PathTool.h"
 #include <iostream>
 #include <string>
 
@@ -156,7 +157,7 @@ static void PrintUnkowCmd()
 }
 
 int main()
-{
+{	
 	MiraiLog::get_instance()->add_backend_sinks([&](const MiraiLog::Level& lv, const std::string& category, const std::string& dat, void* user_ptr) {
 		if (!printLog)
 		{

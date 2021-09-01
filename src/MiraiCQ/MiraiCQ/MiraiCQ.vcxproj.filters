@@ -38,6 +38,9 @@
     <Filter Include="config">
       <UniqueIdentifier>{6b988444-e431-4e87-b896-5979eea6c043}</UniqueIdentifier>
     </Filter>
+    <Filter Include="thirdpart\libpcre">
+      <UniqueIdentifier>{526ced27-fa4e-4d29-acf7-f5ab3c0023b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp">
@@ -105,6 +108,69 @@
     </ClCompile>
     <ClCompile Include="tool\InputTool.cpp">
       <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_byte_order.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_compile.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_config.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_dfa_exec.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_exec.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_fullinfo.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_get.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_globals.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_maketables.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_newline.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_ord2utf8.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_refcount.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_string_utils.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_study.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_tables.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_ucd.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_valid_utf8.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_version.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_xclass.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_jit_compile.c">
+      <Filter>thirdpart\libpcre</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\libpcre\pcre_chartables.c">
+      <Filter>thirdpart\libpcre</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

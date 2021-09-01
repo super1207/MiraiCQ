@@ -23,7 +23,7 @@ MiraiPlus::~MiraiPlus()
 bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) 
 {
 	err_msg.clear();
-	std::string bin_path = PathTool::get_exe_dir() + "\\bin\\";
+	std::string bin_path = PathTool::get_exe_dir() + "";
 	PathTool::create_dir(bin_path);
 	//SetDllDirectoryA(bin_path.c_str()); 
 	std::string cqp_path = bin_path + "CQP.dll";

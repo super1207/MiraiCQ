@@ -3,7 +3,9 @@
 #include <objbase.h>
 #include <mutex>
 #include <vector>
-#include <libpcre/pcre.h>
+#include <pcre.h>
+
+#pragma comment(lib,"Ole32.lib")
 
 std::string StrTool::tolower(const std::string& str) 
 {

@@ -45,7 +45,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -55,9 +55,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include\libpcre;$(ProjectDir)thirdpart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -66,7 +66,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
-      <AdditionalDependencies>libpcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,9 +78,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include\libpcre;$(ProjectDir)thirdpart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -89,7 +92,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
-      <AdditionalDependencies>libpcre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -109,6 +115,27 @@
     <ClCompile Include="thirdpart\include\jsoncpp\json_reader.cpp" />
     <ClCompile Include="thirdpart\include\jsoncpp\json_value.cpp" />
     <ClCompile Include="thirdpart\include\jsoncpp\json_writer.cpp" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_byte_order.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_chartables.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_compile.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_config.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_dfa_exec.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_exec.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_fullinfo.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_get.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_globals.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_jit_compile.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_maketables.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_newline.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_ord2utf8.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_refcount.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_string_utils.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_study.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_tables.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_ucd.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_valid_utf8.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_version.c" />
+    <ClCompile Include="thirdpart\include\libpcre\pcre_xclass.c" />
     <ClCompile Include="tool\BinTool.cpp" />
     <ClCompile Include="tool\ImgTool.cpp" />
     <ClCompile Include="tool\InputTool.cpp" />
