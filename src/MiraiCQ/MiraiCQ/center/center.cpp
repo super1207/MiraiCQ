@@ -290,7 +290,7 @@ void Center::normal_cal_plus_fun(int fun_type, std::function<int(const void* fun
 		{
 			return false;
 		}
-		return fun1->priority < fun1->priority;
+		return fun1->priority < fun2->priority;
 	});
 	for (auto ac : all_ac)
 	{
