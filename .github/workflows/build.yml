@@ -25,7 +25,4 @@ jobs:
       with:
         name: release
         path: 
-            src/MiraiCQ/Release/
-            !src/MiraiCQ/Release/*.exp
-            !src/MiraiCQ/Release/*.lib
-            !src/MiraiCQ/Release/*.pdb
+            Release/
