@@ -18,11 +18,12 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3
     - name: MSBuild
-      working-directory: src/MiraiCQ
-      run: msbuild /property:Configuration=Release
+      run: |
+        cd src/MiraiCQ
+        msbuild /property:Configuration=Release
     - name: upload file
       uses: actions/upload-artifact@v2
       with:
-        name: release
+        name: upload files
         path: 
-            Release/
+            src/MiraiCQ/Release
