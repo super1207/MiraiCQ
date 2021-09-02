@@ -13,7 +13,7 @@
 std::atomic_bool printLog = true;
 static thread_local std::string retStr;
 
-int InitBot()
+int InitBot() 
 {
 	static auto  net = MiraiNet::get_instance("onebot");
 	if (!net)
