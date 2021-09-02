@@ -5,6 +5,7 @@ on:
     branches:
     - MiraiCQ-Cli
     paths:
+    - .github/workflows/**
     - src/**
 
 jobs:
@@ -14,8 +15,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
-    - name: Setup VS2019
-      uses: warrenbuckley/Setup-MSBuild@v1
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.3
     - name: MSBuild
       working-directory: src/MiraiCQ
       run: msbuild /property:Configuration=Release
