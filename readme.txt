@@ -22,7 +22,7 @@ MiraiCQ-Cli
 	4：运行`MiraiCQ.exe`。
 
 运行环境：
-	`Windows 7 with  sp1`、`Windows Server 2016`或更高版本的Windows系统。
+	`Windows 7 with sp1`、`Windows Server 2016`或更高版本的Windows系统。
 	`wine`（暂未测试）。
 
 编译方法：
