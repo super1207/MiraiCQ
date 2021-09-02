@@ -13,7 +13,8 @@ MiraiCQ-Cli
 	4：此版本为今后长期优化，维护的版本（之前的MFC GUI版本仍然可用，见其它分支）。
 
 下载地址：
-	https://github.com/super1207/MiraiCQ/releases
+	1：https://github.com/super1207/MiraiCQ/releases
+	2：https://github.com/super1207/MiraiCQ/actions
 
 使用方法：
 	1：将原酷Q插件的dll和json放入app文件夹。
