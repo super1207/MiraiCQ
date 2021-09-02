@@ -27,6 +27,13 @@ public:
 	* 返回值：成功返回`true`，失败返回`false`
 	*/
 	static bool download_img(const std::string& url, const std::string& save_path) ;
+
+	/*
+	* 描述：获得图片信息
+	* 参数`body`：图片的body(可以只是一部分图片)
+	* 返回值：图片信息(可能不完整)
+	*/
+	static ImgInfo parse_img(const std::string& body);
 	
 
 private:

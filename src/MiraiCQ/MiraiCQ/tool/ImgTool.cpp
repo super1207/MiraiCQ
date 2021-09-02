@@ -4,7 +4,7 @@
 #include "StrTool.h"
 
 
-static ImgTool::ImgInfo parse_img(const std::string& body)
+ImgTool::ImgInfo ImgTool::parse_img(const std::string& body)
 {
     ImgTool::ImgInfo ret_info;
     if (body.size() >= 26 &&  (unsigned char)body[0] == 0x42 && (unsigned char)body[1] == 0x4d)
@@ -140,7 +140,7 @@ bool ImgTool::get_info(const std::string& url, ImgInfo& info)
             std::string size_str = response.get_header_value("Content-Length");
             if (size_str != "")
             {
-                size =  (unsigned int)atol(size_str.c_str());
+                size = (unsigned int)std::stol(size_str);
             }
             return true;
         },

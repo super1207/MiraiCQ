@@ -368,7 +368,8 @@ static bool deal_json_array(Json::Value & json_arr)
 			}
 			/* 获得图片信息需要下载一部分图片 */
 			ImgTool::ImgInfo info;
-			if (!ImgTool::get_info(url, info))
+			/* 这里进行两次尝试，增大成功概率 */
+			if (!ImgTool::get_info(url, info) && !ImgTool::get_info(url, info))
 			{
 				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取图片信息:" + url);
 				/* 
@@ -376,6 +377,9 @@ static bool deal_json_array(Json::Value & json_arr)
 					node = Json::nullValue;
 					continue;
 				*/
+				/* 无法获得图片信息，则类型使用image，之后若使用`CQ_getImage`获取图片，可能会没有正确的后缀名 */
+				info.height = info.width = info.size = 0;
+				info.type = "image";
 			}
 			std::string cqimg_name = md5_str + "." + info.type;
 			/* 创建目录 */
