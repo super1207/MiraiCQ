@@ -148,9 +148,9 @@ PCRE_EXP_DATA_DEFN only if they are not already set. */
 #ifndef PCRE_EXP_DECL
 #  ifdef _WIN32
 #    ifndef PCRE_STATIC
-#      define PCRE_EXP_DECL       extern __declspec(dllexport)
-#      define PCRE_EXP_DEFN       __declspec(dllexport)
-#      define PCRE_EXP_DATA_DEFN  __declspec(dllexport)
+#      define PCRE_EXP_DECL       //extern __declspec(dllexport)
+#      define PCRE_EXP_DEFN       //__declspec(dllexport)
+#      define PCRE_EXP_DATA_DEFN  //__declspec(dllexport)
 #    else
 #      define PCRE_EXP_DECL       extern
 #      define PCRE_EXP_DEFN

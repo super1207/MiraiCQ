@@ -21,6 +21,9 @@ jobs:
       run: |
         cd src/MiraiCQ
         msbuild /property:Configuration=Release
+        del *.exp
+        del *.pdb
+        del MiraiCQ.lib
     - name: upload file
       uses: actions/upload-artifact@v2
       with:
