@@ -4,6 +4,8 @@
 
 #include "OneBot/OneBotImpl.h"
 
+#include "MiraiHttp/MiraiHttpImpl.h"
+
 
 using namespace std;
 
@@ -63,10 +65,16 @@ std::string MiraiNet::get_config(const std::string& key)
 
 std::shared_ptr<MiraiNet> MiraiNet::get_instance(const std::string & type) 
 {
-	if (StrTool::tolower(type) == "onebot")
+	if (StrTool::tolower(type) == "onebotv11")
 	{
 		auto ret =  std::make_shared<OneBotNetImpl>();
-		ret->set_config("net_type", "onebot");
+		ret->set_config("net_type", "onebotv11");
+		return ret;
+	}
+	else if (StrTool::tolower(type) == "miraihttp")
+	{
+		auto ret = std::make_shared<MiraiHttpNetImpl>();
+		ret->set_config("net_type", "miraihttp");
 		return ret;
 	}
 	return std::shared_ptr<MiraiNet>();

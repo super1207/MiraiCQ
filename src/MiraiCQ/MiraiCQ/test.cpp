@@ -15,14 +15,17 @@ static thread_local std::string retStr;
 
 int InitBot()  
 {
-	static auto  net = MiraiNet::get_instance("onebot");
+	static auto  net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
 	if (!net)
 	{
 		MiraiLog::get_instance()->add_debug_log("Net", "网络模块实例化失败");
 		return -1;
 	}
 	net->set_config("ws_url", Config::get_instance()->get_ws_url());
+	net->set_config("verifyKey", Config::get_instance()->get_verifyKey());
+	net->set_config("http_url", Config::get_instance()->get_http_url());
 	net->set_config("access_token", Config::get_instance()->get_access_token());
+	/* net->set_config("adapter", Config::get_instance()->get_adapter()); */
 	if (!net->connect())
 	{
 		MiraiLog::get_instance()->add_debug_log("Net", "网络连接错误");

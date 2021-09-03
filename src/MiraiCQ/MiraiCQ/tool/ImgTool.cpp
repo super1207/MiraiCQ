@@ -140,7 +140,7 @@ bool ImgTool::get_info(const std::string& url, ImgInfo& info)
             std::string size_str = response.get_header_value("Content-Length");
             if (size_str != "")
             {
-                size = (unsigned int)std::stol(size_str);
+                size = (unsigned int)std::stoll(size_str);
             }
             return true;
         },

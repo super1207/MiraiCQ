@@ -1,10 +1,10 @@
-MiraiCQ-Cli
+﻿MiraiCQ-Cli
 
 软件说明：
 	1：本软件的编写初衷为兼容酷Q插件，除此之外，还会提供一些额外的功能。
 	2：多个插件共用一套消息系统，在收发图片文件时，可以显著节省网络开销。
 	3：为网络处理较麻烦的编程语言提供便利的方式来开发聊天插件。
-	4：对接`OneBot v11`或`Mirai Http Api`（暂未实现），软件长期可用。
+	4：对接`OneBot v11`或`Mirai Http Api`（正在施工中,已经支持基础图文消息收发，仅支持`singleMode`），软件长期可用。
 
 命令行版本的MiraiCQ相比于之前的MFC GUI版本：
 	1：更加稳定，高效，占用资源更少。
@@ -18,8 +18,12 @@ MiraiCQ-Cli
 
 使用方法：
 	1：将原酷Q插件的dll和json放入app文件夹。
-	2：开启`OneBot`实现端的`websocket`正向连接（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp ）。
-	3：修改`config\congig.ini`文件中的`ws_url`和`access_token`项。
+	2：
+		开启`OneBot`实现端的`websocket`正向连接（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp ）。
+			或者
+		开启`Mirai Http Api`的`websocket`正向连接以及正向`http`
+	3：修改`config\congig.ini`文件中的`ws_url`(all)、`access_token`(onebot)、`verifyKey`(mirai_http_api)、`http_url`(mirai_http_api)、`adapter`(all)项。
+		示例config.ini：https://github.com/super1207/MiraiCQ/blob/MiraiCQ-Cli/config.ini
 	4：运行`MiraiCQ.exe`。
 
 运行环境：

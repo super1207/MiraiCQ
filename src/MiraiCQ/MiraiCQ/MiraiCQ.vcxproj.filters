@@ -41,6 +41,9 @@
     <Filter Include="thirdpart\libpcre">
       <UniqueIdentifier>{526ced27-fa4e-4d29-acf7-f5ab3c0023b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net\MiraiHttp">
+      <UniqueIdentifier>{82a63dad-631d-47bf-9be3-6b5cd34a5de9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp">
@@ -172,6 +175,15 @@
     <ClCompile Include="thirdpart\include\libpcre\pcre_chartables.c">
       <Filter>thirdpart\libpcre</Filter>
     </ClCompile>
+    <ClCompile Include="net\MiraiHttp\MiraiHttpImpl.cpp">
+      <Filter>net\MiraiHttp</Filter>
+    </ClCompile>
+    <ClCompile Include="net\MiraiHttp\MiraiHttpApiDeal.cpp">
+      <Filter>net\MiraiHttp</Filter>
+    </ClCompile>
+    <ClCompile Include="net\MiraiHttp\MiraiHttpEventDeal.cpp">
+      <Filter>net\MiraiHttp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -215,6 +227,15 @@
     </ClInclude>
     <ClInclude Include="tool\InputTool.h">
       <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="net\MiraiHttp\MiraiHttpImpl.h">
+      <Filter>net\MiraiHttp</Filter>
+    </ClInclude>
+    <ClInclude Include="net\MiraiHttp\MiraiHttpApiDeal.h">
+      <Filter>net\MiraiHttp</Filter>
+    </ClInclude>
+    <ClInclude Include="net\MiraiHttp\MiraiHttpEventDeal.h">
+      <Filter>net\MiraiHttp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

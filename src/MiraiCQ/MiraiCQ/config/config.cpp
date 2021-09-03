@@ -22,13 +22,56 @@ std::string Config::get_ws_url()
 	std::string config_path = PathTool::get_exe_dir() + "config\\";
 	PathTool::create_dir(config_path);
 	std::string config_file = config_path + "config.ini";
-	std::string url = StrTool::get_str_from_ini(config_file,"OneBot","ws_url","");
+	std::string url = StrTool::get_str_from_ini(config_file,"Setting","ws_url","");
 	if (url == "")
 	{
-		WritePrivateProfileStringA("OneBot", "ws_url", this->ws_url.c_str(), config_file.c_str());
+		WritePrivateProfileStringA("Setting", "ws_url", this->ws_url.c_str(), config_file.c_str());
 		return this->ws_url;
 	}
 	return url;
+}
+
+std::string Config::get_http_url()
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	std::string url = StrTool::get_str_from_ini(config_file, "Setting", "http_url", "");
+	if (url == "")
+	{
+		WritePrivateProfileStringA("Setting", "http_url", this->http_url.c_str(), config_file.c_str());
+		return this->ws_url;
+	}
+	return url;
+}
+
+std::string Config::get_verifyKey()
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	std::string uuid = StrTool::gen_uuid();
+	std::string verifyKey = StrTool::get_str_from_ini(config_file, "Setting", "verifyKey", uuid);
+	if (verifyKey == uuid)
+	{
+		WritePrivateProfileStringA("Setting", "access_token", this->verifyKey.c_str(), config_file.c_str());
+		return this->access_token;
+	}
+	return verifyKey;
+}
+
+std::string Config::get_adapter()
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	std::string adapter = StrTool::get_str_from_ini(config_file, "Adapter", "adapter", "");
+	if (adapter == "")
+	{
+		WritePrivateProfileStringA("Adapter", "adapter", this->adapter.c_str(), config_file.c_str());
+		return this->ws_url;
+	}
+	return adapter;
 }
 
 std::string Config::get_access_token() 
@@ -37,11 +80,11 @@ std::string Config::get_access_token()
 	PathTool::create_dir(config_path);
 	std::string config_file = config_path + "config.ini";
 	std::string uuid = StrTool::gen_uuid();
-	std::string token = StrTool::get_str_from_ini(config_file, "OneBot", "access_token", uuid);
-	if (token == uuid)
+	std::string access_token = StrTool::get_str_from_ini(config_file, "Setting", "access_token", uuid);
+	if (access_token == uuid)
 	{
-		WritePrivateProfileStringA("OneBot", "access_token", this->access_token.c_str(), config_file.c_str());
+		WritePrivateProfileStringA("Setting", "access_token", this->access_token.c_str(), config_file.c_str());
 		return this->access_token;
 	}
-	return token;
+	return access_token;
 }
