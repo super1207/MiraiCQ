@@ -54,7 +54,7 @@ std::string Config::get_verifyKey()
 	std::string verifyKey = StrTool::get_str_from_ini(config_file, "Setting", "verifyKey", uuid);
 	if (verifyKey == uuid)
 	{
-		WritePrivateProfileStringA("Setting", "access_token", this->verifyKey.c_str(), config_file.c_str());
+		WritePrivateProfileStringA("Setting", "verifyKey", this->verifyKey.c_str(), config_file.c_str());
 		return this->access_token;
 	}
 	return verifyKey;
