@@ -137,10 +137,10 @@ bool MiraiHttpNetImpl::connect_()
 
 	websocketpp::lib::error_code ec;
 	std::string ws_url = get_config("ws_url") + "/all";
-	std::string access_token = get_config("access_token");
-	if (access_token != "")
+	std::string verifyKey = get_config("verifyKey");
+	if (verifyKey != "")
 	{
-		ws_url += "?verifyKey=" + access_token;
+		ws_url += "?verifyKey=" + verifyKey;
 	}
 	Client::connection_ptr con = client.get_connection(ws_url, ec);
 	if (ec)
