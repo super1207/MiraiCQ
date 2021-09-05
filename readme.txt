@@ -28,7 +28,7 @@
 
 运行环境：
 	`Windows 7 with sp1`、`Windows Server 2016`或更高版本的Windows系统。
-	`wine`（暂未测试）。
+	`wine`: 见 https://github.com/super1207/MiraiCQ/blob/MiraiCQ-Cli/doc/MiraiCQ_In_Wine.txt
 
 编译方法：
 	1：安装VS2019，安装时勾选`使用C++的桌面开发`。
