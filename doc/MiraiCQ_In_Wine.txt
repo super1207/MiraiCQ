@@ -1,0 +1,7 @@
+MiraiCQ-Cli可以在wine中运行，下面为参考步骤，测试环境为`ubuntu20.04`
+1:安装`wine`:
+    `apt-get install wine`
+2:安装中文语言包:
+    `apt-get install language-pack-zh-hans`
+3:运行`MiraiCQ`:
+    `env LANG=zh_CN.UTF-8 wine MiraiCQ.exe`
