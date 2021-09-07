@@ -15,7 +15,7 @@ MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& 
 	auto ret_json = MiraiNet::NetStruct(new Json::Value(root));
 	auto id_json = (*ret_json).get("message_id",Json::nullValue);
 	/* 只有撤回消息之类的api才有msg_id,所以，如果没有msg_id，则不做处理 */
-	if (!id_json.isNull() && id_json.isInt())
+	if (id_json.isInt())
 	{
 		/* 在此转换message_id */
 		int id = id_json.asInt();
@@ -42,7 +42,7 @@ MiraiNet::NetStruct OneBotApiDeal::deal_recv(const Json::Value & root, std::mute
 	if(data_json.isObject())
 	{
 		auto id_json = data_json.get("message_id", Json::nullValue);
-		if (!id_json.isNull() && id_json.isInt())
+		if (id_json.isInt())
 		{
 			/* 在此转换message_id */
 			int id = id_json.asInt();
