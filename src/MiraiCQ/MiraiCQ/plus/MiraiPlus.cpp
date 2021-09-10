@@ -200,19 +200,29 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 				auto fun_name_json = node.get("function", def_str);
 				if (fun_name_json.isString() && fun_name_json.asString() != "")
 				{
-					menu->name = fun_name_json.asString();
+					menu->fun_name = fun_name_json.asString();
 				}
 				else
 				{
 					err_msg = "模块json文件解析失败,缺少function";
 					return false;
 				}
+				auto name_json = node.get("name", def_str);
+				if (name_json.isString() && name_json.asString() != "")
+				{
+					menu->name = name_json.asString();
+				}
+				else
+				{
+					err_msg = "模块json文件解析失败,缺少name";
+					return false;
+				}
 			}
 			{
-				void* dll_func = GetProcAddress((HMODULE)plus_def->module_hand, menu->name.c_str());
+				void* dll_func = GetProcAddress((HMODULE)plus_def->module_hand, menu->fun_name.c_str());
 				if (dll_func == NULL)
 				{
-					err_msg = "函数`" + menu->name + "`加载失败";
+					err_msg = "函数`" + menu->fun_name + "`加载失败";
 					return false;
 				}
 				menu->function = dll_func;

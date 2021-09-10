@@ -22,6 +22,7 @@ public:
 		};
 		struct Menu
 		{
+			std::string fun_name;
 			std::string name;
 			void* function = 0;
 		};
