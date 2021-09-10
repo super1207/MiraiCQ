@@ -5,16 +5,109 @@
 #include "log/MiraiLog.h"
 #include "tool/TimeTool.h"
 #include "tool/InputTool.h"
+#include "tool/StrTool.h"
 #include "center/center.h"
 #include "tool/PathTool.h"
 #include <iostream>
 #include <string>
 
+#pragma comment(lib,"USer32.lib")
+#pragma comment(lib,"gdi32.lib")
+
 std::atomic_bool printLog = true;
 static thread_local std::string retStr;
 
+std::atomic_int last_ac = 1000, menu_pos;
+
+//过程函数的声明
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wparam, LPARAM lparam);
+//入口函数 
+int WINAPI mWinMain()
+{
+	auto uuid = StrTool::gen_uuid();
+	//设计窗体
+	WNDCLASSEX wndClass = { 0 };
+	wndClass.style = CS_HREDRAW | CS_VREDRAW;
+	wndClass.cbSize = sizeof(WNDCLASSEX);
+	wndClass.cbClsExtra = 0;
+	wndClass.cbWndExtra = 0;
+	wndClass.hInstance = GetModuleHandle(NULL);
+	wndClass.hIcon = (HICON)LoadImage(NULL, "icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndClass.hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH);
+	wndClass.lpszClassName = uuid.c_str();
+	wndClass.lpszMenuName = 0;
+	wndClass.lpfnWndProc = WndProc;
+
+	//注册窗体
+	if (!RegisterClassEx(&wndClass))
+	{
+		MessageBox(NULL, "RegisterClassEx Error", "ERROR", MB_OK);
+		return -1;
+	}
+
+	//创建窗体
+	HWND hWnd = CreateWindow(uuid.c_str(),
+		"窗口循环",
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		300,
+		300,
+		NULL,
+		NULL,
+		GetModuleHandle(NULL),
+		NULL);
+
+	//显示与更新
+	ShowWindow(hWnd, SW_SHOWNORMAL);
+	UpdateWindow(hWnd);
+
+	//读取窗体消息队列
+	MSG msg = { 0 };//描述消息队列的结构体
+	while (msg.message != WM_QUIT)//判断是否退出程序，如果没有退出，就一直循环读取消息
+	{
+		if (PeekMessage(&msg,//存消息信息的结构体
+			0,//窗体的句柄，0表示获取所有消息
+			0,//消息最小值，为0即可
+			0,//消息最大值，为0即可
+			PM_REMOVE)//读取后，如果存在，发送消息，并移除该条信息
+			)//读取消息
+		{
+			TranslateMessage(&msg);//将虚拟键消息转换为字符消息
+			DispatchMessage(&msg);//把这个消息发给窗口程序
+		}
+	}
+	UnregisterClass(uuid.c_str(), GetModuleHandle(NULL));
+	return 0;
+}
+
+//窗口过程函数处理
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	switch (message)//根据消息ID判断需要处理的消息
+	{
+	case WM_CREATE:
+	{
+		//调用插件菜单函数
+		auto center = Center::get_instance();
+		center->call_menu_fun_by_ac(last_ac, menu_pos);
+		break;
+	}
+	case WM_PAINT://重绘窗体
+		ValidateRect(hWnd, NULL);
+		break;
+	case WM_DESTROY://窗口的关闭消息
+		PostQuitMessage(0);
+		break;
+	default://如果没有需要处理的消息，就调用默认的过程函数
+		return DefWindowProc(hWnd, message, wparam, lparam);
+	}
+	return 0;
+}
 int InitBot()  
 {
+	
 	static auto  net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
 	if (!net)
 	{
@@ -32,6 +125,7 @@ int InitBot()
 		return -1;
 	}
 	Center::get_instance()->set_net(net);
+	
 	std::thread([&]() {
 		while (1)
 		{
@@ -194,7 +288,6 @@ int main()
 			TimeTool::sleep(0);
 		}
 	}
-	int last_ac = 1000;
 	std::string name = "";
 	/* 这里延时用于等待打印lifecycle，保证视觉良好 */
 	TimeTool::sleep(1000);
@@ -255,7 +348,13 @@ int main()
 			{
 				PrintUnkowCmd();
 			}
-			CallMenuFun(last_ac, n);
+			menu_pos = n;
+			std::thread([]() {
+				mWinMain();
+			}).detach();
+			
+			
+			//CallMenuFun(last_ac, n);
 			printf("\n>>>");
 		}
 		else if (LineVec.size() == 1 && LineVec[0] == "log")
