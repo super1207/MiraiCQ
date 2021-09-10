@@ -41,3 +41,11 @@
 交流与问题反馈：
 	1：https://github.com/super1207/MiraiCQ/issues
 	2：QQ群：920220179
+
+常见问题解答：
+	1：插件的json文件需要使用ANSI编码。
+	2：某些原酷Q插件会依赖一些酷Q的dll,可以自行将其放入指定目录，一般是bin目录（自行创建）或者MiraiCQ.exe目录（不清楚可以两个目录都放）。
+	3：原酷Q中的dll下载：https://super1207.lanzoui.com/iVNkJttuf2f
+	4：MiraiCQ不会支持获取txqq的cookie，csrf token，也不会支持点赞，钱包相关内容。
+	5：MiraiCQ"暂时"不支持语音收发
+		
