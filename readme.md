@@ -19,16 +19,20 @@ MiraiCQ-Cli
 #### 使用方法：
 
 1. 将原酷Q插件的dll和json放入app文件夹。
-2. 开启`OneBot`实现端的`websocket`正向连接（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp ）。
+2. 开启`OneBot`实现端的`websocket`正向连接（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp）。
+
 	或者
-  开启`Mirai Http Api`的`websocket`正向连接以及正向`http`
+	
+	开启`Mirai Http Api`的`websocket`正向连接以及正向`http`
 3. 修改`config\congig.ini`文件中的`ws_url`(all)、`access_token`(onebot)、`verifyKey`(mirai_http_api)、`http_url`(mirai_http_api)、`adapter`(all)项。
+
 	示例config.ini：https://github.com/super1207/MiraiCQ/blob/MiraiCQ-Cli/config.ini
 4. 运行`MiraiCQ.exe`。
 
 #### 运行环境：
 	
 `Windows 7 with sp1`、`Windows Server 2016`或更高版本的Windows系统。
+
 `wine`: 见 https://github.com/super1207/MiraiCQ/blob/MiraiCQ-Cli/doc/MiraiCQ_In_Wine.txt
 
 #### 编译方法：
@@ -37,7 +41,9 @@ MiraiCQ-Cli
 
 ### 开源说明：
 本软件(不包括插件，插件是否免费取决于插件作者)永久免费使用，您可以通过任何合法方式使用本软件。
+
 本软件使用`GNU Affero General Public License v3.0`开源，若要用于其它用途，请仔细阅读开源协议。
+
 开源地址：https://github.com/super1207/MiraiCQ
 
 #### 交流与问题反馈：
