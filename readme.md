@@ -14,7 +14,7 @@ MiraiCQ-Cli
 3. 支持插件函数优先级，事件拦截。
 4. 此版本为今后长期优化，维护的版本（之前的MFC GUI版本仍然可用，见其它分支）。
 
-#### [下载地址](https://github.com/super1207/MiraiCQ/actions)
+#### [下载地址](https://github.com/super1207/MiraiCQ/releases)
 
 #### 使用方法：
 
