@@ -81,12 +81,20 @@ int user_event_message_private(const Json::Value & raw_json,const SbotEventMessa
 
 ## 参考与依赖
 感谢他/她们！<br />
-[https://github.com/Mrs4s/go-cqhttp](https://github.com/Mrs4s/go-cqhttp) (运行依赖)  <br />
-[https://github.com/mamoe/mirai](https://github.com/mamoe/mirai) (起名依赖)  <br />
-[https://github.com/howmanybots/onebot](https://github.com/howmanybots/onebot) (教材) <br />
-[https://github.com/howmanybots/cqcppsdk](https://github.com/howmanybots/cqcppsdk) (少量源码依赖)  <br />
-[https://github.com/zaphoyd/websocketpp](https://github.com/zaphoyd/websocketpp) (抄作业)  <br />
-[https://github.com/open-source-parsers/jsoncpp](https://github.com/open-source-parsers/jsoncpp) (抄作业)  <br />
-[https://github.com/iTXTech/mirai-native](https://github.com/iTXTech/mirai-native) (相似项目参考)  <br />
-[https://www.boost.org/](https://www.boost.org/) (编译依赖) <br />
-[https://github.com/richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api) (插件测试)
+[Mrs4s/go-cqhttp](https://github.com/Mrs4s/go-cqhttp) (运行依赖)
+
+[mamoe/mirai](https://github.com/mamoe/mirai) (起名依赖)
+
+[howmanybots/onebot](https://github.com/howmanybots/onebot) (教材)
+
+[howmanybots/cqcppsdk](https://github.com/howmanybots/cqcppsdk) (少量源码依赖)
+
+[zaphoyd/websocketpp](https://github.com/zaphoyd/websocketpp) (抄作业)
+
+[open-source-parsers/jsoncpp](https://github.com/open-source-parsers/jsoncpp) (抄作业)
+
+[iTXTech/mirai-native](https://github.com/iTXTech/mirai-native) (相似项目参考)
+
+[boost](https://www.boost.org/) (编译依赖)
+
+[richardchien/coolq-http-api](https://github.com/richardchien/coolq-http-api) (插件测试)
