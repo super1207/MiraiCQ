@@ -19,7 +19,7 @@ MiraiCQ-Cli
 #### 使用方法：
 
 1. 将原酷Q插件的dll和json放入app文件夹。
-2. 开启`OneBot`实现端的`websocket`正向连接,如果使用go-cqhttp,请将将"上报数据类型"改为array(目前go-cqhttp的string上报数据类型可能有些问题，待观察)。（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp）。
+2. 开启`OneBot`实现端的`websocket`正向连接,如果使用go-cqhttp,请将"上报数据类型"改为array(目前go-cqhttp的string上报数据类型可能有些问题，待观察)。（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp）。
 
 	或者
 	
