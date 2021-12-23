@@ -119,7 +119,7 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 {
 	using namespace std;
 	std::vector<std::string> dat_vec;
-	auto all_vec = match_all(cq_str, "(\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\],]+)");
+	auto all_vec = match_all(cq_str, "(\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\]]+)");
 	for (auto& i : all_vec)
 	{
 		dat_vec.push_back(i.at(0));
@@ -129,7 +129,7 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 	{
 		if (dat[0] == '[')
 		{
-			/* ËµÃ÷ÊÇCQÂë */
+			/* è¯´æ˜æ˜¯CQç  */
 			size_t pos1 = dat.find_first_of(",");
 			Json::Value node;
 			node["type"] = dat.substr(4, pos1 - 4);
@@ -145,14 +145,13 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 		}
 		else
 		{
-			/* ËµÃ÷ÊÇtext */
+			/* è¯´æ˜æ˜¯text */
 			Json::Value node;
 			node["type"] = "text";
 			Json::Value dat_node;
 			replace_all_distinct(dat, "&amp;", "&");
 			replace_all_distinct(dat, "&#91;", "[");
 			replace_all_distinct(dat, "&#93;", "]");
-			replace_all_distinct(dat, "&#44;", ",");
 			dat_node["text"] = dat;
 			node["data"] = dat_node;
 			jsonarr.append(node);
@@ -191,7 +190,6 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 			replace_all_distinct(text, "&", "&amp;");
 			replace_all_distinct(text, "[", "&#91;");
 			replace_all_distinct(text, "]", "&#93;");
-			replace_all_distinct(text, ",", "&#44;");
 			ret_str.append(text);
 		}
 		else
@@ -204,7 +202,7 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 				std::string dat;
 				if (dat_json.isNull())
 				{
-					/* ¿Õ×Ö¶Î²»´¦Àí */
+					/* ç©ºå­—æ®µä¸å¤„ç† */
 					continue;
 				}
 				if (dat_json.isString())
