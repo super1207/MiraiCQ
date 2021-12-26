@@ -61,6 +61,9 @@
     <ClCompile Include="tool\StrTool.cpp">
       <Filter>tool</Filter>
     </ClCompile>
+    <ClCompile Include="tool\EmojiTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
     <ClCompile Include="thirdpart\include\jsoncpp\json_reader.cpp">
       <Filter>thirdpart\jsoncpp</Filter>
     </ClCompile>
@@ -196,6 +199,9 @@
       <Filter>net</Filter>
     </ClInclude>
     <ClInclude Include="tool\StrTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\EmojiTool.h">
       <Filter>tool</Filter>
     </ClInclude>
     <ClInclude Include="net\OneBot\OneBotImpl.h">
