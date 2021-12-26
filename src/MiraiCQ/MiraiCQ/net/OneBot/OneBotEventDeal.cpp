@@ -1,6 +1,7 @@
 #include "OneBotEventDeal.h"
 #include "../../log/MiraiLog.h"
 #include "../../tool/StrTool.h"
+#include "../../tool/EmojiTool.h"
 
 #include <list>
 
