@@ -98,9 +98,9 @@ int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, 
 int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string& key, int64_t default_value) 
 {
 	auto json_value = json.get(key, Json::nullValue);
-	if (json_value.isInt())
+	if (json_value.isInt64())
 	{
-		return json_value.asInt();
+		return json_value.asInt64();
 	}
 	return default_value;
 }
