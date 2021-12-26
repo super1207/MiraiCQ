@@ -18,12 +18,19 @@ MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::m
 	if (StrTool::get_str_from_json(*root, "post_type", "") == "message")
 	{
 		auto msg_json = root->get("message", Json::nullValue);
-		MiraiLog::get_instance()->add_debug_log("OneBotEventDeal", "orgin msg:\n" + msg_json.toStyledString());
 		/* 在此将message变为数组格式 */
 		if (msg_json.isString())
 		{
-			(*root)["message"] = StrTool::cq_str_to_jsonarr(msg_json.asString());
+			std::string t = EmojiTool::escape_cq_emoji(msg_json.asString());
+			(*root)["message"] = StrTool::cq_str_to_jsonarr(t);
 		}
+		else
+		{
+			std::string t = StrTool::jsonarr_to_cq_str(msg_json);
+			std::string t2 = EmojiTool::escape_cq_emoji(t);
+			(*root)["message"] = StrTool::cq_str_to_jsonarr(t2);
+		}
+		MiraiLog::get_instance()->add_debug_log("OneBotEventDeal", "orgin msg:\n" + msg_json.toStyledString());
 		/* 在此转换message_id */
 		int id = StrTool::get_int_from_json(*root,"message_id",0);
 		std::lock_guard<std::mutex> lk(mx_msg_id_vec);
