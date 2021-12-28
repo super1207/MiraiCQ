@@ -129,7 +129,7 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 	{
 		if (dat[0] == '[')
 		{
-			/* è¯´æ˜æ˜¯CQç  */
+			/* ËµÃ÷ÊÇCQÂë */
 			size_t pos1 = dat.find_first_of(",");
 			Json::Value node;
 			node["type"] = dat.substr(4, pos1 - 4);
@@ -145,7 +145,7 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 		}
 		else
 		{
-			/* è¯´æ˜æ˜¯text */
+			/* ËµÃ÷ÊÇtext */
 			Json::Value node;
 			node["type"] = "text";
 			Json::Value dat_node;
@@ -202,7 +202,7 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 				std::string dat;
 				if (dat_json.isNull())
 				{
-					/* ç©ºå­—æ®µä¸å¤„ç† */
+					/* ¿Õ×Ö¶Î²»´¦Àí */
 					continue;
 				}
 				if (dat_json.isString())

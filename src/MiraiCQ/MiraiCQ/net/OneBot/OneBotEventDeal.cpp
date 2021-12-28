@@ -19,7 +19,7 @@ MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::m
 	if (StrTool::get_str_from_json(*root, "post_type", "") == "message")
 	{
 		auto msg_json = root->get("message", Json::nullValue);
-		/* åœ¨æ­¤å°†messageå˜ä¸ºæ•°ç»„æ ¼å¼ */
+		/* ÔÚ´Ë½«message±äÎªÊı×é¸ñÊ½ */
 		if (msg_json.isString())
 		{
 			std::string t = EmojiTool::escape_cq_emoji(msg_json.asString());
@@ -32,7 +32,7 @@ MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::m
 			(*root)["message"] = StrTool::cq_str_to_jsonarr(t2);
 		}
 		MiraiLog::get_instance()->add_debug_log("OneBotEventDeal", "orgin msg:\n" + msg_json.toStyledString());
-		/* åœ¨æ­¤è½¬æ¢message_id */
+		/* ÔÚ´Ë×ª»»message_id */
 		int id = StrTool::get_int_from_json(*root,"message_id",0);
 		std::lock_guard<std::mutex> lk(mx_msg_id_vec);
 		++curr_msg_id;
@@ -41,7 +41,7 @@ MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::m
 			curr_msg_id = 2;
 		}
 		msg_id_vec.push_back({ curr_msg_id ,id });
-		/* é™åˆ¶msg_idçš„ç¼“å­˜ */
+		/* ÏŞÖÆmsg_idµÄ»º´æ */
 		if (msg_id_vec.size() > 4096)
 		{
 			msg_id_vec.pop_front();

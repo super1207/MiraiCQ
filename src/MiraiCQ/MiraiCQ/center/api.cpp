@@ -1022,7 +1022,7 @@ std::string Center::CQ_getImage(int auth_code, const char* file)
 						MiraiLog::get_instance()->add_debug_log("Center", "Í¼Æ¬ÏÂÔØÊ§°Ü");
 					}
 				}
-				catch (const std::exception& e)
+				catch (const std::exception&)
 				{
 					MiraiLog::get_instance()->add_debug_log("Center", "Í¼Æ¬ÏÂÔØÊ§°Ü");
 				}

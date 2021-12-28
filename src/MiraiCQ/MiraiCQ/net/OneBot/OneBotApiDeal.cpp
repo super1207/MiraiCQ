@@ -35,18 +35,22 @@ MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& 
 	{
 		/* 在此转换message_id */
 		int id = id_json.asInt();
+		bool is_find = false;
 		std::lock_guard<std::mutex> lk(mx_msg_id_vec);
 		for (auto &  i : msg_id_vec)
 		{
 			if (i.first == id)
 			{
 				(*ret_json)["message_id"] = i.second;
+				is_find = true;
 				break;
 			}
 		}
-		/* 执行到这里，说明没有找到对应的msg_id */
-		MiraiLog::get_instance()->add_debug_log("ApiCall", "没有找到对应的message_id");
-		return nullptr;
+		if (is_find == false)
+		{
+			MiraiLog::get_instance()->add_debug_log("ApiCall", "没有找到对应的message_id");
+			ret_json = nullptr;
+		}
 	}
 	return ret_json;
 }

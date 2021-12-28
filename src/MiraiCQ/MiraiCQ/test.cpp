@@ -322,7 +322,7 @@ int main()
 			}
 			name = GetName(ac);
 			last_ac = ac;
-			printf("使用`call <数字>`来调用插件[%s]的一个菜单:\n\n", name.c_str());
+			printf("使用`call <数字>`来调用插件[%s]的一个菜单,对于部分插件(如铃心)，使用callx:\n\n", name.c_str());
 			for (int i = 0;; ++i)
 			{
 				std::string name = GetMenuName(ac, i);
@@ -355,6 +355,21 @@ int main()
 			
 			
 			//CallMenuFun(last_ac, n);
+			printf("\n>>>");
+		}
+		else if (LineVec.size() == 2 && LineVec[0] == "callx")
+		{
+			int n;
+			try
+			{
+				n = std::stoi(LineVec[1]);
+			}
+			catch (const std::exception&)
+			{
+				PrintUnkowCmd();
+			}
+			menu_pos = n;
+			CallMenuFun(last_ac, n);
 			printf("\n>>>");
 		}
 		else if (LineVec.size() == 1 && LineVec[0] == "log")
