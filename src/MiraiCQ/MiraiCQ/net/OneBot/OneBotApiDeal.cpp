@@ -14,22 +14,28 @@ OneBotApiDeal::~OneBotApiDeal()
 MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& mx_msg_id_vec, std::list<std::pair<int, int>>& msg_id_vec, int& curr_msg_id)
 {
 	auto ret_json = MiraiNet::NetStruct(new Json::Value(root));
-	auto msg_json = ret_json->get("message", Json::nullValue);
+	auto params_json = ret_json->get("params", Json::nullValue);
+	/* 处理emoji */
+	Json::Value msg_json = Json::nullValue;
+	if (params_json != Json::nullValue)
+	{
+		msg_json = params_json.get("message", Json::nullValue);
+	}
 	if (msg_json != Json::nullValue)
 	{
 		if (msg_json.isString())
 		{
-			std::string t = EmojiTool::escape_cq_emoji(msg_json.asString());
-			(*ret_json)["message"] = StrTool::cq_str_to_jsonarr(t);
+			std::string t = EmojiTool::unescape_cq_emoji(msg_json.asString());
+			(*ret_json)["params"]["message"] = StrTool::cq_str_to_jsonarr(t);
 		}
 		else
 		{
 			std::string t = StrTool::jsonarr_to_cq_str(msg_json);
-			std::string t2 = EmojiTool::escape_cq_emoji(t);
-			(*ret_json)["message"] = StrTool::cq_str_to_jsonarr(t2);
+			std::string t2 = EmojiTool::unescape_cq_emoji(t);
+			(*ret_json)["params"]["message"] = StrTool::cq_str_to_jsonarr(t2);
 		}
 	}
-	auto id_json = (*ret_json).get("message_id",Json::nullValue);
+	auto id_json = params_json.get("message_id",Json::nullValue);
 	/* 只有撤回消息之类的api才有msg_id,所以，如果没有msg_id，则不做处理 */
 	if (id_json.isInt())
 	{
@@ -41,7 +47,7 @@ MiraiNet::NetStruct OneBotApiDeal::deal_api(const Json::Value& root,std::mutex& 
 		{
 			if (i.first == id)
 			{
-				(*ret_json)["message_id"] = i.second;
+				(*ret_json)["params"]["message_id"] = i.second;
 				is_find = true;
 				break;
 			}
