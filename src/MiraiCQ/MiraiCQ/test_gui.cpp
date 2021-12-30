@@ -120,7 +120,8 @@ static bool login()
 	url_input.value(login_info.ws_url.c_str());
 	Fl_Secret_Input token_input(100, 80, 180, 30, "access_token");
 	token_input.value(login_info.access_token.c_str());
-	Fl_Button button(30, 130, 240, 30, u8"µÇÂ¼");
+	std::string login_str = StrTool::to_utf8("µÇÂ¼");
+	Fl_Button button(30, 130, 240, 30, login_str.c_str());
 	win.end();
 	login_info._url_input = &url_input;
 	login_info._token_input = &token_input;
