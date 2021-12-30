@@ -42,7 +42,8 @@ static void login_cb(Fl_Widget* o, void* p) {
 	LOGIN_INFO* login_info = (LOGIN_INFO*)p;
 	if (strcmp(login_info->_url_input->value(), "") == 0)
 	{
-		fl_alert(u8"ws_url不能为空");
+		std::string str = StrTool::to_utf8("ws_url不能为空");
+		fl_alert(str.c_str());
 		return;
 	}
 	login_info->ws_url = login_info->_url_input->value();
@@ -51,14 +52,16 @@ static void login_cb(Fl_Widget* o, void* p) {
 	static auto  net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
 	if (!net)
 	{
-		fl_alert(u8"网络模块实例化失败");
+		std::string str = StrTool::to_utf8("网络模块实例化失败");
+		fl_alert(str.c_str());
 		return;
 	}
 	net->set_config("ws_url", login_info->ws_url);
 	net->set_config("access_token", login_info->access_token);
 	if (!net->connect())
 	{
-		fl_alert(u8"网络连接错误");
+		std::string str = StrTool::to_utf8("网络连接错误");
+		fl_alert(str.c_str());
 		net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
 		return;
 	}
@@ -156,8 +159,9 @@ class MyTable2 : public Fl_Table {
 		fl_pop_clip();
 	}
 	void draw_cell(TableContext context, int ROW = 0, int COL = 0, int X = 0, int Y = 0, int W = 0, int H = 0) {
-		static char s[40];
-		const char* arr[] = { u8"插件菜单" };
+		static char s[100];
+		std::string str = StrTool::to_utf8("插件菜单");
+		const char* arr[] = { str.c_str()};
 		switch (context) {
 		case CONTEXT_STARTPAGE:                   // before page is drawn..
 			fl_font(FL_HELVETICA, 16);              // set the font for our drawing operations
@@ -242,7 +246,8 @@ class MyTable : public Fl_Table {
 	}
 	void draw_cell(TableContext context, int ROW = 0, int COL = 0, int X = 0, int Y = 0, int W = 0, int H = 0) {
 		static char s[100];
-		const char* arr[] = { u8"名称" };
+		std::string str = StrTool::to_utf8("名称");
+		const char* arr[] = { str.c_str()};
 		switch (context) {
 		case CONTEXT_STARTPAGE:                   // before page is drawn..
 			fl_font(FL_HELVETICA, 16);              // set the font for our drawing operations
@@ -319,12 +324,16 @@ public:
 
 void plus_dlg()
 {
-	Fl_Window win(500, 400, u8"MiraiCQ插件管理");
+	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理");
+	Fl_Window win(500, 400, str1.c_str());
 	win.size_range(500, 400, 500, 400);
 	MyTable2 table2(200, 280, 300, 110);
-	Fl_Box box_name(200, 10, 300, 20, u8"插件名：");
-	Fl_Box box_author(200, 40, 300, 20, u8"作者：");
-	Fl_Box box_version(200, 70, 300, 20, u8"版本：");
+	std::string str2 = StrTool::to_utf8("插件名：");
+	std::string str3 = StrTool::to_utf8("作者：");
+	std::string str4 = StrTool::to_utf8("版本：");
+	Fl_Box box_name(200, 10, 300, 20, str2.c_str());
+	Fl_Box box_author(200, 40, 300, 20, str3.c_str());
+	Fl_Box box_version(200, 70, 300, 20, str4.c_str());
 	Fl_Multiline_Input edit_des(200, 100, 300, 180);
 	MyTable table(10, 10, 180, 380, &table2, &box_name, &box_author, &box_version, &edit_des);
 	win.end();
