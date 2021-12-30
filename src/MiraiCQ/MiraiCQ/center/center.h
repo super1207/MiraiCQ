@@ -17,6 +17,7 @@ public:
 		std::string name;
 		std::string version;
 		std::string description;
+		std::string author;
 		bool is_enable;
 		bool is_load;
 	};

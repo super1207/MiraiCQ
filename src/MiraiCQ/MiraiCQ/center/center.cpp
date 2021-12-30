@@ -225,6 +225,7 @@ std::shared_ptr<Center::PlusInfo> Center::get_plus_by_ac(int ac)
 	info->is_load = !(pdf->is_first_enable);
 	info->name = pdf->name;
 	info->version = pdf->version;
+	info->author = pdf->author;
 	return info;
 }
 

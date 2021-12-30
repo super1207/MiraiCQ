@@ -253,7 +253,7 @@ static void PrintUnkowCmd()
 	printf("使用`ls`来查看所有插件\n使用`log`来开关log\n输入`q`可以安全退出程序\n>>>");
 }
 
-int main()
+int mmain()
 {	
 	MiraiLog::get_instance()->add_backend_sinks([&](const MiraiLog::Level& lv, const std::string& category, const std::string& dat, void* user_ptr) {
 		if (!printLog)

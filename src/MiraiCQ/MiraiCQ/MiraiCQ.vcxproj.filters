@@ -187,6 +187,9 @@
     <ClCompile Include="net\MiraiHttp\MiraiHttpEventDeal.cpp">
       <Filter>net\MiraiHttp</Filter>
     </ClCompile>
+    <ClCompile Include="test_gui.cpp">
+      <Filter>export</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">

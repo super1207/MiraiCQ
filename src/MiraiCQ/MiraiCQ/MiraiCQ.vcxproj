@@ -21,13 +21,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -57,17 +57,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include\libpcre;$(ProjectDir)thirdpart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include\libpcre;$(ProjectDir)thirdpart\include;$(ProjectDir)thirdpart\include\fltk-1.3.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;$(ProjectDir)thirdpart\include\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>fltk.lib;advapi32.lib;shell32.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>
@@ -80,7 +79,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include\libpcre;$(ProjectDir)thirdpart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)thirdpart\include\iconv;$(ProjectDir)thirdpart\include\libpcre;$(ProjectDir)thirdpart\include;$(ProjectDir)thirdpart\include\fltk-1.3.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -90,10 +89,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;$(ProjectDir)thirdpart\include\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>fltk.lib;advapi32.lib;shell32.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>
@@ -114,6 +112,7 @@
     <ClCompile Include="net\OneBot\OneBotImpl.cpp" />
     <ClCompile Include="plus\MiraiPlus.cpp" />
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="test_gui.cpp" />
     <ClCompile Include="thirdpart\include\base64\base64.cpp" />
     <ClCompile Include="thirdpart\include\jsoncpp\json_reader.cpp" />
     <ClCompile Include="thirdpart\include\jsoncpp\json_value.cpp" />
