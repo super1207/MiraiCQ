@@ -31,7 +31,7 @@ MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::m
 			std::string t2 = EmojiTool::escape_cq_emoji(t);
 			(*root)["message"] = StrTool::cq_str_to_jsonarr(t2);
 		}
-		MiraiLog::get_instance()->add_debug_log("OneBotEventDeal", "orgin msg:\n" + msg_json.toStyledString());
+		//MiraiLog::get_instance()->add_debug_log("OneBotEventDeal", "orgin msg:\n" + msg_json.toStyledString());
 		/* ÔÚ´Ë×ª»»message_id */
 		int id = StrTool::get_int_from_json(*root,"message_id",0);
 		std::lock_guard<std::mutex> lk(mx_msg_id_vec);

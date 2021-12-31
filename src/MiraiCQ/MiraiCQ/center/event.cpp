@@ -16,7 +16,7 @@ using namespace std;
 void Center::deal_event(MiraiNet::NetStruct evt) 
 {
 	assert(evt);
-	const std::string print_utf8_str = evt->toStyledString();
+	const std::string print_utf8_str = Json::FastWriter().write(*evt);
 	const std::string print_ansi_str = StrTool::to_ansi(print_utf8_str);
 	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:\n" + print_ansi_str);
 	Json::Value ansi_json;

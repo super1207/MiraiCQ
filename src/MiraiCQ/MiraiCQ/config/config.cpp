@@ -31,6 +31,15 @@ std::string Config::get_ws_url()
 	return url;
 }
 
+bool Config::set_ws_url(const std::string & ws_url)
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	WritePrivateProfileStringA("Setting", "ws_url", ws_url.c_str(), config_file.c_str());
+	return get_ws_url() == ws_url;
+}
+
 std::string Config::get_http_url()
 {
 	std::string config_path = PathTool::get_exe_dir() + "config\\";
@@ -40,7 +49,7 @@ std::string Config::get_http_url()
 	if (url == "")
 	{
 		WritePrivateProfileStringA("Setting", "http_url", this->http_url.c_str(), config_file.c_str());
-		return this->ws_url;
+		return this->http_url;
 	}
 	return url;
 }
@@ -55,7 +64,7 @@ std::string Config::get_verifyKey()
 	if (verifyKey == uuid)
 	{
 		WritePrivateProfileStringA("Setting", "verifyKey", this->verifyKey.c_str(), config_file.c_str());
-		return this->access_token;
+		return this->verifyKey;
 	}
 	return verifyKey;
 }
@@ -69,7 +78,7 @@ std::string Config::get_adapter()
 	if (adapter == "")
 	{
 		WritePrivateProfileStringA("Adapter", "adapter", this->adapter.c_str(), config_file.c_str());
-		return this->ws_url;
+		return this->adapter;
 	}
 	return adapter;
 }
@@ -87,4 +96,13 @@ std::string Config::get_access_token()
 		return this->access_token;
 	}
 	return access_token;
+}
+
+bool Config::set_access_token(const std::string& access_token)
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	WritePrivateProfileStringA("Setting", "access_token", access_token.c_str(), config_file.c_str());
+	return get_access_token() == access_token;
 }

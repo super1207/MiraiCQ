@@ -66,7 +66,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;$(ProjectDir)thirdpart\include\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
-      <AdditionalDependencies>fltkd.lib;advapi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>fltkd.lib;advapi32.lib;shell32.lib;user32.lib;gdi32.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>
@@ -91,7 +91,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;$(ProjectDir)thirdpart\include\fltk-1.3.8\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
-      <AdditionalDependencies>fltk.lib;advapi32.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>fltk.lib;advapi32.lib;shell32.lib;user32.lib;gdi32.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>

@@ -38,32 +38,26 @@ struct LOGIN_INFO
 	bool is_login = false;
 };
 
-static void login_cb(Fl_Widget* o, void* p) {
-	LOGIN_INFO* login_info = (LOGIN_INFO*)p;
-	if (strcmp(login_info->_url_input->value(), "") == 0)
-	{
-		std::string str = StrTool::to_utf8("ws_url不能为空");
-		fl_alert(str.c_str());
-		return;
-	}
-	login_info->ws_url = login_info->_url_input->value();
-	login_info->access_token = login_info->_token_input->value();
 
+static bool login(LOGIN_INFO * login_info)
+{
 	static auto  net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
 	if (!net)
 	{
 		std::string str = StrTool::to_utf8("网络模块实例化失败");
 		fl_alert(str.c_str());
-		return;
+		return false;
 	}
 	net->set_config("ws_url", login_info->ws_url);
 	net->set_config("access_token", login_info->access_token);
+	net->set_config("verifyKey", Config::get_instance()->get_verifyKey());
+	net->set_config("http_url", Config::get_instance()->get_http_url());
 	if (!net->connect())
 	{
 		std::string str = StrTool::to_utf8("网络连接错误");
 		fl_alert(str.c_str());
 		net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
-		return;
+		return false;
 	}
 	Center::get_instance()->set_net(net);
 	std::thread([&]() {
@@ -95,24 +89,46 @@ static void login_cb(Fl_Widget* o, void* p) {
 		if (Center::get_instance()->load_all_plus() < 0)
 		{
 			MiraiLog::get_instance()->add_debug_log("Center", "插件加载失败");
-			return;
+			return false;
 		}
 		if (Center::get_instance()->enable_all_plus() < 0)
 		{
 			MiraiLog::get_instance()->add_debug_log("Center", "插件启动失败");
-			return;
+			return false;
 		}
 
 		if (!Center::get_instance()->run())
 		{
 			MiraiLog::get_instance()->add_debug_log("Center", "Center运行失败");
-			return;
+			return false;
 		}
-		login_info->is_login = true;
-		login_info->_win->hide();
+		return true;
 }
 
-static bool login()
+static void login_dlg_cb(Fl_Widget* o, void* p) {
+	LOGIN_INFO* login_info = (LOGIN_INFO*)p;
+	if (strcmp(login_info->_url_input->value(), "") == 0)
+	{
+		std::string str = StrTool::to_utf8("ws_url不能为空");
+		fl_alert(str.c_str());
+		return;
+	}
+	login_info->ws_url = login_info->_url_input->value();
+	login_info->access_token = login_info->_token_input->value();
+	if (login(login_info))
+	{
+		login_info->is_login = true;
+		login_info->_win->hide();
+		Config::get_instance()->set_ws_url(login_info->ws_url);
+		Config::get_instance()->set_access_token(login_info->access_token);
+	}
+	else
+	{
+		login_info->is_login = false;
+	}
+}
+
+static bool login_dlg()
 {
 	LOGIN_INFO login_info;
 	Fl_Window win(300, 180, "MiraiCQ V2.0");
@@ -129,7 +145,7 @@ static bool login()
 	login_info._url_input = &url_input;
 	login_info._token_input = &token_input;
 	login_info._win = &win;
-	button.callback(login_cb, &login_info);
+	button.callback(login_dlg_cb, &login_info);
 	win.show();
 	Fl::run();
 	return login_info.is_login;
@@ -345,10 +361,33 @@ void plus_dlg()
 int  main(int argc, char* argv[])
 {
 	/* 登录 */
-	bool is_login = login();
-	if (is_login == false)
+	while (true)
 	{
-		return -1;
+		if (!PathTool::is_file_exist(PathTool::get_exe_dir() + "config\\config.ini"))
+		{
+			bool is_login = login_dlg();
+			if (is_login == false)
+			{
+				return -1;
+			}
+			break;
+		}
+		LOGIN_INFO login_info;
+		login_info.ws_url = Config::get_instance()->get_ws_url();
+		login_info.access_token = Config::get_instance()->get_access_token();
+		if (login(&login_info))
+		{
+			break;
+		}
+		else
+		{
+			bool is_login = login_dlg();
+			if (is_login == false)
+			{
+				return -1;
+			}
+			break;
+		}
 	}
 	/* 插件菜单 */
 	plus_dlg();
