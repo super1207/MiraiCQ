@@ -138,6 +138,14 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 			auto all_vec = match_all(dat, "[:,]([^\\[\\],]+?)=([^\\[\\],]*?)(?=[\\],])");
 			for (auto& i : all_vec)
 			{
+				replace_all_distinct(i.at(1), "&#91;", "[");
+				replace_all_distinct(i.at(1), "&#93;", "]");
+				replace_all_distinct(i.at(1), "&#44;", ",");
+				replace_all_distinct(i.at(1), "&amp;", "&");
+				replace_all_distinct(i.at(2), "&#91;", "[");
+				replace_all_distinct(i.at(2), "&#93;", "]");
+				replace_all_distinct(i.at(2), "&#44;", ",");
+				replace_all_distinct(i.at(2), "&amp;", "&");
 				dat_node[i.at(1)] = i.at(2);
 			}
 			node["data"] = dat_node;
@@ -149,9 +157,9 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str)
 			Json::Value node;
 			node["type"] = "text";
 			Json::Value dat_node;
-			replace_all_distinct(dat, "&amp;", "&");
 			replace_all_distinct(dat, "&#91;", "[");
 			replace_all_distinct(dat, "&#93;", "]");
+			replace_all_distinct(dat, "&amp;", "&");
 			dat_node["text"] = dat;
 			node["data"] = dat_node;
 			jsonarr.append(node);
