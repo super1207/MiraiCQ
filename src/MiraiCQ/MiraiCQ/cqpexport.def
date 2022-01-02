@@ -38,3 +38,4 @@ CQ_canSendRecord_T
 CQ_addLog_T
 CQ_setFatal_T
 CQ_setRestart_T
+CQ_callApi_T
