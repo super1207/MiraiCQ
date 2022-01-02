@@ -1161,3 +1161,33 @@ int Center::CQ_setRestart(int auth_code)
 	//TODO..
 	return -1;
 }
+
+std::string Center::CQ_callApi(int auth_code, const char* msg)
+{
+	Json::Value root;
+	Json::Reader reader;
+	if (msg == NULL)
+	{
+		return "";
+	}
+	if (!reader.parse(msg, root))
+	{
+		return "";
+	}
+	std::weak_ptr<MiraiNet> net;
+	{
+		std::shared_lock<std::shared_mutex> lk;
+		net = this->net;
+	}
+	return normal_call<std::string>(auth_code, net, false,
+		[&](MiraiNet::NetStruct json)
+		{
+			(*json) = root;
+
+		}, [&](const Json::Value& data_json)
+		{
+			return Json::FastWriter().write(data_json);
+		},
+			JSON_TYPE::JSON_OBJECT);
+
+}

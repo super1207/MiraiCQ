@@ -339,5 +339,12 @@ extern "C"
 		});
 	}
 
+	const char* __stdcall CQ_callApi_T(int auth_code, const char* msg)
+	{
+		return call_str_api([&](Center* center_ptr)->std::string {
+			return center_ptr->CQ_callApi(auth_code, msg);
+		});
+	}
+
 
 }

@@ -338,7 +338,7 @@ public:
 	~MyTable() { }
 };
 
-void plus_dlg()
+static void plus_dlg()
 {
 	std::string str1 = StrTool::to_utf8("MiraiCQ²å¼ş¹ÜÀí");
 	Fl_Window win(500, 400, str1.c_str());

@@ -75,6 +75,7 @@ public:
 	int  CQ_addLog(int auth_code, int log_level, const char* category, const char* log_msg);
 	int  CQ_setFatal(__int32 auth_code, const char* error_info);
 	int  CQ_setRestart(int auth_code);
+	std::string CQ_callApi(int auth_code, const char* msg);
 
 private:
 	std::weak_ptr<MiraiNet> net;
@@ -101,6 +102,7 @@ private:
 	void deal_type_meta_event(Json::Value& evt);
 	void deal_type_message_private(Json::Value& evt);
 	void deal_type_message_group(Json::Value& evt);
+	void deal_1207_event(Json::Value& evt);
 
 };
 

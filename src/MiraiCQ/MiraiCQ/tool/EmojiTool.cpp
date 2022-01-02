@@ -1,6 +1,6 @@
 #include "EmojiTool.h"
 
-std::string u2utf8(int v)
+static std::string u2utf8(int v)
 {
     if (v < 0x80)
     {
@@ -63,7 +63,7 @@ std::string u2utf8(int v)
         return "\0";
 }
 
-int utf82u(const std::string& str)
+static int utf82u(const std::string& str)
 {
     int t = 0;
     switch (str.size())
@@ -107,7 +107,7 @@ int utf82u(const std::string& str)
     return t;
 }
 
-int utf8_next_len(const std::string& str, int offset)
+static int utf8_next_len(const std::string& str, int offset)
 {
     if (str.size() <= (size_t)offset || str[offset] == 0)
         return 0;
@@ -129,7 +129,7 @@ int utf8_next_len(const std::string& str, int offset)
     return 0;
 }
 
-bool is_emoji(int code)
+static bool is_emoji(int code)
 {
     if ((0x0080 <= code && code <= 0x02AF) ||
         (0x0300 <= code && code <= 0x03FF) ||

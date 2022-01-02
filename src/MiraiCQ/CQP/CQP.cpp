@@ -84,3 +84,4 @@ FFUN1(int, canSendRecord, int auth_code) FFUN2(auth_code)
 FFUN1(int, addLog, int auth_code, int log_level, const char* category, const char* log_msg) FFUN2(auth_code, log_level, category, log_msg)
 FFUN1(int, setFatal, int auth_code, const char* error_info) FFUN2(auth_code, error_info)
 FFUN1(int, setRestart, int auth_code) FFUN2(auth_code) // currently ineffective
+FFUN1(const char*, callApi, int auth_code, const char* msg) FFUN2(auth_code, msg)

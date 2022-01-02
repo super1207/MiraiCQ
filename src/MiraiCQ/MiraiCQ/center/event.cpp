@@ -8,6 +8,7 @@
 #include "../tool/TimeTool.h"
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
+#include "../tool/EmojiTool.h"
 #include <base64/base64.h>
 
 
@@ -36,6 +37,9 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 	}
 	try
 	{
+		/* 1207号事件暂时单独处理 */
+		deal_1207_event(*evt);
+
 		if (post_type == "message")
 		{
 			deal_type_message(ansi_json);
@@ -54,7 +58,7 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 		}
 		else
 		{
-			MiraiLog::get_instance()->add_debug_log("Center", "未知的post_type");
+			MiraiLog::get_instance()->add_debug_log("Center", "未知的post_type:"+ post_type);
 		}
 	}
 	catch (const std::exception& e)
@@ -77,7 +81,7 @@ void Center::deal_type_message(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的message_type");
+		MiraiLog::get_instance()->add_debug_log("Center", "未知的message_type:"+ message_type);
 	}
 }
 
@@ -110,7 +114,7 @@ void Center::deal_type_notice(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的notice_type");
+		MiraiLog::get_instance()->add_debug_log("Center", "未知的notice_type:"+ notice_type);
 	}
 }
 
@@ -302,7 +306,7 @@ void Center::deal_type_request(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的request_type");
+		MiraiLog::get_instance()->add_debug_log("Center", "未知的request_type:" + request_type);
 	}
 }
 
@@ -445,7 +449,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的私聊消息来源，不进行处理");
+		MiraiLog::get_instance()->add_debug_log("Center", "未知的私聊消息来源:"+ sub_type_str +"，不进行处理");
 		return;
 	}
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
@@ -502,4 +506,25 @@ void Center::deal_type_message_group(Json::Value& evt)
 		return ((cq_event_group_message)fun_ptr)(1, message_id,group_id, user_id, from_anonymous_base64.c_str(), cq_str.c_str(), font);
 	}, 0);
 	
+}
+
+
+void Center::deal_1207_event(Json::Value& evt)
+{
+	Json::Value msg_json = evt.get("message", Json::nullValue);
+
+	/* 将message中的emoji还原(如果有message的话) */
+	if (msg_json != Json::nullValue)
+	{
+		std::string t = StrTool::jsonarr_to_cq_str(msg_json);
+		std::string t2 = EmojiTool::unescape_cq_emoji(t);
+		evt["message"] = StrTool::cq_str_to_jsonarr(t2);
+	}
+
+	/* 调用事件函数 */
+	normal_cal_plus_fun(1207, [&](const void* fun_ptr, void* user_data)->int {
+		typedef int(__stdcall* cq_1207_event)(const char* msg);
+		return ((cq_1207_event)fun_ptr)(Json::FastWriter().write(evt).c_str());
+	}, 0);
+
 }
