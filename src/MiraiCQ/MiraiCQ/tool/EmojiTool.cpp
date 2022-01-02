@@ -133,10 +133,15 @@ static bool is_emoji(int code)
 {
     if (
         /* 杂项符号与符号字体 */
-        (code >= 0x2600 && code <= 0x27BF) ||
-        code == 0x303D || 
-        code == 0x2049 || 
-        code == 0x203C || 
+        (code >= 0x2600 && code <= 0x2604) ||
+        (code >= 0x2610 && code <= 0x263F) ||
+        (code >= 0x2643 && code <= 0x27BF) ||
+        code == 0x303D ||
+        code == 0x2049 ||
+        code == 0x203C ||
+        code == 0x2607 ||
+        code == 0x2608 ||
+        code == 0x2642 ||
         /* 标点符号占用区域 */
         (code >= 0x2000 && code <= 0x200F) ||
         (code >= 0x2028 && code <= 0x202F) ||
@@ -151,7 +156,8 @@ static bool is_emoji(int code)
         /* 箭头B */
         (code >= 0x2900 && code <= 0x297F) ||
         /* 中文符号 */
-        (code >= 0x3200 && code <= 0x32FF))
+        (code >= 0x3200 && code <= 0x321F) ||
+        (code >= 0x322A && code <= 0x32FF))
         return true;
     return false;
 }
