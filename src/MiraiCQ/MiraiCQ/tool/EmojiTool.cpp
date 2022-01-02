@@ -132,19 +132,19 @@ static int utf8_next_len(const std::string& str, int offset)
 static bool is_emoji(int code)
 {
     if ((code >= 0x2600 && code <= 0x27BF) || // 杂项符号与符号字体
-code == 0x303D || 
-code == 0x2049 || 
-code == 0x203C || 
-(code >= 0x2000 && code <= 0x200F) || //
-(code >= 0x2028 && code <= 0x202F) || //
-code == 0x205F || //
-(code >= 0x2065 && code <= 0x206F) || //
+        code == 0x303D || 
+        code == 0x2049 || 
+        code == 0x203C || 
+        (code >= 0x2000 && code <= 0x200F) || //
+        (code >= 0x2028 && code <= 0x202F) || //
+        code == 0x205F || //
+        (code >= 0x2065 && code <= 0x206F) || //
                 /* 标点符号占用区域 */
-(code >= 0x2100 && code <= 0x214F) || // 字母符号
-(code >= 0x2300 && code <= 0x23FF) || // 各种技术符号
-(code >= 0x2B00 && code <= 0x2BFF) || // 箭头A
-(code >= 0x2900 && code <= 0x297F) || // 箭头B
-(code >= 0x3200 && code <= 0x32FF)) // 中文符号
+        (code >= 0x2100 && code <= 0x214F) || // 字母符号
+        (code >= 0x2300 && code <= 0x23FF) || // 各种技术符号
+        (code >= 0x2B00 && code <= 0x2BFF) || // 箭头A
+        (code >= 0x2900 && code <= 0x297F) || // 箭头B
+        (code >= 0x3200 && code <= 0x32FF)) // 中文符号
         return true;
     return false;
 }
