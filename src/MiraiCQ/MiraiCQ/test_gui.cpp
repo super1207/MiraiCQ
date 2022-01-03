@@ -11,6 +11,8 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Multiline_Input.H>
 
+#include <StackWalker/BaseException.h>
+
 
 
 
@@ -360,6 +362,10 @@ static void plus_dlg()
 
 int  main(int argc, char* argv[])
 {
+	// ÉèÖÃ±ÀÀ£´òÓ¡
+	SET_DEFULTER_HANDLER();
+	CBaseException* be = new CBaseException();
+	be->ShowLoadModules();
 	/* µÇÂ¼ */
 	while (true)
 	{

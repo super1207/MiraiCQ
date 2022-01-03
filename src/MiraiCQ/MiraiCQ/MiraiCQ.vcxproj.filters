@@ -44,6 +44,9 @@
     <Filter Include="net\MiraiHttp">
       <UniqueIdentifier>{82a63dad-631d-47bf-9be3-6b5cd34a5de9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="thirdpart\StackWalker">
+      <UniqueIdentifier>{89d8b525-31f3-4b4b-bd6b-10607c5c635a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp">
@@ -192,6 +195,12 @@
     </ClCompile>
     <ClCompile Include="tool\MsgIdTool.cpp">
       <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\StackWalker\BaseException.cpp">
+      <Filter>thirdpart\StackWalker</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdpart\include\StackWalker\StackWalker.cpp">
+      <Filter>thirdpart\StackWalker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
