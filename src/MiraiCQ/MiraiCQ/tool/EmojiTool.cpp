@@ -132,9 +132,6 @@ static int utf8_next_len(const std::string& str, int offset)
 static bool is_emoji(int code)
 {
     if (
-        code == 0x0023 ||
-        code == 0x002A ||
-        (code >= 0x0030 && code <= 0x0039) ||
         code == 0x00A9 ||
         code == 0x00AE ||
         code == 0x203C ||
@@ -175,8 +172,6 @@ static bool is_emoji(int code)
         code == 0x262F ||
         (code >= 0x2638 && code <= 0x2639) ||
         code == 0x263A ||
-        code == 0x2640 ||
-        code == 0x2642 ||
         (code >= 0x2648 && code <= 0x2653) ||
         code == 0x265F ||
         code == 0x2660 ||
