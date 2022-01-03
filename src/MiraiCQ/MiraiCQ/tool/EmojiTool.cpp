@@ -131,31 +131,33 @@ static int utf8_next_len(const std::string& str, int offset)
 
 static bool is_emoji(int code)
 {
-    if ((0x0080 <= code && code <= 0x02AF) ||
-        (0x0300 <= code && code <= 0x03FF) ||
-        (0x0600 <= code && code <= 0x06FF) ||
-        (0x0C00 <= code && code <= 0x0C7F) ||
-        (0x1DC0 <= code && code <= 0x1DFF) ||
-        (0x1E00 <= code && code <= 0x1EFF) ||
-        (0x2000 <= code && code <= 0x209F) ||
-        (0x20D0 <= code && code <= 0x214F) ||
-        (0x2190 <= code && code <= 0x23FF) ||
-        (0x2460 <= code && code <= 0x25FF) ||
-        (0x2600 <= code && code <= 0x27EF) ||
-        (0x2900 <= code && code <= 0x29FF) ||
-        (0x2B00 <= code && code <= 0x2BFF) ||
-        (0x2C60 <= code && code <= 0x2C7F) ||
-        (0x2E00 <= code && code <= 0x2E7F) ||
-        (0xA490 <= code && code <= 0xA4CF) ||
-        (0xE000 <= code && code <= 0xF8FF) ||
-        (0xFE00 <= code && code <= 0xFE0F) ||
-        (0xFE30 <= code && code <= 0xFE4F) ||
-        (0x1F000 <= code && code <= 0x1F02F) ||
-        (0x1F0A0 <= code && code <= 0x1F0FF) ||
-        (0x1F100 <= code && code <= 0x1F64F) ||
-        (0x1F680 <= code && code <= 0x1F6FF) ||
-        (0x1F910 <= code && code <= 0x1F96B) ||
-        (0x1F980 <= code && code <= 0x1F9E0))
+    if (
+        /* 杂项符号与符号字体 */
+        (code >= 0x2600 && code <= 0x2604) ||
+        (code >= 0x2610 && code <= 0x263F) ||
+        (code >= 0x2643 && code <= 0x27BF) ||
+        code == 0x303D ||
+        code == 0x2049 ||
+        code == 0x203C ||
+        code == 0x2607 ||
+        code == 0x2608 ||
+        code == 0x2642 ||
+        /* 标点符号占用区域 */
+        (code >= 0x2000 && code <= 0x200F) ||
+        (code >= 0x2028 && code <= 0x202F) ||
+        code == 0x205F || //
+        (code >= 0x2065 && code <= 0x206F) ||
+        /* 字母符号 */
+        (code >= 0x2100 && code <= 0x214F) ||
+        /* 各种技术符号 */
+        (code >= 0x2300 && code <= 0x23FF) ||
+        /* 箭头A */
+        (code >= 0x2B00 && code <= 0x2BFF) ||
+        /* 箭头B */
+        (code >= 0x2900 && code <= 0x297F) ||
+        /* 中文符号 */
+        (code >= 0x3200 && code <= 0x321F) ||
+        (code >= 0x322A && code <= 0x32FF))
         return true;
     return false;
 }
