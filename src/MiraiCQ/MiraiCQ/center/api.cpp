@@ -6,6 +6,7 @@
 #include "../tool/TimeTool.h"
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
+#include "../tool/MsgIdTool.h"
 
 #include <base64/base64.h>
 #include <fstream>
@@ -158,6 +159,11 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 			node["data"]["file"] = "base64://" + base64_encode((const unsigned char*)(&(buffer[0])), buffer.size());
 
 		}
+		else if (node["type"].asString() == "reply")/* 修改reply的cq码，以符合onebot实现端的要求 */
+		{
+			int cqid = stoi(node["data"]["id"].asString());
+			node["data"]["id"] = MsgIdTool::getInstance()->to_webid(cqid);
+		}
 	}
 	/* auto s = json_arr.toStyledString(); */
 	return json_arr;
@@ -185,7 +191,8 @@ int Center::CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg)
 		
 	}, [&](const Json::Value& data_json) 
 	{
-		return StrTool::get_int_from_json(data_json, "message_id", 0);
+		Json::Value webid = data_json.get("message_id", Json::nullValue);
+		return MsgIdTool::getInstance()->to_cqid(webid);
 	}, 
 	JSON_TYPE::JSON_OBJECT);
 }
@@ -211,7 +218,8 @@ int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg)
 
 	}, [&](const Json::Value& data_json)
 	{
-		return StrTool::get_int_from_json(data_json, "message_id", 0);
+		Json::Value webid = data_json.get("message_id", Json::nullValue);
+		return MsgIdTool::getInstance()->to_cqid(webid);
 	},
 		JSON_TYPE::JSON_OBJECT);
 }
@@ -227,7 +235,7 @@ int Center::CQ_deleteMsg(int auth_code, int64_t msg_id)
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "delete_msg";
-		(*json)["params"]["message_id"] = msg_id;
+		(*json)["params"]["message_id"] = MsgIdTool::getInstance()->to_webid((int)msg_id);
 
 	}, [&](const Json::Value& data_json)
 	{

@@ -202,6 +202,10 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 		}
 		else
 		{
+			replace_all_distinct(type, "&", "&amp;");
+			replace_all_distinct(type, "[", "&#91;");
+			replace_all_distinct(type, "]", "&#93;");
+			replace_all_distinct(type, ",", "&#44;");
 			std::string cq_str = "[CQ:" + type;
 			Json::Value::Members member = data_json.getMemberNames();
 			for (std::vector<std::string>::iterator iter = member.begin(); iter != member.end(); iter++)

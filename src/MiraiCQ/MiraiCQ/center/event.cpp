@@ -9,6 +9,7 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/EmojiTool.h"
+#include "../tool/MsgIdTool.h"
 #include <base64/base64.h>
 
 
@@ -70,6 +71,10 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 
 void Center::deal_type_message(Json::Value& evt)
 {
+	// 处理message事件中的message_id
+	Json::Value webid = evt.get("message_id", Json::nullValue);
+	evt["message_id"] = MsgIdTool::getInstance()->to_cqid(webid);
+
 	auto message_type = StrTool::get_str_from_json(evt, "message_type", "");
 	if (message_type == "private")
 	{
@@ -410,6 +415,12 @@ static bool deal_json_array(Json::Value & json_arr)
 			Json::Value v;
 			v["file"] = cqimg_name;
 			node["data"] = v;
+		}
+		else if (type_str == "reply")
+		{
+			/* 这里将web的msg_id变为cq的msgid */
+			Json::Value id_json = node["data"]["id"];
+			node["data"]["id"] = MsgIdTool::getInstance()->to_cqid(id_json);
 		}
 	}
 	return true;

@@ -141,6 +141,7 @@
     <ClCompile Include="tool\BinTool.cpp" />
     <ClCompile Include="tool\ImgTool.cpp" />
     <ClCompile Include="tool\InputTool.cpp" />
+    <ClCompile Include="tool\MsgIdTool.cpp" />
     <ClCompile Include="tool\PathTool.cpp" />
     <ClCompile Include="tool\StrTool.cpp" />
     <ClCompile Include="tool\EmojiTool.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="tool\BinTool.h" />
     <ClInclude Include="tool\ImgTool.h" />
     <ClInclude Include="tool\InputTool.h" />
+    <ClInclude Include="tool\MsgIdTool.h" />
     <ClInclude Include="tool\PathTool.h" />
     <ClInclude Include="tool\StrTool.h" />
     <ClInclude Include="tool\EmojiTool.h" />

@@ -13,7 +13,7 @@ OneBotEventDeal::~OneBotEventDeal()
 {
 }
 
-MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::mutex & mx_msg_id_vec, std::list<std::pair<int, int>> & msg_id_vec, int& curr_msg_id)
+MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_)
 {
 	auto root = MiraiNet::NetStruct(new Json::Value(root_));
 	if (StrTool::get_str_from_json(*root, "post_type", "") == "message")
@@ -33,23 +33,23 @@ MiraiNet::NetStruct OneBotEventDeal::deal_event(const Json::Value & root_,std::m
 		}
 		//MiraiLog::get_instance()->add_debug_log("OneBotEventDeal", "orgin msg:\n" + msg_json.toStyledString());
 		/* 在此转换message_id */
-		Json::Value msg_id = (*root)["message_id"];
-		if (msg_id.isInt())
-		{
-			std::lock_guard<std::mutex> lk(mx_msg_id_vec);
-			++curr_msg_id;
-			if (curr_msg_id == INT32_MAX)
-			{
-				curr_msg_id = 2;
-			}
-			msg_id_vec.push_back({ curr_msg_id ,msg_id.asInt()});
-			/* 限制msg_id的缓存 */
-			if (msg_id_vec.size() > 4096)
-			{
-				msg_id_vec.pop_front();
-			}
-			(*root)["message_id"] = curr_msg_id;
-		}
+		//Json::Value msg_id = (*root)["message_id"];
+		//if (msg_id.isInt())
+		//{
+		//	std::lock_guard<std::mutex> lk(mx_msg_id_vec);
+		//	++curr_msg_id;
+		//	if (curr_msg_id == INT32_MAX)
+		//	{
+		//		curr_msg_id = 2;
+		//	}
+		//	msg_id_vec.push_back({ curr_msg_id ,msg_id.asInt()});
+		//	/* 限制msg_id的缓存 */
+		//	if (msg_id_vec.size() > 4096)
+		//	{
+		//		msg_id_vec.pop_front();
+		//	}
+		//	(*root)["message_id"] = curr_msg_id;
+		//}
 	}
 	return root;
 }

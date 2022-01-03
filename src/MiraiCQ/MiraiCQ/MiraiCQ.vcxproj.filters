@@ -190,6 +190,9 @@
     <ClCompile Include="test_gui.cpp">
       <Filter>export</Filter>
     </ClCompile>
+    <ClCompile Include="tool\MsgIdTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -245,6 +248,9 @@
     </ClInclude>
     <ClInclude Include="net\MiraiHttp\MiraiHttpEventDeal.h">
       <Filter>net\MiraiHttp</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\MsgIdTool.h">
+      <Filter>tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

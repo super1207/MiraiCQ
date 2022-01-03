@@ -39,9 +39,4 @@ private:
 	std::map<std::string,CallStuct> call_map;
 	std::mutex mx_call_map;
 
-	std::mutex mx_msg_id_vec;
-	std::list<std::pair<int, int>> msg_id_vec;
-	int curr_msg_id = 1;
-
-
 };

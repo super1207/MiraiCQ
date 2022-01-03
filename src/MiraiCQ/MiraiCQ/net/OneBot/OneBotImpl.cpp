@@ -98,7 +98,7 @@ bool OneBotNetImpl::connect_()
 			if (post_type_json.asString() != "") /* 收到事件 */
 			{
 				
-				MiraiNet::NetStruct event = OneBotEventDeal::deal_event(root,mx_msg_id_vec,msg_id_vec, curr_msg_id);
+				MiraiNet::NetStruct event = OneBotEventDeal::deal_event(root);
 				if (!event)
 				{
 					MiraiLog::get_instance()->add_debug_log("事件解析失败", event_str);
@@ -108,7 +108,7 @@ bool OneBotNetImpl::connect_()
 			}
 			else /* 收到API返回 */
 			{
-				MiraiNet::NetStruct recv = OneBotApiDeal::deal_recv(root, mx_msg_id_vec, msg_id_vec, curr_msg_id);
+				MiraiNet::NetStruct recv = OneBotApiDeal::deal_recv(root);
 				if (!recv)
 				{
 					MiraiLog::get_instance()->add_debug_log("API返回解析失败", event_str);
@@ -210,8 +210,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 	MiraiNet::NetStruct api_json;
 	try
 	{
-		/* onebot中的msg_id可以为负数，但是cq里面只能为递增的正数，所以，需要进行一些处理 */
-		api_json = OneBotApiDeal::deal_api(*senddat, mx_msg_id_vec, msg_id_vec, curr_msg_id);
+		api_json = OneBotApiDeal::deal_api(*senddat);
 	}
 	catch (std::exception& e)
 	{
