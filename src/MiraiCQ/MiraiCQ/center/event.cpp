@@ -246,7 +246,7 @@ void Center::deal_type_notice_group_ban(Json::Value& evt)
 	/* 调用事件函数 */
 	normal_cal_plus_fun(104, [&](const void* fun_ptr, void* user_data)->int {
 		typedef int(__stdcall* cq_event_group_ban)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq, __int64 duration);
-		return ((cq_event_group_ban)fun_ptr)(sub_type, time_, group_id, user_id, operator_id, duration);
+		return ((cq_event_group_ban)fun_ptr)(sub_type, time_, group_id, operator_id, user_id, duration);
 	}, 0);
 }
 
