@@ -272,8 +272,15 @@ void CBaseException::ShowExceptionInformation()
 	ShowExceptionResoult(m_pEp->ExceptionRecord->ExceptionCode);
 	TCHAR szFaultingModule[MAX_PATH];
 	DWORD section, offset;
-	GetLogicalAddress(m_pEp->ExceptionRecord->ExceptionAddress, szFaultingModule, sizeof(szFaultingModule), section, offset );
-	OutputString( _T("Fault address:  %08X %02X:%08X %s\r\n"), m_pEp->ExceptionRecord->ExceptionAddress, section, offset, szFaultingModule );
+	if (GetLogicalAddress(m_pEp->ExceptionRecord->ExceptionAddress, szFaultingModule, sizeof(szFaultingModule), section, offset) == FALSE)
+	{
+		OutputString(_T("Module not found\r\n"));
+	}
+	else
+	{
+		OutputString(_T("Fault address:  %08X %02X:%08X %s\r\n"), m_pEp->ExceptionRecord->ExceptionAddress, section, offset, szFaultingModule);
+	}
+	
 
 	ShowRegistorInformation(m_pEp->ContextRecord);
 

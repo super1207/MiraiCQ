@@ -364,8 +364,6 @@ int  main(int argc, char* argv[])
 {
 	// ÉèÖÃ±ÀÀ£´òÓ¡
 	SET_DEFULTER_HANDLER();
-	CBaseException* be = new CBaseException();
-	be->ShowLoadModules();
 	/* µÇÂ¼ */
 	while (true)
 	{
