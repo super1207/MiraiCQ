@@ -19,7 +19,7 @@ MiraiCQ-Cli
 #### 使用方法：
 
 1. 将原酷Q插件的dll和json放入app文件夹。
-2. 开启`OneBot`实现端的`websocket`正向连接。（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp）。
+2. 开启`OneBot`实现端的`websocket`正向连接。（详细说明请参照此项目：https://github.com/Mrs4s/go-cqhttp ）。
 3. 修改`config\congig.ini`文件中的`ws_url`、`access_token`、`adapter`项。
 示例config.ini：https://github.com/super1207/MiraiCQ/blob/MiraiCQ-Cli/config.ini
 4. 运行`MiraiCQ.exe`。
