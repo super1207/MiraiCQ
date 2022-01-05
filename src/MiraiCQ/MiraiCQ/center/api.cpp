@@ -44,8 +44,10 @@ static TER_TYPE normal_call(
 	std::weak_ptr<MiraiNet> net_,
 	bool can_not_enable,
 	std::function<void(MiraiNet::NetStruct json)> fun1,
-	std::function<TER_TYPE(const Json::Value & data_json)> fun2,
-	JSON_TYPE json_type)
+	std::function<TER_TYPE(const Json::Value& data_json)> fun2,
+	JSON_TYPE json_type,
+	bool is_call_api = false
+	)
 {
 	if (!can_not_enable)
 	{
@@ -75,9 +77,19 @@ static TER_TYPE normal_call(
 	{
 		return RETERR(TP10086<TER_TYPE>());
 	}
-	if (StrTool::get_int_from_json(*ret_json, "retcode", -1) != 0)
+	if (is_call_api == false)
 	{
-		return RETERR(TP10086<TER_TYPE>());
+		if (StrTool::get_int_from_json(*ret_json, "retcode", -1) != 0)
+		{
+			MiraiLog::get_instance()->add_info_log("ApiCall", "call api ret not 0:" + Json::FastWriter().write(*ret_json));
+			return RETERR(TP10086<TER_TYPE>());
+		}
+	}
+	else
+	{
+		/* callApi函数不需要MiraiCQ检查返回值 */
+		auto ret = fun2(*ret_json);
+		return ret;
 	}
 	Json::Value data_json = ret_json->get("data", Json::Value());
 	if (json_type == JSON_TYPE::JSON_OBJECT)
@@ -1194,6 +1206,6 @@ std::string Center::CQ_callApi(int auth_code, const char* msg)
 		{
 			return Json::FastWriter().write(data_json);
 		},
-			JSON_TYPE::JSON_OBJECT);
+			JSON_TYPE::JSON_OBJECT,true);
 
 }
