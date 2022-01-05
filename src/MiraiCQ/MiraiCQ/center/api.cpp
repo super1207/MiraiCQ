@@ -7,6 +7,7 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
+#include "../tool/EmojiTool.h"
 
 #include <base64/base64.h>
 #include <fstream>
@@ -57,7 +58,7 @@ static TER_TYPE normal_call(
 	}
 	else
 	{
-		auto ret = fun2(Json::nullValue);
+		auto ret = fun2(Json::Value());
 		return ret;
 	}
 	/* 如果需要访问onebot实现端，则插件必须开启 */
@@ -78,7 +79,7 @@ static TER_TYPE normal_call(
 	{
 		return RETERR(TP10086<TER_TYPE>());
 	}
-	Json::Value data_json = ret_json->get("data", Json::nullValue);
+	Json::Value data_json = ret_json->get("data", Json::Value());
 	if (json_type == JSON_TYPE::JSON_OBJECT)
 	{
 		if (!data_json.isObject())
@@ -100,21 +101,18 @@ static TER_TYPE normal_call(
 
 static Json::Value deal_cq_str(const std::string & cq_str)
 {
-	/* 首先将jsonarr转换成utf8格式 */
-	auto json_arr = StrTool::cq_str_to_jsonarr(cq_str);
+	/* 首先将cq_str转换成utf8 */
+	std::string utf8_cq_str = StrTool::to_utf8(cq_str);
+	/* 将emoji码去除 */
+	std::string utf8_cq_str_without_emoji = EmojiTool::unescape_cq_emoji(utf8_cq_str);
+
+	auto json_arr = StrTool::cq_str_to_jsonarr(utf8_cq_str_without_emoji);
 	if (!json_arr.isArray())
 	{
 		/* 转换失败 */
-		return Json::arrayValue;
+		throw std::runtime_error("cq str to jsonarr failed");
 	}
-	auto utf8_json_str = StrTool::to_utf8(Json::FastWriter().write(json_arr));
-	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(utf8_json_str, json_arr))
-	{
-		/* 转换失败 */
-		return Json::arrayValue;
-	}
+	/* 此时jsonarr 为utf8,不含[CQ:emoji] */
 	for (auto & node : json_arr)
 	{
 		/* 由StrTool::cq_str_to_jsonarr 转换而来的json一定有type */
@@ -191,7 +189,7 @@ int Center::CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg)
 		
 	}, [&](const Json::Value& data_json) 
 	{
-		Json::Value webid = data_json.get("message_id", Json::nullValue);
+		Json::Value webid = data_json.get("message_id", Json::Value());
 		return MsgIdTool::getInstance()->to_cqid(webid);
 	}, 
 	JSON_TYPE::JSON_OBJECT);
@@ -218,7 +216,7 @@ int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg)
 
 	}, [&](const Json::Value& data_json)
 	{
-		Json::Value webid = data_json.get("message_id", Json::nullValue);
+		Json::Value webid = data_json.get("message_id", Json::Value());
 		return MsgIdTool::getInstance()->to_cqid(webid);
 	},
 		JSON_TYPE::JSON_OBJECT);

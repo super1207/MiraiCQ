@@ -77,7 +77,7 @@ std::string StrTool::remove_suffix(const std::string& file_str)
 
 std::string StrTool::get_str_from_json(const Json::Value& json, const std::string& key, const std::string& default_value) 
 {
-	auto json_value = json.get(key, Json::nullValue);
+	auto json_value = json.get(key, Json::Value());
 	if (json_value.isString())
 	{
 		return json_value.asString();
@@ -87,7 +87,7 @@ std::string StrTool::get_str_from_json(const Json::Value& json, const std::strin
 
 int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, int default_value) 
 {
-	auto json_value = json.get(key, Json::nullValue);
+	auto json_value = json.get(key, Json::Value());
 	if (json_value.isInt())
 	{
 		return json_value.asInt();
@@ -97,7 +97,7 @@ int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, 
 
 int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string& key, int64_t default_value) 
 {
-	auto json_value = json.get(key, Json::nullValue);
+	auto json_value = json.get(key, Json::Value());
 	if (json_value.isInt64())
 	{
 		return json_value.asInt64();
@@ -107,7 +107,7 @@ int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string&
 
 bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key, bool default_value) 
 {
-	auto json_value = json.get(key, Json::nullValue);
+	auto json_value = json.get(key, Json::Value());
 	if (json_value.isBool())
 	{
 		return json_value.asBool();
@@ -183,7 +183,7 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 			continue;
 		}
 		std::string type = get_str_from_json(node, "type", "");
-		auto data_json = node.get("data", Json::nullValue);
+		auto data_json = node.get("data", Json::Value());
 		if (!data_json.isObject())
 		{
 			continue;

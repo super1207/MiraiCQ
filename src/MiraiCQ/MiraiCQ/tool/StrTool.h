@@ -91,7 +91,7 @@ public:
 	/*
 	* 描述：将cq的str消息格式转换为jsonarr
 	* 参数`cq_str`：要转换的cq_str
-	* 返回值：成功返回jsonarr，失败返回`Json::nullValue`
+	* 返回值：成功返回jsonarr，失败返回`Json::Value()`
 	*/
 	static Json::Value cq_str_to_jsonarr(const std::string & cq_str) ;
 

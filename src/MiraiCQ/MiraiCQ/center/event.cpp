@@ -15,18 +15,36 @@
 
 using namespace std;
 
-void Center::deal_event(MiraiNet::NetStruct evt) 
+static Json::Value utf8evt_to_ansi_with_emoji(const Json::Value & evt_)
 {
-	assert(evt);
-	const std::string print_utf8_str = Json::FastWriter().write(*evt);
-	const std::string print_ansi_str = StrTool::to_ansi(print_utf8_str);
-	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:\n" + print_ansi_str);
+	Json::Value evt = evt_;
+	/* 处理emoji */
+	if (evt.get("message", Json::Value()).isArray())
+	{
+		string t = StrTool::jsonarr_to_cq_str(evt["message"]);
+		string t1 = EmojiTool::escape_cq_emoji(t);
+		evt["message"] = StrTool::cq_str_to_jsonarr(t1);
+	}
+	const std::string utf8_str = Json::FastWriter().write(evt);
+	const std::string ansi_str = StrTool::to_ansi(utf8_str);
+	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:\n" + ansi_str);
 	Json::Value ansi_json;
 	Json::Reader reader;
-	if (!reader.parse(print_ansi_str, ansi_json))
+	if (!reader.parse(ansi_str, ansi_json))
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "json转换为ansi失败");
 		/* 失败，不再继续处理 */
+		return Json::Value();
+	}
+	return ansi_json;
+}
+
+void Center::deal_event(MiraiNet::NetStruct evt) 
+{
+	assert(evt);
+	Json::Value ansi_json = utf8evt_to_ansi_with_emoji(*evt);
+	if (!ansi_json.isObject())
+	{
 		return;
 	}
 	auto post_type = StrTool::get_str_from_json(ansi_json, "post_type", "");
@@ -72,7 +90,7 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 void Center::deal_type_message(Json::Value& evt)
 {
 	// 处理message事件中的message_id
-	Json::Value webid = evt.get("message_id", Json::nullValue);
+	Json::Value webid = evt.get("message_id", Json::Value());
 	evt["message_id"] = MsgIdTool::getInstance()->to_cqid(webid);
 
 	auto message_type = StrTool::get_str_from_json(evt, "message_type", "");
@@ -127,10 +145,10 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 {
 	std::string file_base64;
 
-	Json::Value file = evt.get("file",Json::nullValue);
+	Json::Value file = evt.get("file", Json::Value());
 	if (!file.isObject())
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "错误的deal_type_message_group_upload 事件");
+		MiraiLog::get_instance()->add_debug_log("Center", "错误的deal_type_notice_group_upload 事件");
 		return;
 	}
 	std::string id = StrTool::get_str_from_json(file, "id", "");
@@ -343,19 +361,19 @@ static bool deal_json_array(Json::Value & json_arr)
 		if (!node.isObject())
 		{
 			/* 不是object,说明json格式错误,将这节消息删除 */
-			node = Json::nullValue;
+			node = Json::Value();
 			continue;
 		}
 		std::string type_str = StrTool::get_str_from_json(node, "type", "");
 		if (type_str == "")
 		{
 			/* 将这节消息删除 */
-			node = Json::nullValue;
+			node = Json::Value();
 			continue;
 		}
 		if (type_str == "image")
 		{
-			Json::Value dat_json = node.get("data", Json::nullValue);
+			Json::Value dat_json = node.get("data", Json::Value());
 			std::string url = StrTool::get_str_from_json(dat_json, "url", "");
 			if (url == "")
 			{
@@ -364,7 +382,7 @@ static bool deal_json_array(Json::Value & json_arr)
 					MiraiCQ目前需要从图片的url中获取图片的md5，长，宽，大小，格式 
 				*/
 				MiraiLog::get_instance()->add_debug_log("Center", "检测到图片中没有url");
-				node = Json::nullValue;
+				node = Json::Value();
 				continue;
 			}
 			std::string md5_str = get_md5_from_imgurl(url);
@@ -372,7 +390,7 @@ static bool deal_json_array(Json::Value & json_arr)
 			{
 				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取md5:"+url);
 				/* MiraiCQ要使用md5作为文件名的一部分，如果没有获取到md5，则无法继续处理下去 */
-				node = Json::nullValue;
+				node = Json::Value();
 				continue;
 			}
 			/* 获得图片信息需要下载一部分图片 */
@@ -383,7 +401,7 @@ static bool deal_json_array(Json::Value & json_arr)
 				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取图片信息:" + url);
 				/* 
 					即使无法获得图片信息，也需要写入url,md5等信息到cqimg文件
-					node = Json::nullValue;
+					node = Json::Value();
 					continue;
 				*/
 				/* 无法获得图片信息，则类型使用image，之后若使用`CQ_getImage`获取图片，可能会没有正确的后缀名 */
@@ -408,7 +426,7 @@ static bool deal_json_array(Json::Value & json_arr)
 			{
 				/* 再次检查cqmig是否存在 */
 				MiraiLog::get_instance()->add_debug_log("Center", "cqimg文件写入失败，检查`data\\image`下的文件权限");
-				node = Json::nullValue;
+				node = Json::Value();
 				continue;
 			}
 			/* 重新构造data字段，删除多余的键 */
@@ -428,7 +446,7 @@ static bool deal_json_array(Json::Value & json_arr)
 
 void Center::deal_type_message_private(Json::Value& evt)
 {
-	Json::Value jsonarr = evt.get("message", Json::nullValue);
+	Json::Value jsonarr = evt.get("message", Json::Value());
 	/* 处理json array,比如要生成cqimg文件，或者要将多余的字段去掉 */
 	if (!deal_json_array(jsonarr))
 	{
@@ -479,7 +497,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 void Center::deal_type_message_group(Json::Value& evt)
 {
 	std::string from_anonymous_base64;
-	Json::Value anonymous = evt.get("anonymous", Json::nullValue);
+	Json::Value anonymous = evt.get("anonymous", Json::Value());
 	if (anonymous.isObject())
 	{
 		int64_t id = StrTool::get_int64_from_json(anonymous, "id", 0);
@@ -492,7 +510,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 		from_anonymous_base64 = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 
 	}
-	Json::Value jsonarr = evt.get("message", Json::nullValue);
+	Json::Value jsonarr = evt.get("message", Json::Value());
 	/* 处理json array,比如要生成cqimg文件，或者要将多余的字段去掉 */
 	if (!deal_json_array(jsonarr))
 	{
@@ -522,16 +540,6 @@ void Center::deal_type_message_group(Json::Value& evt)
 
 void Center::deal_1207_event(Json::Value& evt)
 {
-	Json::Value msg_json = evt.get("message", Json::nullValue);
-
-	/* 将message中的emoji还原(如果有message的话) */
-	if (msg_json != Json::nullValue)
-	{
-		std::string t = StrTool::jsonarr_to_cq_str(msg_json);
-		std::string t2 = EmojiTool::unescape_cq_emoji(t);
-		evt["message"] = StrTool::cq_str_to_jsonarr(t2);
-	}
-
 	/* 调用事件函数 */
 	normal_cal_plus_fun(1207, [&](const void* fun_ptr, void* user_data)->int {
 		typedef int(__stdcall* cq_1207_event)(const char* msg);
