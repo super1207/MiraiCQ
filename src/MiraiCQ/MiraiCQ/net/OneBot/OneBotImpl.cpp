@@ -131,9 +131,9 @@ bool OneBotNetImpl::connect_()
 				
 			}
 		}
-		catch (const std::exception&)
+		catch (const std::exception& e)
 		{
-			MiraiLog::get_instance()->add_debug_log("OneBot", "OnMessage");
+			MiraiLog::get_instance()->add_debug_log("OneBot", string("OnMessage:") + e.what());
 		}
 	});
 	client.set_open_handler([&](websocketpp::connection_hdl hdl) ->void

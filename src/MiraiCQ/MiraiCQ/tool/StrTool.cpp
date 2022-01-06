@@ -4,10 +4,11 @@
 #include <mutex>
 #include <vector>
 #include <pcre.h>
+#include <set>
 
 #pragma comment(lib,"Ole32.lib")
 
-std::string StrTool::tolower(const std::string& str) 
+std::string StrTool::tolower(const std::string& str)
 {
 	std::string ret;
 	for (const auto ch : str)
@@ -17,7 +18,7 @@ std::string StrTool::tolower(const std::string& str)
 	return ret;
 }
 
-std::string StrTool::to_ansi(const std::string& utf8_str) 
+std::string StrTool::to_ansi(const std::string& utf8_str)
 {
 	int len = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), utf8_str.size(), NULL, 0);
 	std::wstring unicode_buf(len, L'\0');
@@ -28,7 +29,7 @@ std::string StrTool::to_ansi(const std::string& utf8_str)
 	return ansi_buf;
 }
 
-std::string StrTool::to_utf8(const std::string& ansi_str) 
+std::string StrTool::to_utf8(const std::string& ansi_str)
 {
 	int len = MultiByteToWideChar(CP_ACP, 0, ansi_str.c_str(), ansi_str.size(), NULL, 0);
 	std::wstring unicode_buf(len, L'\0');
@@ -39,7 +40,7 @@ std::string StrTool::to_utf8(const std::string& ansi_str)
 	return utf8_buf;
 }
 
-std::string StrTool::gen_uuid() 
+std::string StrTool::gen_uuid()
 {
 	char buf[64] = { 0 };
 	GUID guid;
@@ -56,7 +57,7 @@ std::string StrTool::gen_uuid()
 	return buf;
 }
 
-int StrTool::gen_ac() 
+int StrTool::gen_ac()
 {
 	static std::mutex mx;
 	static int ac = 0;
@@ -65,17 +66,17 @@ int StrTool::gen_ac()
 	return ac;
 }
 
-bool StrTool::end_with(const std::string& str, const std::string& end_str) 
+bool StrTool::end_with(const std::string& str, const std::string& end_str)
 {
 	return str.rfind(end_str) == str.length() - end_str.length();
 }
 
-std::string StrTool::remove_suffix(const std::string& file_str) 
+std::string StrTool::remove_suffix(const std::string& file_str)
 {
 	return file_str.substr(0, file_str.rfind('.', file_str.length()));
 }
 
-std::string StrTool::get_str_from_json(const Json::Value& json, const std::string& key, const std::string& default_value) 
+std::string StrTool::get_str_from_json(const Json::Value& json, const std::string& key, const std::string& default_value)
 {
 	auto json_value = json.get(key, Json::Value());
 	if (json_value.isString())
@@ -85,7 +86,7 @@ std::string StrTool::get_str_from_json(const Json::Value& json, const std::strin
 	return default_value;
 }
 
-int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, int default_value) 
+int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, int default_value)
 {
 	auto json_value = json.get(key, Json::Value());
 	if (json_value.isInt())
@@ -95,7 +96,7 @@ int StrTool::get_int_from_json(const Json::Value& json, const std::string& key, 
 	return default_value;
 }
 
-int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string& key, int64_t default_value) 
+int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string& key, int64_t default_value)
 {
 	auto json_value = json.get(key, Json::Value());
 	if (json_value.isInt64())
@@ -105,7 +106,7 @@ int64_t StrTool::get_int64_from_json(const Json::Value& json, const std::string&
 	return default_value;
 }
 
-bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key, bool default_value) 
+bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key, bool default_value)
 {
 	auto json_value = json.get(key, Json::Value());
 	if (json_value.isBool())
@@ -115,61 +116,221 @@ bool StrTool::get_bool_from_json(const Json::Value& json, const std::string& key
 	return default_value;
 }
 
-Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str) 
+
+//这个表来自:https://github.com/kyubotics/coolq-http-api/blob/master/src/cqsdk/message.h
+const std::set<std::string> cq_code_type = {
+	"text",
+	"emoji",
+	"face",
+	"image",
+	"record",
+	"at",
+	"rps",
+	"dice",
+	"anonymous",
+	"shake",
+	"share",
+	"contact",
+	"location",
+	"music"
+};
+
+Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 {
-	using namespace std;
-	std::vector<std::string> dat_vec;
-	auto all_vec = match_all(cq_str, "(\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\]]+)");
-	for (auto& i : all_vec)
+	// `cq_str`的规则
+	// (\\[CQ:[^\\[\\],]+?(,[^\\[\\],]+?=[^\\[\\],]*?)*?\\])|([^\\[\\]]+)
+	int stat = 0;//0:text 1:cqcode_type 2:cqcode_key 3:cqcode_val
+	Json::Value jsonarr;
+	jsonarr.resize(0);
+	std::string text;
+	std::string type;
+	std::string key;
+	std::string val;
+	Json::Value cqcode = {};
+	for (size_t i = 0;i < cq_str.size();++i)
 	{
-		dat_vec.push_back(i.at(0));
-	}
-	Json::Value jsonarr = Json::arrayValue;
-	for (auto& dat : dat_vec)
-	{
-		if (dat[0] == '[')
+		char cur_ch = cq_str[i];
+		if (stat == 0) //text mode
 		{
-			/* 说明是CQ码 */
-			size_t pos1 = dat.find_first_of(",");
-			Json::Value node;
-			node["type"] = dat.substr(4, pos1 - 4);
-			Json::Value dat_node = Json::objectValue;
-			
-			auto all_vec = match_all(dat, "[:,]([^\\[\\],]+?)=([^\\[\\],]*?)(?=[\\],])");
-			for (auto& i : all_vec)
+			if (cur_ch == '[') // to cqcode
 			{
-				replace_all_distinct(i.at(1), "&#91;", "[");
-				replace_all_distinct(i.at(1), "&#93;", "]");
-				replace_all_distinct(i.at(1), "&#44;", ",");
-				replace_all_distinct(i.at(1), "&amp;", "&");
-				replace_all_distinct(i.at(2), "&#91;", "[");
-				replace_all_distinct(i.at(2), "&#93;", "]");
-				replace_all_distinct(i.at(2), "&#44;", ",");
-				replace_all_distinct(i.at(2), "&amp;", "&");
-				dat_node[i.at(1)] = i.at(2);
+				//[CQ:image,file=abc.jpg,url=ddd.html]
+				std::string t = cq_str.substr(i, 4);
+				if (t == "[CQ:")
+				{
+					if (text.size() != 0)
+					{
+						Json::Value node;
+						node["type"] = "text";
+						node["data"]["text"] = text;
+						jsonarr.append(node);
+						text.clear();
+					}
+					stat = 1; //to cqcode_type
+					i += 3;
+				}
 			}
-			node["data"] = dat_node;
-			jsonarr.append(node);
+			else if (cur_ch == '&') // escape
+			{
+				std::string t = cq_str.substr(i, 5);
+				if (t == "&#91;") // [
+				{
+					text += '[';
+					i += 4;
+				}
+				else if (t == "&#93;") // ]
+				{
+					text += ']';
+					i += 4;
+				}
+				else if (t == "&amp;") // &
+				{
+					text += '&';
+					i += 4;
+				}
+			}
+			else //normal ch
+			{
+				text += cq_str[i];
+			}
 		}
-		else
+		else if (stat == 1) // cqcode_type
 		{
-			/* 说明是text */
-			Json::Value node;
-			node["type"] = "text";
-			Json::Value dat_node;
-			replace_all_distinct(dat, "&#91;", "[");
-			replace_all_distinct(dat, "&#93;", "]");
-			replace_all_distinct(dat, "&amp;", "&");
-			dat_node["text"] = dat;
-			node["data"] = dat_node;
-			jsonarr.append(node);
+			if (cur_ch == ',')//to cqcode_key
+			{
+				stat = 2;
+			}
+			else if (cur_ch == '&') // escape
+			{
+				std::string t = cq_str.substr(i, 5);
+				if (t == "&#91;") // [
+				{
+					type += '[';
+					i += 4;
+				}
+				else if (t == "&#93;") // ]
+				{
+					type += ']';
+					i += 4;
+				}
+				else if (t == "&amp;") // &
+				{
+					type += '&';
+					i += 4;
+				}
+				else if (t == "&#44;") // ,
+				{
+					type += ',';
+					i += 4;
+				}
+			}
+			else //normal ch
+			{
+				type += cq_str[i];
+			}
+		}
+		else if (stat == 2) // cqcode_key
+		{
+			if (cur_ch == '=')//to cqcode_val
+			{
+				stat = 3;
+			}
+			else if (cur_ch == '&') // escape
+			{
+				std::string t = cq_str.substr(i, 5);
+				if (t == "&#91;") // [
+				{
+					key += '[';
+					i += 4;
+				}
+				else if (t == "&#93;") // ]
+				{
+					key += ']';
+					i += 4;
+				}
+				else if (t == "&amp;") // &
+				{
+					key += '&';
+					i += 4;
+				}
+				else if (t == "&#44;") // ,
+				{
+					key += ',';
+					i += 4;
+				}
+			}
+			else //normal ch
+			{
+				key += cq_str[i];
+			}
+		}
+		else if (stat == 3) // cqcode_val
+		{
+			if (cur_ch == ']')//to cqcode
+			{
+				if ((mode == 0) || 
+					((mode == 1) && (cq_code_type.find(type) != cq_code_type.end())))
+				{
+					Json::Value node;
+					cqcode[key] = val;
+					node["type"] = type;
+					node["data"] = cqcode;
+					jsonarr.append(node);
+				}
+				key.clear();
+				val.clear();
+				type.clear();
+				cqcode.clear();
+				stat = 0;
+			}
+			else if (cur_ch == ',') // to cqcode_key
+			{
+				cqcode[key] = val;
+				key.clear();
+				val.clear();
+				stat = 2;
+			}
+			else if (cur_ch == '&') // escape
+			{
+				std::string t = cq_str.substr(i, 5);
+				if (t == "&#91;") // [
+				{
+					val += '[';
+					i += 4;
+				}
+				else if (t == "&#93;") // ]
+				{
+					val += ']';
+					i += 4;
+				}
+				else if (t == "&amp;") // &
+				{
+					val += '&';
+					i += 4;
+				}
+				else if (t == "&#44;") // ,
+				{
+					val += ',';
+					i += 4;
+				}
+			}
+			else //normal ch
+			{
+				val += cq_str[i];
+			}
 		}
 	}
-	//std::string s = jsonarr.toStyledString();
+	if (text.size() != 0) //if not end with cqcode
+	{
+		Json::Value node;
+		node["type"] = "text";
+		node["data"]["text"] = text;
+		jsonarr.append(node);
+	}
 	return jsonarr;
 }
 
-std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr) 
+std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr,int mode)
 {
 	std::string ret_str;
 	if (!jsonarr.isArray())
@@ -189,6 +350,10 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 			continue;
 		}
 		if (type == "")
+		{
+			continue;
+		}
+		if ((mode == 1) && (cq_code_type.find(type) == cq_code_type.end()))
 		{
 			continue;
 		}
@@ -251,7 +416,7 @@ std::string StrTool::jsonarr_to_cq_str(const Json::Value& jsonarr)
 
 }
 
-void StrTool::replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value) 
+void StrTool::replace_all_distinct(std::string& str, const std::string& old_value, const std::string& new_value)
 {
 	for (std::string::size_type pos(0); pos != std::string::npos; pos += new_value.length())
 	{
@@ -259,14 +424,14 @@ void StrTool::replace_all_distinct(std::string& str, const std::string& old_valu
 		{
 			str.replace(pos, old_value.length(), new_value);
 		}
-		else 
-		{ 
+		else
+		{
 			break;
 		}
 	}
 }
 
-std::string StrTool::get_str_from_ini(const std::string& file, const std::string& section, const std::string& key, const std::string& default_value) 
+std::string StrTool::get_str_from_ini(const std::string& file, const std::string& section, const std::string& key, const std::string& default_value)
 {
 	std::string retStr;
 	char* buf = (char*)malloc(4096);
@@ -310,7 +475,7 @@ std::vector<std::vector<std::string>> StrTool::match_all(const std::string& cont
 	offsetcount = pcre_exec(re, NULL, content.c_str(), content.length(), 0, 0, ovector, 3 * 14);
 	while (offsetcount > 0)
 	{
-		
+
 		std::vector <std::string> temp_vec;
 		for (int i = 0; i < offsetcount; ++i)
 		{

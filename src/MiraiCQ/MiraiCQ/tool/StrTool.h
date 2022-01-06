@@ -91,16 +91,18 @@ public:
 	/*
 	* 描述：将cq的str消息格式转换为jsonarr
 	* 参数`cq_str`：要转换的cq_str
+	* 参数`mode`：0:直接转换 1:过滤掉非酷Q的CQ码
 	* 返回值：成功返回jsonarr，失败返回`Json::Value()`
 	*/
-	static Json::Value cq_str_to_jsonarr(const std::string & cq_str) ;
+	static Json::Value cq_str_to_jsonarr(const std::string & cq_str, int mode = 0) ;
 
 	/*
 	* 描述：将jsonarr转换为cq的str消息格式
 	* 参数`jsonarr`：要转换的jsonarr
+	* 参数`mode`：0:直接转换 1:过滤掉非酷Q的CQ码
 	* 返回值：成功返回cqstr，失败返回`""`
 	*/
-	static std::string jsonarr_to_cq_str(const Json::Value& jsonarr) ;
+	static std::string jsonarr_to_cq_str(const Json::Value& jsonarr, int mode = 0) ;
 
 	/*
 	* 描述：字符串替换

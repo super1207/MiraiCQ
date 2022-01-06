@@ -454,7 +454,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 		return;
 	}
 	auto s = jsonarr.toStyledString();
-	std::string cq_str = StrTool::jsonarr_to_cq_str(jsonarr);
+	std::string cq_str = StrTool::jsonarr_to_cq_str(jsonarr,1);
 	if (cq_str == "")
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr×ª»»Ê§°Ü");
@@ -517,7 +517,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarrÔ¤´¦ÀíÊ§°Ü");
 		return;
 	}
-	std::string cq_str = StrTool::jsonarr_to_cq_str(jsonarr);
+	std::string cq_str = StrTool::jsonarr_to_cq_str(jsonarr,1);
 	if (cq_str == "")
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr×ª»»Ê§°Ü");

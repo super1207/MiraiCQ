@@ -37,7 +37,8 @@ MiraiHttpApiDeal::~MiraiHttpApiDeal()
 
 static Json::Value deal_cq_msg(const Json::Value& chain)
 {
-	Json::Value ret_arr = Json::arrayValue;
+	Json::Value ret_arr;
+	ret_arr.resize(0);
 	string s = chain.toStyledString();
 	for (size_t i = 0; i < chain.size(); i++)
 	{
