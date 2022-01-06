@@ -15,7 +15,7 @@
 
 using namespace std;
 
-static Json::Value utf8evt_to_ansi_with_emoji(const Json::Value & evt_)
+static Json::Value utf8evt_with_emoji(const Json::Value & evt_)
 {
 	Json::Value evt = evt_;
 	/* 处理emoji */
@@ -28,21 +28,21 @@ static Json::Value utf8evt_to_ansi_with_emoji(const Json::Value & evt_)
 	const std::string utf8_str = Json::FastWriter().write(evt);
 	const std::string ansi_str = StrTool::to_ansi(utf8_str);
 	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:\n" + ansi_str);
-	Json::Value ansi_json;
+	Json::Value out_json;
 	Json::Reader reader;
-	if (!reader.parse(ansi_str, ansi_json))
+	if (!reader.parse(utf8_str, out_json))
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "json转换为ansi失败");
+		MiraiLog::get_instance()->add_debug_log("Center", "json + emoji失败");
 		/* 失败，不再继续处理 */
 		return Json::Value();
 	}
-	return ansi_json;
+	return out_json;
 }
 
 void Center::deal_event(MiraiNet::NetStruct evt) 
 {
 	assert(evt);
-	Json::Value ansi_json = utf8evt_to_ansi_with_emoji(*evt);
+	Json::Value ansi_json = utf8evt_with_emoji(*evt);
 	if (!ansi_json.isObject())
 	{
 		return;
@@ -151,8 +151,8 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 		MiraiLog::get_instance()->add_debug_log("Center", "错误的deal_type_notice_group_upload 事件");
 		return;
 	}
-	std::string id = StrTool::get_str_from_json(file, "id", "");
-	std::string name = StrTool::get_str_from_json(file, "name", "");
+	std::string id = StrTool::to_ansi(StrTool::get_str_from_json(file, "id", ""));
+	std::string name = StrTool::to_ansi(StrTool::get_str_from_json(file, "name", ""));
 	int64_t size = StrTool::get_int64_from_json(file, "size", 0);
 	int64_t busid = StrTool::get_int64_from_json(file, "busid", 0);
 	BinTool bin_pack;
@@ -174,7 +174,7 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 
 void Center::deal_type_notice_group_admin(Json::Value& evt)
 {
-	std::string subtype = StrTool::get_str_from_json(evt, "sub_type", "");
+	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
 	if (subtype == "set")
 	{
@@ -196,7 +196,7 @@ void Center::deal_type_notice_group_admin(Json::Value& evt)
 
 void Center::deal_type_notice_group_decrease(Json::Value& evt)
 {
-	std::string subtype = StrTool::get_str_from_json(evt, "sub_type", "");
+	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
 	if (subtype == "leave")
 	{
@@ -223,7 +223,7 @@ void Center::deal_type_notice_group_decrease(Json::Value& evt)
 
 void Center::deal_type_notice_group_increase(Json::Value& evt)
 {
-	std::string subtype = StrTool::get_str_from_json(evt, "sub_type", "");
+	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
 	if (subtype == "approve")
 	{
@@ -246,7 +246,7 @@ void Center::deal_type_notice_group_increase(Json::Value& evt)
 
 void Center::deal_type_notice_group_ban(Json::Value& evt)
 {
-	std::string subtype = StrTool::get_str_from_json(evt, "sub_type", "");
+	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
 	if (subtype == "lift_ban")
 	{
@@ -281,8 +281,8 @@ void Center::deal_type_notice_friend_add(Json::Value& evt)
 
 void Center::deal_type_request_friend(Json::Value& evt)
 {
-	std::string comment = StrTool::get_str_from_json(evt, "comment", "");
-	std::string response_flag = StrTool::get_str_from_json(evt, "flag", "");
+	std::string comment = StrTool::to_ansi(StrTool::get_str_from_json(evt, "comment", ""));
+	std::string response_flag = StrTool::to_ansi(StrTool::get_str_from_json(evt, "flag", ""));
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	/* 调用事件函数 */
@@ -294,12 +294,12 @@ void Center::deal_type_request_friend(Json::Value& evt)
 
 void Center::deal_type_request_group(Json::Value& evt)
 {
-	std::string comment = StrTool::get_str_from_json(evt, "comment", "");
-	std::string response_flag = StrTool::get_str_from_json(evt, "flag", "");
+	std::string comment = StrTool::to_ansi(StrTool::get_str_from_json(evt, "comment", ""));
+	std::string response_flag = StrTool::to_ansi(StrTool::get_str_from_json(evt, "flag", ""));
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
-	std::string subtype = StrTool::get_str_from_json(evt, "sub_type", "");
+	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
 	if (subtype == "add")
 	{
@@ -318,7 +318,7 @@ void Center::deal_type_request_group(Json::Value& evt)
 
 void Center::deal_type_request(Json::Value& evt)
 {
-	auto request_type = StrTool::get_str_from_json(evt, "request_type", "");
+	std::string request_type = StrTool::to_ansi(StrTool::get_str_from_json(evt, "request_type", ""));
 	if (request_type == "friend")
 	{
 		deal_type_request_friend(evt);
@@ -453,15 +453,15 @@ void Center::deal_type_message_private(Json::Value& evt)
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr预处理失败");
 		return;
 	}
-	auto s = jsonarr.toStyledString();
-	std::string cq_str = StrTool::jsonarr_to_cq_str(jsonarr,1);
+	auto s = Json::FastWriter().write(jsonarr);
+	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr,1));
 	if (cq_str == "")
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr转换失败");
 		return;
 	}
 	MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:\n"+ cq_str);
-	std::string sub_type_str = StrTool::get_str_from_json(evt, "sub_type", "");
+	std::string sub_type_str = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	int subtype_int;
 	if (sub_type_str == "friend")
 	{
@@ -501,8 +501,8 @@ void Center::deal_type_message_group(Json::Value& evt)
 	if (anonymous.isObject())
 	{
 		int64_t id = StrTool::get_int64_from_json(anonymous, "id", 0);
-		std::string name = StrTool::get_str_from_json(anonymous, "name", "");
-		std::string flag = StrTool::get_str_from_json(anonymous, "flag", "");
+		std::string name = StrTool::to_ansi(StrTool::get_str_from_json(anonymous, "name", ""));
+		std::string flag = StrTool::to_ansi(StrTool::get_str_from_json(anonymous, "flag", ""));
 		BinTool bin_pack;
 		bin_pack.int64_push(id);
 		bin_pack.string_push(name);
@@ -517,7 +517,8 @@ void Center::deal_type_message_group(Json::Value& evt)
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr预处理失败");
 		return;
 	}
-	std::string cq_str = StrTool::jsonarr_to_cq_str(jsonarr,1);
+	auto s = Json::FastWriter().write(jsonarr);
+	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr, 1));
 	if (cq_str == "")
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr转换失败");
