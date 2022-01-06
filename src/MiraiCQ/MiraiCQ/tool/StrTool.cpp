@@ -169,6 +169,10 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 					stat = 1; //to cqcode_type
 					i += 3;
 				}
+				else //not to cqcode mode
+				{
+					text += cq_str[i];
+				}
 			}
 			else if (cur_ch == '&') // escape
 			{
@@ -187,6 +191,10 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 				{
 					text += '&';
 					i += 4;
+				}
+				else //not escape
+				{
+					text += cq_str[i];
 				}
 			}
 			else //normal ch
