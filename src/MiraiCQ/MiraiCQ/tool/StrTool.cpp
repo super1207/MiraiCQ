@@ -132,7 +132,8 @@ const std::set<std::string> cq_code_type = {
 	"share",
 	"contact",
 	"location",
-	"music"
+	"music",
+	"reply"
 };
 
 Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
