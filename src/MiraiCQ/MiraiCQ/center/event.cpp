@@ -17,7 +17,7 @@ using namespace std;
 void Center::deal_event(MiraiNet::NetStruct evt) 
 {
 	assert(evt);
-	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:"+ Json::FastWriter().write(*evt));
+	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:"+ StrTool::to_ansi(Json::FastWriter().write(*evt)));
 	if (!(*evt).isObject())
 	{
 		return;
