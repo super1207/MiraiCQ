@@ -2,6 +2,7 @@
 
 #include <string>
 #include <mutex>
+#include <shared_mutex>
 #include <functional>
 #include <vector>
 
@@ -75,7 +76,7 @@ private:
 private:
 	std::vector<std::pair<front_sinks_funtype,void *>> front_sinks_vec;
 	std::vector<std::pair<backend_sinks_funtype, void*>> backend_sinks_vec;
-	std::mutex add_log_mx;
+	std::shared_mutex add_log_mx;
 	
 };
 

@@ -247,6 +247,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 			return MiraiNet::NetStruct();
 		}
 		auto send_json = Json::FastWriter().write(*api_json);
+		lock_guard<mutex> lock(mx_send);
 		client.send(hdl, send_json, websocketpp::frame::opcode::text);
 	}
 	catch (const std::exception& e)

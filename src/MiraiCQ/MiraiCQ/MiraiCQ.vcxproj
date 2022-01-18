@@ -139,6 +139,7 @@
     <ClCompile Include="thirdpart\include\libpcre\pcre_valid_utf8.c" />
     <ClCompile Include="thirdpart\include\libpcre\pcre_version.c" />
     <ClCompile Include="thirdpart\include\libpcre\pcre_xclass.c" />
+    <ClCompile Include="thirdpart\include\smtTP\MutexQueue.cpp" />
     <ClCompile Include="thirdpart\include\StackWalker\BaseException.cpp" />
     <ClCompile Include="thirdpart\include\StackWalker\StackWalker.cpp" />
     <ClCompile Include="tool\BinTool.cpp" />

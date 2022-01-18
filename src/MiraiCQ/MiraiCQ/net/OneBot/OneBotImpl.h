@@ -39,4 +39,6 @@ private:
 	std::map<std::string,CallStuct> call_map;
 	std::mutex mx_call_map;
 
+	std::mutex mx_send;
+
 };
