@@ -1,7 +1,6 @@
 ﻿#include "OneBotApiDeal.h"
 #include "../../tool/StrTool.h"
 #include "../../log/MiraiLog.h"
-#include "../../tool/EmojiTool.h"
 
 OneBotApiDeal::OneBotApiDeal()
 {

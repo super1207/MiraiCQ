@@ -7,7 +7,6 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
-#include "../tool/EmojiTool.h"
 
 #include <base64/base64.h>
 #include <fstream>
@@ -114,9 +113,7 @@ static TER_TYPE normal_call(
 static Json::Value deal_cq_str(const std::string & cq_str)
 {
 	/* 首先将cq_str转换成utf8 */
-	std::string utf8_cq_str = StrTool::to_utf8(cq_str);
-	/* 将emoji码去除 */
-	std::string utf8_cq_str_without_emoji = EmojiTool::unescape_cq_emoji(utf8_cq_str);
+	std::string utf8_cq_str_without_emoji = StrTool::to_utf8(cq_str);
 
 	auto json_arr = StrTool::cq_str_to_jsonarr(utf8_cq_str_without_emoji);
 	if (!json_arr.isArray())

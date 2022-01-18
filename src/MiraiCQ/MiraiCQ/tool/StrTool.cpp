@@ -1,5 +1,5 @@
 #include "StrTool.h"
-
+#include "EmojiTool.h"
 #include <objbase.h>
 #include <mutex>
 #include <vector>
@@ -18,8 +18,9 @@ std::string StrTool::tolower(const std::string& str)
 	return ret;
 }
 
-std::string StrTool::to_ansi(const std::string& utf8_str)
+std::string StrTool::to_ansi(const std::string& utf8_str_)
 {
+	std::string utf8_str = EmojiTool::escape_cq_emoji(utf8_str_);
 	int len = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), utf8_str.size(), NULL, 0);
 	std::wstring unicode_buf(len, L'\0');
 	MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), utf8_str.size(), unicode_buf.data(), len);
@@ -37,7 +38,7 @@ std::string StrTool::to_utf8(const std::string& ansi_str)
 	len = WideCharToMultiByte(CP_UTF8, 0, unicode_buf.data(), unicode_buf.size(), NULL, 0, NULL, NULL);
 	std::string utf8_buf(len, '\0');
 	WideCharToMultiByte(CP_UTF8, 0, unicode_buf.data(), unicode_buf.size(), utf8_buf.data(), len, NULL, NULL);
-	return utf8_buf;
+	return EmojiTool::unescape_cq_emoji(utf8_buf);
 }
 
 std::string StrTool::gen_uuid()

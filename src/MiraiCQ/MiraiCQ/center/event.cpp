@@ -8,46 +8,21 @@
 #include "../tool/TimeTool.h"
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
-#include "../tool/EmojiTool.h"
 #include "../tool/MsgIdTool.h"
 #include <base64/base64.h>
 
 
 using namespace std;
 
-static Json::Value utf8evt_with_emoji(const Json::Value & evt_)
-{
-	Json::Value evt = evt_;
-	/* 处理emoji */
-	if (evt.get("message", Json::Value()).isArray())
-	{
-		string t = StrTool::jsonarr_to_cq_str(evt["message"]);
-		string t1 = EmojiTool::escape_cq_emoji(t);
-		evt["message"] = StrTool::cq_str_to_jsonarr(t1);
-	}
-	const std::string utf8_str = Json::FastWriter().write(evt);
-	const std::string ansi_str = StrTool::to_ansi(utf8_str);
-	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:\n" + ansi_str);
-	Json::Value out_json;
-	Json::Reader reader;
-	if (!reader.parse(utf8_str, out_json))
-	{
-		MiraiLog::get_instance()->add_debug_log("Center", "json + emoji失败");
-		/* 失败，不再继续处理 */
-		return Json::Value();
-	}
-	return out_json;
-}
-
 void Center::deal_event(MiraiNet::NetStruct evt) 
 {
 	assert(evt);
-	Json::Value ansi_json = utf8evt_with_emoji(*evt);
-	if (!ansi_json.isObject())
+	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:"+ Json::FastWriter().write(*evt));
+	if (!(*evt).isObject())
 	{
 		return;
 	}
-	auto post_type = StrTool::get_str_from_json(ansi_json, "post_type", "");
+	auto post_type = StrTool::get_str_from_json((*evt), "post_type", "");
 	if (post_type == "")
 	{
 		MiraiLog::get_instance()->add_debug_log("Center", "post_type不存在");
@@ -61,19 +36,19 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 
 		if (post_type == "message")
 		{
-			deal_type_message(ansi_json);
+			deal_type_message(*evt);
 		}
 		else if (post_type == "notice")
 		{
-			deal_type_notice(ansi_json);
+			deal_type_notice(*evt);
 		}
 		else if (post_type == "request")
 		{
-			deal_type_request(ansi_json);
+			deal_type_request(*evt);
 		}
 		else if (post_type == "meta_event")
 		{
-			deal_type_meta_event(ansi_json);
+			deal_type_meta_event(*evt);
 		}
 		else
 		{
@@ -440,6 +415,13 @@ static bool deal_json_array(Json::Value & json_arr)
 			Json::Value id_json = node["data"]["id"];
 			node["data"]["id"] = MsgIdTool::getInstance()->to_cqid(id_json);
 		}
+		//else if (type_str == "face") 
+		//{
+		//	// [CQ:face,id=324,type=sticker] -> [CQ:face,id=324]
+		//	Json::Value id_json;
+		//	id_json["id"] = node["data"]["id"];
+		//	node["data"] = id_json;
+		//}
 	}
 	return true;
 }
