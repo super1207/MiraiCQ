@@ -359,13 +359,44 @@ static void plus_dlg()
 	Fl::run();
 }
 
+static void hide_all_window()
+{
+	// 获得当前进程的ID
+	DWORD cur_process_id = GetCurrentProcessId();
+	// 获得桌面窗口句柄
+	HWND desk_window = GetDesktopWindow();
+	// 遍历以桌面为根的所有窗口
+	HWND window = FindWindowExA(desk_window, NULL, NULL, NULL);
+	while (window)
+	{
+		DWORD process_id = 0;
+		// 获得窗口对应进程的进程号
+		GetWindowThreadProcessId(window, &process_id);
+		// 如果与当前进程号相同，则隐藏窗口
+		if (process_id == cur_process_id)
+		{
+			ShowWindow(window, SW_HIDE);
+		}
+		// 获得下一个窗口
+		HWND window_next = FindWindowEx(desk_window, window, NULL, NULL);
+		CloseHandle(window);
+		window = window_next;
+	}
+	CloseHandle(desk_window);
+}
+
+static bool is_rub_in_cmd()
+{
+	DWORD ids[2] = { 0 };
+	return (GetConsoleProcessList(ids, 2) > 1);
+}
 
 int  main(int argc, char* argv[])
 {
 	// 设置崩溃打印
 	SET_DEFULTER_HANDLER();
-	DWORD ids = 0;
-	if (GetConsoleProcessList(&ids, 2) > 1)
+	
+	if (is_rub_in_cmd())
 	{
 		// 在cmd中运行
 		// do nothing
@@ -373,11 +404,7 @@ int  main(int argc, char* argv[])
 	else
 	{
 		// 不在cmd中运行，则需要隐藏窗口
-		HWND hwnd = FindWindowA("ConsoleWindowClass", NULL);
-		if (hwnd)
-		{
-			ShowWindow(hwnd, SW_HIDE);
-		}
+		hide_all_window();
 	}
 	/* 登录 */
 	while (true)
