@@ -241,6 +241,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 			return false;
 		}
 		fun_ptr1(plus_def->ac);
+		MiraiLog::get_instance()->add_debug_log("PLUS", plus_def->name + "µÄauth_code:" + std::to_string(plus_def->ac));
 	}
 
 	{

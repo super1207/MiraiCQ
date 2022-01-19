@@ -267,6 +267,7 @@
     <ClInclude Include="tool\MsgIdTool.h">
       <Filter>tool</Filter>
     </ClInclude>
+    <ClInclude Include="center\cqpexport.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cqpexport.def">

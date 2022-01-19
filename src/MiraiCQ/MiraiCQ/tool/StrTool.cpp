@@ -124,7 +124,7 @@ const std::set<std::string> cq_code_type = {
 	"emoji",
 	"face",
 	"image",
-	"record",
+	//"record",
 	"at",
 	"rps",
 	"dice",

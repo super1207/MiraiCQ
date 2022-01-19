@@ -44,8 +44,10 @@ public:
 	/**************************来自插件的调用**********************************/
 	int CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg) ;
 	int CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg) ;
+	int CQ_sendDiscussMsg(int auth_code, int64_t discuss_id, const char* msg);
 	int CQ_deleteMsg(int auth_code, int64_t msg_id) ;
-	int CQ_sendLike(int auth_code, int64_t qq,int times) ;
+	int CQ_sendLike(int auth_code, int64_t qq) ;
+	int CQ_sendLikeV2(int auth_code, int64_t qq, int times);
 	int CQ_setGroupKick(int auth_code, int64_t group_id, int64_t qq, int reject_add_request) ;
 	int CQ_setGroupBan(int auth_code, int64_t group_id, int64_t qq, int64_t duration) ;
 	int CQ_setGroupAnonymousBan(int auth_code, int64_t group_id, const char* anonymous, int64_t duration) ;
@@ -56,7 +58,8 @@ public:
 	int CQ_setGroupLeave(int auth_code, __int64 group_id, int is_dismiss);
 	int CQ_setGroupSpecialTitle(int auth_code, __int64 group_id, __int64 qq, const char* new_special_title, __int64 duration);
 	int CQ_setFriendAddRequest(__int32 auth_code, const char* response_flag, __int32 response_operation, const char* remark);
-	int CQ_setGroupAddRequest(__int32 auth_code, const char* response_flag, int request_type, int response_operation, const char* reason);
+	int CQ_setGroupAddRequest(__int32 auth_code, const char* response_flag, int request_type, int response_operation);
+	int CQ_setGroupAddRequestV2(__int32 auth_code, const char* response_flag, int request_type, int response_operation, const char* reason);
 	int64_t CQ_getLoginQQ(int auth_code);
 	std::string CQ_getLoginNick(int auth_code);
 	std::string CQ_getStrangerInfo(int auth_code, __int64 qq, int no_cache);
@@ -65,10 +68,12 @@ public:
 	std::string CQ_getGroupInfo(int auth_code, int64_t group_id, int no_cache);
 	std::string CQ_getGroupMemberList(int auth_code, int64_t group_id);
 	std::string CQ_getGroupMemberInfoV2(int auth_code, int64_t group_id, int64_t qq, int no_cache);
-	std::string CQ_getCookies(int auth_code, const char* domain);
+	std::string CQ_getCookies(int auth_code);
+	std::string CQ_getCookiesV2(int auth_code, const char* domain);
 	int CQ_getCsrfToken(int auth_code);
 	std::string CQ_getAppDirectory(int auth_code);
-	std::string CQ_getRecord(int auth_code, const char* file, const char* out_format,bool full_path);
+	std::string CQ_getRecord(int auth_code, const char* file, const char* out_format);
+	std::string CQ_getRecordV2(int auth_code, const char* file, const char* out_format);
 	std::string CQ_getImage(int auth_code, const char* file);
 	int CQ_canSendImage(int auth_code);
 	int CQ_canSendRecord(int auth_code);
@@ -76,6 +81,7 @@ public:
 	int  CQ_setFatal(__int32 auth_code, const char* error_info);
 	int  CQ_setRestart(int auth_code);
 	std::string CQ_callApi(int auth_code, const char* msg);
+	int CQ_setDiscussLeave(int auth_code, int64_t discuss_id);
 
 private:
 	std::weak_ptr<MiraiNet> net;

@@ -364,6 +364,21 @@ int  main(int argc, char* argv[])
 {
 	// 设置崩溃打印
 	SET_DEFULTER_HANDLER();
+	DWORD ids = 0;
+	if (GetConsoleProcessList(&ids, 2) > 1)
+	{
+		// 在cmd中运行
+		// do nothing
+	}
+	else
+	{
+		// 不在cmd中运行，则需要隐藏窗口
+		HWND hwnd = FindWindowA("ConsoleWindowClass", NULL);
+		if (hwnd)
+		{
+			ShowWindow(hwnd, SW_HIDE);
+		}
+	}
 	/* 登录 */
 	while (true)
 	{
