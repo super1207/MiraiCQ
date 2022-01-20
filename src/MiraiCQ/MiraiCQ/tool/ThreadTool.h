@@ -44,5 +44,9 @@ private:
 	/* 任务队列 */
 	std::shared_mutex mx_task_list;
 	std::list<std::function<void()>> task_list;
+	/* 线程池中的最大线程数量 */
+	int max_thread_nums = 100;
+	/* 任务队列中的最大任务数量 */
+	size_t max_task_nums = 200;
 };
 

@@ -8,6 +8,12 @@
 
 bool ThreadTool::submit(const std::function<void()> & task)
 {
+	/* 当前任务过多，拒绝提交新任务 */
+	if (get_task_list_nums() > max_task_nums)
+	{
+		MiraiLog::get_instance()->add_debug_log("ThreadTool","提交新任务失败，累积任务数量过多");
+		return false;
+	}
 	// 将任务放入任务队列
 	{
 		std::unique_lock<std::shared_mutex> lock(mx_task_list);
@@ -74,6 +80,11 @@ ThreadTool::ThreadTool()
 
 void ThreadTool::add_new_thread()
 {
+	// 如果当前线程数量过多，则拒绝增加新的线程
+	if (cur_thread_nums > max_thread_nums)
+	{
+		return;
+	}
 	++cur_thread_nums;
 	std::thread([&]() {
 		// 用于标记是否空闲

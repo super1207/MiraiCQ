@@ -1260,7 +1260,7 @@ int Center::CQ_setFatal(__int32 auth_code, const char* error_info)
 		}
 		std::string name = plus_def->get_name();
 		plus_def = nullptr; /* ¾¡¿ìÊÍ·Åplus_def */
-		MiraiLog::get_instance()->add_info_log(std::string("[") + name + std::string("] CQ_setFatal: "), (error_info ? error_info : ""));
+		MiraiLog::get_instance()->add_fatal_log(std::string("[") + name + std::string("] CQ_setFatal: "), (error_info ? error_info : ""));
 		return 0;
 	},
 		JSON_TYPE::JSON_NULL);
