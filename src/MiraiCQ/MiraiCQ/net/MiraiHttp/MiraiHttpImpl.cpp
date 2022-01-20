@@ -183,7 +183,7 @@ bool MiraiHttpNetImpl::is_connect()
 	return is_run;
 }
 
-MiraiNet::NetStruct MiraiHttpNetImpl::call_fun(NetStruct senddat, int timeout) 
+MiraiNet::NetStruct MiraiHttpNetImpl::call_fun(NetStruct senddat, int timeout,bool in_new_net) 
 {
 	using namespace httplib;
 	if (!senddat)

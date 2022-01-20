@@ -33,7 +33,7 @@ public:
 	* 参数`timeout`：超时，单位ms
 	* 返回值：返回调用结果
 	*/
-	virtual NetStruct call_fun(NetStruct senddat,int timeout) = 0;
+	virtual NetStruct call_fun(NetStruct senddat,int timeout,bool in_new_net = false) = 0;
 	
 	/*
 	* 描述：设置config，若已经存在则覆盖

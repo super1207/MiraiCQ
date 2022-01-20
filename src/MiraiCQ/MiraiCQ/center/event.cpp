@@ -439,7 +439,6 @@ void Center::deal_type_message_private(Json::Value& evt)
 	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr,1));
 	if (cq_str == "")
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr转换失败");
 		return;
 	}
 	MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:\n"+ cq_str);
@@ -503,7 +502,6 @@ void Center::deal_type_message_group(Json::Value& evt)
 	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr, 1));
 	if (cq_str == "")
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr转换失败");
 		return;
 	}
 	MiraiLog::get_instance()->add_debug_log("Center", "传入GroupEvent的Msg:\n" + cq_str);

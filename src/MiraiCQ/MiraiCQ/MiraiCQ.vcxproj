@@ -139,7 +139,6 @@
     <ClCompile Include="thirdpart\include\libpcre\pcre_valid_utf8.c" />
     <ClCompile Include="thirdpart\include\libpcre\pcre_version.c" />
     <ClCompile Include="thirdpart\include\libpcre\pcre_xclass.c" />
-    <ClCompile Include="thirdpart\include\smtTP\MutexQueue.cpp" />
     <ClCompile Include="thirdpart\include\StackWalker\BaseException.cpp" />
     <ClCompile Include="thirdpart\include\StackWalker\StackWalker.cpp" />
     <ClCompile Include="tool\BinTool.cpp" />
@@ -149,11 +148,11 @@
     <ClCompile Include="tool\PathTool.cpp" />
     <ClCompile Include="tool\StrTool.cpp" />
     <ClCompile Include="tool\EmojiTool.cpp" />
+    <ClCompile Include="tool\ThreadTool.cpp" />
     <ClCompile Include="tool\TimeTool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="center\center.h" />
-    <ClInclude Include="center\cqpexport.h" />
     <ClInclude Include="config\config.h" />
     <ClInclude Include="log\MiraiLog.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpApiDeal.h" />
@@ -171,6 +170,7 @@
     <ClInclude Include="tool\PathTool.h" />
     <ClInclude Include="tool\StrTool.h" />
     <ClInclude Include="tool\EmojiTool.h" />
+    <ClInclude Include="tool\ThreadTool.h" />
     <ClInclude Include="tool\TimeTool.h" />
   </ItemGroup>
   <ItemGroup>

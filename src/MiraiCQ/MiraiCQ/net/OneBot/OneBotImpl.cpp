@@ -184,9 +184,9 @@ bool OneBotNetImpl::connect_()
 	});
 
 	/* 此处进行一些等待，确保连接成功 */
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
-		TimeTool::sleep(500);
+		TimeTool::sleep(50);
 		if (is_run)
 		{
 			return true;
@@ -200,7 +200,7 @@ bool OneBotNetImpl::is_connect()
 	return is_run;
 }
 
-MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout) 
+MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout,bool in_new_net)
 {
 	if (!senddat)
 	{
@@ -247,13 +247,35 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout)
 			return MiraiNet::NetStruct();
 		}
 		auto send_json = Json::FastWriter().write(*api_json);
-		lock_guard<mutex> lock(mx_send);
-		client.send(hdl, send_json, websocketpp::frame::opcode::text);
+		// MiraiLog::get_instance()->add_debug_log("OnebotImpl", "send_json_size:" + std::to_string(send_json.size()));
+		// 超过50kb的信息建立新的连接来发送
+		if ((send_json.size() > 1024 * 50) && (in_new_net == false))
+		{
+			auto new_net = MiraiNet::get_instance(this->get_config("net_type"));
+			if (!new_net)
+			{
+				throw std::runtime_error("can't create new net");
+			}
+			new_net->set_all_config(this->get_all_config());
+			if (!new_net->connect())
+			{
+				throw std::runtime_error("can't connect new net");
+			}
+			auto ret_json = new_net->call_fun(senddat, timeout, true);
+			lock_guard<mutex> lock(mx_call_map);
+			call_map.erase(echo);
+			return ret_json;
+		}
+		else
+		{
+			lock_guard<mutex> lock(mx_send);
+			client.send(hdl, send_json, websocketpp::frame::opcode::text);
+		}	
 	}
 	catch (const std::exception& e)
 	{
 
-		MiraiLog::get_instance()->add_debug_log("发送消息失败", e.what());
+		MiraiLog::get_instance()->add_warning_log("发送消息失败", e.what());
 		//err_msg = "net error";
 		lock_guard<mutex> lock(mx_call_map);
 		call_map.erase(echo);

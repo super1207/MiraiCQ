@@ -47,9 +47,6 @@
     <Filter Include="thirdpart\StackWalker">
       <UniqueIdentifier>{89d8b525-31f3-4b4b-bd6b-10607c5c635a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="thirdpart\smtTP">
-      <UniqueIdentifier>{05fd0c7e-86f8-4aed-8ecb-360cbf2b0c3f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp">
@@ -205,8 +202,8 @@
     <ClCompile Include="thirdpart\include\StackWalker\StackWalker.cpp">
       <Filter>thirdpart\StackWalker</Filter>
     </ClCompile>
-    <ClCompile Include="thirdpart\include\smtTP\MutexQueue.cpp">
-      <Filter>thirdpart\smtTP</Filter>
+    <ClCompile Include="tool\ThreadTool.cpp">
+      <Filter>tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -267,7 +264,9 @@
     <ClInclude Include="tool\MsgIdTool.h">
       <Filter>tool</Filter>
     </ClInclude>
-    <ClInclude Include="center\cqpexport.h" />
+    <ClInclude Include="tool\ThreadTool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cqpexport.def">

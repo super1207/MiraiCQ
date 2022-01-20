@@ -44,11 +44,26 @@ void MiraiLog::add_backend_sinks(backend_sinks_funtype backend_sinks, void* user
     unique_lock<shared_mutex> lock(add_log_mx);
     backend_sinks_vec.push_back({ backend_sinks, user_dat });
 }
-
+static string get_exe_dir()
+{
+    string ret_str;
+    char path_str[MAX_PATH + 1] = { 0 };
+    const DWORD n = GetModuleFileNameA(NULL, path_str, MAX_PATH);
+    if (n == 0)
+    {
+        ret_str = "";
+    }
+    else
+    {
+        *(strrchr(path_str, '\\')) = '\0';
+        ret_str = path_str + string("\\");
+    }
+    return ret_str;
+}
 MiraiLog::MiraiLog()
 {
     spdlog::set_level(spdlog::level::debug);
-    auto logger = spdlog::daily_logger_mt("MiraiLog", "log/daily.txt", 2, 30);
+    auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/daily.txt", 2, 30);
     logger->set_level(spdlog::level::debug);
 }
 

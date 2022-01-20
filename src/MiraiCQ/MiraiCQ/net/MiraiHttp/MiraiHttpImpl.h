@@ -21,7 +21,7 @@ public:
 	~MiraiHttpNetImpl()override;
 	virtual bool connect() override;
 	virtual bool is_connect() override;
-	virtual NetStruct call_fun(NetStruct senddat, int timeout) override;
+	virtual NetStruct call_fun(NetStruct senddat, int timeout,bool in_new_net = false) override;
 private:
 	struct CallStuct
 	{

@@ -5,8 +5,9 @@
 #include "../tool/StrTool.h"
 #include "../tool/TimeTool.h"
 #include "../config/config.h"
-#include <smtTP/SmartTP.h>
+#include "../tool/ThreadTool.h"
 #include <cassert>
+#include <algorithm>
 
 using namespace std;
 
@@ -140,8 +141,8 @@ bool Center::run()
 	}
 	can_run = true;
 	run_thread = std::thread([this]() {
-		auto pool = unique_ptr<SmartTP>(new SmartTP(10,100));
-		pool->init();
+		auto pool = unique_ptr<ThreadTool>(new ThreadTool());
+		//pool->init();
 		is_run = true;
 		MiraiLog::get_instance()->add_info_log("Center", "Center已经开始运行");
 		while (can_run)
@@ -185,7 +186,7 @@ bool Center::run()
 			}
 		}
 		/* 用于释放线程池 */
-		pool->close();
+		//pool->close();
 		pool = nullptr;
 		is_run = false;
 	});

@@ -5,7 +5,6 @@
 #include "center.h"
 #include "../log/MiraiLog.h"
 #include <spdlog/fmt/fmt.h>
-#include "cqpexport.h"
 
 
 static thread_local std::string ret_str;
@@ -58,7 +57,7 @@ extern "C"
 {
 	int __stdcall CQ_sendPrivateMsg_T(int auth_code, int64_t qq, const char* msg) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendPrivateMsg called,auth_code:{},qq:{},msg:{}", auth_code, qq, msg));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendPrivateMsg called,auth_code:{},qq:{},msg:{}", auth_code, qq, (msg ? msg : "NULL")));
 			auto ret = center_ptr->CQ_sendPrivateMsg(auth_code, qq, msg);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendPrivateMsg ret:{}", ret));
 			return ret;
@@ -66,7 +65,7 @@ extern "C"
 	}
 	int __stdcall CQ_sendGroupMsg_T(int auth_code, int64_t group_id, const char* msg) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendGroupMsg called,auth_code:{},group_id:{},msg:{}", auth_code, group_id, msg));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendGroupMsg called,auth_code:{},group_id:{},msg:{}", auth_code, group_id, (msg ? msg : "NULL")));
 			auto ret = center_ptr->CQ_sendGroupMsg(auth_code, group_id, msg);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendGroupMsg ret:{}", ret));
 			return ret;
@@ -74,7 +73,7 @@ extern "C"
 	}
 	int __stdcall CQ_sendDiscussMsg_T(int auth_code, int64_t discuss_id, const char* msg) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendDiscussMsg called,auth_code:{},discuss_id:{},msg:{}", auth_code, discuss_id, msg));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendDiscussMsg called,auth_code:{},discuss_id:{},msg:{}", auth_code, discuss_id, (msg ? msg : "NULL")));
 			auto ret = center_ptr->CQ_sendDiscussMsg(auth_code, discuss_id, msg);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_sendDiscussMsg ret:{}", ret));
 			return ret;
@@ -122,7 +121,7 @@ extern "C"
 	}
 	int __stdcall CQ_setGroupAnonymousBan_T(int auth_code, int64_t group_id, const char* anonymous, int64_t duration) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAnonymousBan called,auth_code:{},group_id:{},anonymous:{},duration:{}", auth_code, group_id, anonymous, duration));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAnonymousBan called,auth_code:{},group_id:{},anonymous:{},duration:{}", auth_code, group_id, (anonymous ? anonymous : "NULL"), duration));
 			auto ret = center_ptr->CQ_setGroupAnonymousBan(auth_code, group_id, anonymous, duration);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAnonymousBan ret:{}", ret));
 			return ret;
@@ -154,7 +153,7 @@ extern "C"
 	}
 	int __stdcall CQ_setGroupCard_T(int auth_code, int64_t group_id, int64_t qq, const char* new_card) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupCard called,auth_code:{},group_id:{},qq:{},new_card:{}", auth_code, group_id, qq, new_card));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupCard called,auth_code:{},group_id:{},qq:{},new_card:{}", auth_code, group_id, qq, (new_card ? new_card : "NULL")));
 			auto ret = center_ptr->CQ_setGroupCard(auth_code, group_id, qq, new_card);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupCard ret:{}", ret));
 			return ret;
@@ -170,7 +169,7 @@ extern "C"
 	}
 	int __stdcall CQ_setGroupSpecialTitle_T(int auth_code, int64_t group_id, int64_t qq, const char* new_special_title, int64_t duration) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupSpecialTitle called,auth_code:{},group_id:{},qq:{},new_special_title:{},duration:{}", auth_code, group_id, qq, new_special_title, duration));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupSpecialTitle called,auth_code:{},group_id:{},qq:{},new_special_title:{},duration:{}", auth_code, group_id, qq, (new_special_title ? new_special_title : "NULL"), duration));
 			auto ret = center_ptr->CQ_setGroupSpecialTitle(auth_code, group_id, qq, new_special_title, duration);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupSpecialTitle ret:{}", ret));
 			return ret;
@@ -186,7 +185,7 @@ extern "C"
 	}
 	int __stdcall CQ_setFriendAddRequest_T(int auth_code, const char* response_flag, int response_operation, const char* remark) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setFriendAddRequest called,auth_code:{},response_flag:{},response_operation:{},remark:{}", auth_code, response_flag, response_operation, remark));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setFriendAddRequest called,auth_code:{},response_flag:{},response_operation:{},remark:{}", auth_code, (response_flag ? response_flag : "NULL"), response_operation, (remark ? remark : "NULL")));
 			auto ret = center_ptr->CQ_setFriendAddRequest(auth_code, response_flag, response_operation, remark);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setFriendAddRequest ret:{}", ret));
 			return ret;
@@ -194,7 +193,7 @@ extern "C"
 	}
 	int __stdcall CQ_setGroupAddRequest_T(int auth_code, const char* response_flag, int request_type, int response_operation) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAddRequest called,auth_code:{},response_flag:{},request_type:{},response_operation:{}", auth_code, response_flag, request_type, response_operation));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAddRequest called,auth_code:{},response_flag:{},request_type:{},response_operation:{}", auth_code, (response_flag ? response_flag : "NULL"), request_type, response_operation));
 			auto ret = center_ptr->CQ_setGroupAddRequest(auth_code, response_flag, request_type, response_operation);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAddRequest ret:{}", ret));
 			return ret;
@@ -202,7 +201,7 @@ extern "C"
 	}
 	int __stdcall CQ_setGroupAddRequestV2_T(int auth_code, const char* response_flag, int request_type, int response_operation, const char* reason) {
 		return call_int_api([&](Center* center_ptr)->int {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAddRequestV2 called,auth_code:{},response_flag:{},request_type:{},response_operation:{},reason:{}", auth_code, response_flag, request_type, response_operation, reason));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAddRequestV2 called,auth_code:{},response_flag:{},request_type:{},response_operation:{},reason:{}", auth_code, (response_flag ? response_flag : "NULL"), request_type, response_operation, (reason ? reason : "NULL")));
 			auto ret = center_ptr->CQ_setGroupAddRequestV2(auth_code, response_flag, request_type, response_operation, reason);
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_setGroupAddRequestV2 ret:{}", ret));
 			return ret;
@@ -220,7 +219,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getLoginNick called,auth_code:{}", auth_code));
 			auto ret = center_ptr->CQ_getLoginNick(auth_code);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getLoginNick ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getLoginNick ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -228,7 +227,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getStrangerInfo called,auth_code:{},qq:{},no_cache:{}", auth_code, qq, no_cache));
 			auto ret = center_ptr->CQ_getStrangerInfo(auth_code, qq, no_cache);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getStrangerInfo ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getStrangerInfo ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -236,7 +235,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getFriendList called,auth_code:{},reserved:{}", auth_code, reserved));
 			auto ret = center_ptr->CQ_getFriendList(auth_code, reserved);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getFriendList ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getFriendList ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -244,7 +243,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupList called,auth_code:{}", auth_code));
 			auto ret = center_ptr->CQ_getGroupList(auth_code);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupList ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupList ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -252,7 +251,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupInfo called,auth_code:{},group_id:{},no_cache:{}", auth_code, group_id, no_cache));
 			auto ret = center_ptr->CQ_getGroupInfo(auth_code, group_id, no_cache);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupInfo ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupInfo ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -260,7 +259,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupMemberList called,auth_code:{},group_id:{}", auth_code, group_id));
 			auto ret = center_ptr->CQ_getGroupMemberList(auth_code, group_id);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupMemberList ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupMemberList ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -268,7 +267,7 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupMemberInfoV2 called,auth_code:{},group_id:{},qq:{},no_cache:{}", auth_code, group_id, qq, no_cache));
 			auto ret = center_ptr->CQ_getGroupMemberInfoV2(auth_code, group_id, qq, no_cache);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupMemberInfoV2 ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getGroupMemberInfoV2 ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -276,15 +275,15 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookies called,auth_code:{}", auth_code));
 			auto ret = center_ptr->CQ_getCookies(auth_code);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookies ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookies ret:\"{}\"", ret));
 			return ret;
 			});
 	}
 	const char* __stdcall CQ_getCookiesV2_T(int auth_code, const char* domain) {
 		return call_str_api([&](Center* center_ptr)->std::string {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookiesV2 called,auth_code:{},domain:{}", auth_code, domain));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookiesV2 called,auth_code:{},domain:{}", auth_code, (domain ? domain : "NULL")));
 			auto ret = center_ptr->CQ_getCookiesV2(auth_code, domain);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookiesV2 ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getCookiesV2 ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -300,31 +299,31 @@ extern "C"
 		return call_str_api([&](Center* center_ptr)->std::string {
 			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getAppDirectory called,auth_code:{}", auth_code));
 			auto ret = center_ptr->CQ_getAppDirectory(auth_code);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getAppDirectory ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getAppDirectory ret:\"{}\"", ret));
 			return ret;
 			});
 	}
 	const char* __stdcall CQ_getRecord_T(int auth_code, const char* file, const char* out_format) {
 		return call_str_api([&](Center* center_ptr)->std::string {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecord called,auth_code:{},file:{},out_format:{}", auth_code, file, out_format));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecord called,auth_code:{},file:{},out_format:{}", auth_code, (file ? file : "NULL"), (out_format ? out_format : "NULL")));
 			auto ret = center_ptr->CQ_getRecord(auth_code, file, out_format);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecord ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecord ret:\"{}\"", ret));
 			return ret;
 			});
 	}
 	const char* __stdcall CQ_getRecordV2_T(int auth_code, const char* file, const char* out_format) {
 		return call_str_api([&](Center* center_ptr)->std::string {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecordV2 called,auth_code:{},file:{},out_format:{}", auth_code, file, out_format));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecordV2 called,auth_code:{},file:{},out_format:{}", auth_code, (file ? file : "NULL"), (out_format ? out_format : "NULL")));
 			auto ret = center_ptr->CQ_getRecordV2(auth_code, file, out_format);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecordV2 ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getRecordV2 ret:\"{}\"", ret));
 			return ret;
 			});
 	}
 	const char* __stdcall CQ_getImage_T(int auth_code, const char* file) {
 		return call_str_api([&](Center* center_ptr)->std::string {
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getImage called,auth_code:{},file:{}", auth_code, file));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getImage called,auth_code:{},file:{}", auth_code, (file ? file : "NULL")));
 			auto ret = center_ptr->CQ_getImage(auth_code, file);
-			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getImage ret:{}", ret));
+			MiraiLog::get_instance()->add_debug_log("CQP", fmt::format("CQ_getImage ret:\"{}\"", ret));
 			return ret;
 			});
 	}
@@ -373,7 +372,5 @@ extern "C"
 			return ret;
 			});
 	}
-
-
 
 }
