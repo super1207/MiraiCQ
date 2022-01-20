@@ -141,7 +141,7 @@ bool Center::run()
 	}
 	can_run = true;
 	run_thread = std::thread([this]() {
-		auto pool = unique_ptr<ThreadTool>(new ThreadTool());
+		auto pool = ThreadTool::get_instance();
 		//pool->init();
 		is_run = true;
 		MiraiLog::get_instance()->add_info_log("Center", "Center已经开始运行");
@@ -185,9 +185,6 @@ bool Center::run()
 				});
 			}
 		}
-		/* 用于释放线程池 */
-		//pool->close();
-		pool = nullptr;
 		is_run = false;
 	});
 	/* 等待线程启动 */
