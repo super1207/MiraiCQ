@@ -55,7 +55,6 @@ ThreadTool::ThreadTool()
 				add_new_thread();
 			}
 			// 如果线程池已经停止，任务队列没有任务，则退出守护线程
-			std::lock_guard<std::mutex> lock(mx_task_list);
 			if (is_stop && !has_task(task_list, mx_task_list))
 				break;
 		}
