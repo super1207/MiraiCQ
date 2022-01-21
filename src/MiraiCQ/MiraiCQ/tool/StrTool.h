@@ -7,6 +7,12 @@ class StrTool
 {
 public:
 	/*
+	* 描述：将字符串中的小写字母转为大写
+	* 参数`str`：要转换的字符串
+	* 返回值：转换后的字符串
+	*/
+	static std::string toupper(const std::string& str);
+	/*
 	* 描述：将字符串中的大写字母转为小写
 	* 参数`str`：要转换的字符串
 	* 返回值：转换后的字符串

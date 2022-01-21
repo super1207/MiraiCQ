@@ -317,7 +317,20 @@ static std::string get_md5_from_imgurl(const std::string & url)
 	auto ret_vec = StrTool::match(url, "http.*?-([a-zA-Z0-9]{32}).*");
 	if (ret_vec.size() >= 2)
 	{
-		return ret_vec[1];
+		return StrTool::toupper(ret_vec[1]);
+	}
+	else
+	{
+		return "";
+	}
+}
+
+static std::string get_md5_from_file_str(const std::string& file_str)
+{
+	auto ret_vec = StrTool::match(file_str, "^([a-zA-Z0-9]{32}).*");
+	if (ret_vec.size() >= 2)
+	{
+		return StrTool::toupper(ret_vec[1]);
 	}
 	else
 	{
@@ -364,9 +377,16 @@ static bool deal_json_array(Json::Value & json_arr)
 			if (md5_str == "")
 			{
 				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取md5:"+url);
-				/* MiraiCQ要使用md5作为文件名的一部分，如果没有获取到md5，则无法继续处理下去 */
-				node = Json::Value();
-				continue;
+				// 尝试从file字段获取MD5
+				std::string file_str = StrTool::get_str_from_json(dat_json, "file", "");
+				md5_str = get_md5_from_file_str(file_str);
+				if (md5_str == "")
+				{
+					MiraiLog::get_instance()->add_debug_log("Center", "无法从file中获取md5:" + file_str);
+					/* MiraiCQ要使用md5作为文件名的一部分，如果没有获取到md5，则无法继续处理下去 */
+					node = Json::Value();
+					continue;
+				}
 			}
 			/* 获得图片信息需要下载一部分图片 */
 			ImgTool::ImgInfo info;

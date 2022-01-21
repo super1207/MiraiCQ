@@ -8,6 +8,16 @@
 
 #pragma comment(lib,"Ole32.lib")
 
+std::string StrTool::toupper(const std::string& str)
+{
+	std::string ret;
+	for (const auto ch : str)
+	{
+		ret += static_cast<char>(std::toupper(static_cast<unsigned char>(ch)));
+	}
+	return ret;
+}
+
 std::string StrTool::tolower(const std::string& str)
 {
 	std::string ret;
