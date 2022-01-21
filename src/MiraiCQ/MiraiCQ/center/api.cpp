@@ -8,7 +8,7 @@
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
 
-#include <base64/base64.h>
+#include <websocketpp/base64/base64.hpp>
 #include <fstream>
 
 
@@ -163,7 +163,7 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				MiraiLog::get_instance()->add_debug_log("ApiCall", "读取图片文件失败");
 				continue;
 			}
-			node["data"]["file"] = "base64://" + base64_encode((const unsigned char*)(&(buffer[0])), buffer.size());
+			node["data"]["file"] = "base64://" + websocketpp::base64_encode((const unsigned char*)(&(buffer[0])), buffer.size());
 
 		}
 		else if (node["type"].asString() == "reply")/* 修改reply的cq码，以符合onebot实现端的要求 */
@@ -356,7 +356,7 @@ int Center::CQ_setGroupAnonymousBan(int auth_code, int64_t group_id, const char*
 		(*json)["params"]["group_id"] = group_id;
 		(*json)["params"]["duration"] = duration;
 		std::vector<char> vec;
-		std::string str = base64_decode((anonymous ? anonymous : ""));
+		std::string str = websocketpp::base64_decode((anonymous ? anonymous : ""));
 		BinTool bin(std::vector<char>(str.begin(), str.end()));
 		bin.int64_pop();
 		bin.string_pop();
@@ -682,7 +682,7 @@ std::string Center::CQ_getStrangerInfo(int auth_code, __int64 qq, int no_cache)
 		bin_pack.string_push(StrTool::to_ansi(nickname));
 		bin_pack.int32_push(sex);
 		bin_pack.int32_push(age);
-		std::string ret_str = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+		std::string ret_str = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 		return ret_str;
 	},
 		JSON_TYPE::JSON_OBJECT);
@@ -716,7 +716,7 @@ std::string Center::CQ_getFriendList(int auth_code, int reserved)
 			bin_pack_child.string_push(StrTool::to_ansi(StrTool::get_str_from_json(data_arr[i], "remark", "")));
 			bin_pack.token_push(bin_pack_child.content);
 		}
-		std::string ret_str = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+		std::string ret_str = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 		return ret_str;
 	},
 		JSON_TYPE::JSON_ARRAY);
@@ -747,7 +747,7 @@ std::string Center::CQ_getGroupList(int auth_code)
 			bin_pack_child.int32_push(StrTool::get_int_from_json(data_arr[i], "max_member_count", 0));
 			bin_pack.token_push(bin_pack_child.content);
 		}
-		std::string ret_str = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+		std::string ret_str = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 		return ret_str;
 	},
 		JSON_TYPE::JSON_ARRAY);
@@ -774,7 +774,7 @@ std::string Center::CQ_getGroupInfo(int auth_code, int64_t group_id, int no_cach
 		bin_pack.string_push(StrTool::to_ansi(StrTool::get_str_from_json(data_json, "group_name", "")));
 		bin_pack.int32_push(StrTool::get_int_from_json(data_json, "member_count", 0));
 		bin_pack.int32_push(StrTool::get_int_from_json(data_json, "max_member_count", 0));
-		std::string ret_str = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+		std::string ret_str = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 		return ret_str;
 	},
 		JSON_TYPE::JSON_OBJECT);
@@ -855,7 +855,7 @@ std::string Center::CQ_getGroupMemberList(int auth_code, int64_t group_id)
 			bin_pack.token_push(bin_pack_child.content);
 
 		}
-		std::string ret_str = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+		std::string ret_str = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 		return ret_str;
 	},
 		JSON_TYPE::JSON_ARRAY);
@@ -936,7 +936,7 @@ std::string Center::CQ_getGroupMemberInfoV2(int auth_code, int64_t group_id, int
 
 		bin_pack.bool_push(StrTool::get_bool_from_json(data_json, "card_changeable", false));
 
-		std::string ret_str = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+		std::string ret_str = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 
 		return ret_str;
 	},

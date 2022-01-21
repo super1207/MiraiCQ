@@ -32,9 +32,6 @@
     <Filter Include="center">
       <UniqueIdentifier>{0b381cab-1efe-42f8-84a0-fe223fbe3b14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="thirdpart\base64">
-      <UniqueIdentifier>{f823343e-e5c9-4bb1-a996-1382898f917f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="config">
       <UniqueIdentifier>{6b988444-e431-4e87-b896-5979eea6c043}</UniqueIdentifier>
     </Filter>
@@ -105,9 +102,6 @@
     </ClCompile>
     <ClCompile Include="tool\BinTool.cpp">
       <Filter>tool</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\base64\base64.cpp">
-      <Filter>thirdpart\base64</Filter>
     </ClCompile>
     <ClCompile Include="tool\ImgTool.cpp">
       <Filter>tool</Filter>

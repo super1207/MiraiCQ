@@ -9,7 +9,7 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
-#include <base64/base64.h>
+#include <websocketpp/base64/base64.hpp>
 
 
 using namespace std;
@@ -135,7 +135,7 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 	bin_pack.string_push(name);
 	bin_pack.int64_push(size);
 	bin_pack.int64_push(busid);
-	file_base64 = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
+	file_base64 = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
@@ -488,8 +488,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 		bin_pack.int64_push(id);
 		bin_pack.string_push(name);
 		bin_pack.token_push(std::vector<char>(flag.begin(), flag.end()));
-		from_anonymous_base64 = base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
-
+		from_anonymous_base64 = websocketpp::base64_encode((const unsigned char*)(&(bin_pack.content[0])), bin_pack.content.size());
 	}
 	Json::Value jsonarr = evt.get("message", Json::Value());
 	/* 处理json array,比如要生成cqimg文件，或者要将多余的字段去掉 */
