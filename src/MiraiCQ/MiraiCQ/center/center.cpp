@@ -183,6 +183,7 @@ bool Center::run()
 					}
 					
 				});
+				TimeTool::sleep(150);
 			}
 		}
 		is_run = false;

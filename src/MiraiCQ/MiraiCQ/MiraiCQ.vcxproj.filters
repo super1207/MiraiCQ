@@ -199,6 +199,9 @@
     <ClCompile Include="tool\ThreadTool.cpp">
       <Filter>tool</Filter>
     </ClCompile>
+    <ClCompile Include="test_ipc.cpp">
+      <Filter>export</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">

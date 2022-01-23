@@ -1,0 +1,7 @@
+LIBRARY	"IPC"
+EXPORTS
+IPC_ApiSend
+IPC_SendEvent
+IPC_GetEvent
+IPC_ApiRecv
+IPC_Malloc
