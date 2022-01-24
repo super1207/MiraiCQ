@@ -391,7 +391,7 @@ static bool is_rub_in_cmd()
 	return (GetConsoleProcessList(ids, 2) > 1);
 }
 
-int  main(int argc, char* argv[])
+int  mmain(int argc, char* argv[])
 {
 	// …Ë÷√±¿¿£¥Ú”°
 	SET_DEFULTER_HANDLER();

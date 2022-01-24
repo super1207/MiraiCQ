@@ -7,11 +7,10 @@
 #include <map>
 #include <Windows.h>
 #include <objbase.h>
+#include <condition_variable>
+#include <chrono>
 
-
-
-
-static std::map<std::string, std::shared_ptr<std::string>> g_api_map;
+static std::map<std::string, std::pair<std::shared_ptr<std::condition_variable>,std::shared_ptr<std::string>>> g_api_map;
 static std::mutex g_mx_api_map;
 static thread_local std::string g_ret_str;
 
@@ -30,8 +29,11 @@ public:
     }
     void send(const std::string& s)
     {
-        std::lock_guard<std::mutex> lock(mx_send_list);
-        send_list.push_back(s);
+        {
+            std::lock_guard<std::mutex> lock(mx_send_list);
+            send_list.push_back(s);
+        }
+        cv.notify_one();
     }
     std::string get_flag() const
     {
@@ -45,21 +47,14 @@ public:
             while (true) {
                 std::string to_send;
                 {
-                    std::lock_guard<std::mutex> lock(mx_send_list);
-                    if (send_list.size() != 0)
-                    {
-                        to_send = (*send_list.begin());
-                        send_list.pop_front();
-                    }
+                    std::unique_lock<std::mutex> lock(mx_send_list);
+                    cv.wait(lock, [&] {return send_list.size() > 0;});
+                    to_send = (*send_list.begin());
+                    send_list.pop_front();
                 }
                 if (to_send != "")
                 {
                     cc.send(to_send);
-                }
-                else
-                {
-                    //sleep sth time，先暂时这样吧
-                    Sleep(100);
                 }
             }
             }).detach();
@@ -68,6 +63,7 @@ private:
     std::mutex mx_send_list;
     std::list<std::string> send_list;
     std::string flag;
+    std::condition_variable cv;
 };
 
 
@@ -268,7 +264,7 @@ const char* IPC_ApiSend(int to_pid, const char* msg)
                     is_run = true;
                     if (ret == "")
                     {
-                        Sleep(100);
+                        Sleep(15);
                         continue;
                     }
                     std::string flag = ret.substr(0, 36);
@@ -276,7 +272,8 @@ const char* IPC_ApiSend(int to_pid, const char* msg)
                     std::lock_guard<std::mutex> lock(g_mx_api_map);
                     if (g_api_map.find(flag) != g_api_map.end())
                     {
-                        g_api_map[flag] = std::make_shared<std::string>(dat);
+                        g_api_map[flag].second = std::make_shared<std::string>(dat);
+                        g_api_map[flag].first->notify_all();
                     }
                 }
                 }).detach();
@@ -284,25 +281,25 @@ const char* IPC_ApiSend(int to_pid, const char* msg)
     }
     while (!is_run);
 
+    std::shared_ptr<std::condition_variable> cv = std::make_shared<std::condition_variable>();
     {
         std::lock_guard<std::mutex> lock(g_mx_api_map);
-        g_api_map[flag] = nullptr;
+        g_api_map[flag].first = cv;
+        g_api_map[flag].second = nullptr;
     }
 
     ApiSendIPC(to_pid).send(send_str);
     std::shared_ptr<std::string> ret_ptr = nullptr;
-    for (int i = 0;i < 1000;++i)
+
     {
+        using namespace std;
+        std::unique_lock<std::mutex> lock(g_mx_api_map);
+        if (cv->wait_for(lock, 15s, [&] {return (g_api_map[flag].second != nullptr);}))
         {
-            std::lock_guard<std::mutex> lock(g_mx_api_map);
-            if (g_api_map[flag] != nullptr)
-            {
-                ret_ptr = g_api_map[flag];
-                break;
-            }
+            ret_ptr = g_api_map[flag].second;
         }
-        Sleep(15);
-    }
+
+    } 
     {
         std::lock_guard<std::mutex> lock(g_mx_api_map);
         g_api_map.erase(flag);
