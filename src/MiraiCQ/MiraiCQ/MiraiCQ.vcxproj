@@ -106,6 +106,7 @@
     <ClCompile Include="center\event.cpp" />
     <ClCompile Include="config\config.cpp" />
     <ClCompile Include="log\MiraiLog.cpp" />
+    <ClCompile Include="mainprocess\mainprocess.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpApiDeal.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpEventDeal.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpImpl.cpp" />
@@ -113,6 +114,7 @@
     <ClCompile Include="net\OneBot\OneBotApiDeal.cpp" />
     <ClCompile Include="net\OneBot\OneBotEventDeal.cpp" />
     <ClCompile Include="net\OneBot\OneBotImpl.cpp" />
+    <ClCompile Include="plusprocess\plusprocess.cpp" />
     <ClCompile Include="plus\MiraiPlus.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_gui.cpp" />
@@ -157,6 +159,7 @@
     <ClInclude Include="center\center.h" />
     <ClInclude Include="config\config.h" />
     <ClInclude Include="log\MiraiLog.h" />
+    <ClInclude Include="mainprocess\mainprocess.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpApiDeal.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpEventDeal.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpImpl.h" />
@@ -164,6 +167,7 @@
     <ClInclude Include="net\OneBot\OneBotApiDeal.h" />
     <ClInclude Include="net\OneBot\OneBotEventDeal.h" />
     <ClInclude Include="net\OneBot\OneBotImpl.h" />
+    <ClInclude Include="plusprocess\plusprocess.h" />
     <ClInclude Include="plus\MiraiPlus.h" />
     <ClInclude Include="tool\BinTool.h" />
     <ClInclude Include="tool\ImgTool.h" />

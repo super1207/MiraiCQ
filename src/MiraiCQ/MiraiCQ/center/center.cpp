@@ -272,48 +272,50 @@ void Center::call_menu_fun_by_ac(int ac, int pos)
 
 void Center::normal_cal_plus_fun(int fun_type, std::function<int(const void* fun_ptr, void * user_data)> fun_ptr,void * user_data)
 {
-	/* 开始调用插件的函数 */
-	auto plus = MiraiPlus::get_instance();
-	assert(plus);
-	auto all_ac = plus->get_all_ac();
-	/* 按函数优先级从小到大排序 */
-	std::sort(all_ac.begin(), all_ac.end(), [&](decltype(all_ac[0]) & p1,decltype(all_ac[0]) & p2) {
-		auto s1 = p1.second.lock();
-		auto s2 = p1.second.lock();
-		/* 插件不存在，不排序 */
-		if (!s1 || !s2)
-		{
-			return false;
-		}
-		auto fun1 = s1->get_event_fun(fun_type);
-		auto fun2 = s1->get_event_fun(fun_type);
-		/* 事件不存在，不排序 */
-		if (!fun1 || !fun2)
-		{
-			return false;
-		}
-		return fun1->priority < fun2->priority;
-	});
-	for (auto ac : all_ac)
-	{
-		/* 获得插件的共享指针 */
-		auto plus_def = ac.second.lock();
-		if (!plus_def || !plus_def->is_enable)
-		{
-			//若插件未启用或者获取共享指针失败，则不处理
-			continue;
-		}
-		auto fun = plus_def->get_event_fun(fun_type);/* 获得事件函数 */
-		if (!fun)
-		{
-			/* 获取函数失败，则不处理 */
-			continue;
-		}
-		int ret = fun_ptr(fun->function, user_data);
-		if (ret != 0)
-		{
-			/*  拦截事件，阻止事件继续传递 */
-			break;
-		}
-	}
+	//不再调用事件函数
+	return ;
+	///* 开始调用插件的函数 */
+	//auto plus = MiraiPlus::get_instance();
+	//assert(plus);
+	//auto all_ac = plus->get_all_ac();
+	///* 按函数优先级从小到大排序 */
+	//std::sort(all_ac.begin(), all_ac.end(), [&](decltype(all_ac[0]) & p1,decltype(all_ac[0]) & p2) {
+	//	auto s1 = p1.second.lock();
+	//	auto s2 = p1.second.lock();
+	//	/* 插件不存在，不排序 */
+	//	if (!s1 || !s2)
+	//	{
+	//		return false;
+	//	}
+	//	auto fun1 = s1->get_event_fun(fun_type);
+	//	auto fun2 = s1->get_event_fun(fun_type);
+	//	/* 事件不存在，不排序 */
+	//	if (!fun1 || !fun2)
+	//	{
+	//		return false;
+	//	}
+	//	return fun1->priority < fun2->priority;
+	//});
+	//for (auto ac : all_ac)
+	//{
+	//	/* 获得插件的共享指针 */
+	//	auto plus_def = ac.second.lock();
+	//	if (!plus_def || !plus_def->is_enable)
+	//	{
+	//		//若插件未启用或者获取共享指针失败，则不处理
+	//		continue;
+	//	}
+	//	auto fun = plus_def->get_event_fun(fun_type);/* 获得事件函数 */
+	//	if (!fun)
+	//	{
+	//		/* 获取函数失败，则不处理 */
+	//		continue;
+	//	}
+	//	int ret = fun_ptr(fun->function, user_data);
+	//	if (ret != 0)
+	//	{
+	//		/*  拦截事件，阻止事件继续传递 */
+	//		break;
+	//	}
+	//}
 }

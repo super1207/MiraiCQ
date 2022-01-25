@@ -4,4 +4,5 @@ IPC_ApiSend
 IPC_SendEvent
 IPC_GetEvent
 IPC_ApiRecv
-IPC_Malloc
+IPC_ApiReply
+IPC_Init

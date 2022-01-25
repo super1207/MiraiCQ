@@ -12,6 +12,7 @@
 #include <FL/Fl_Multiline_Input.H>
 
 #include <StackWalker/BaseException.h>
+#include "../IPC/ipc.h"
 
 
 

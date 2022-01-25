@@ -1225,14 +1225,15 @@ int Center::CQ_addLog(int auth_code, int log_level, const char* category, const 
 
 	}, [&](const Json::Value& data_json)
 	{
-		auto plus = MiraiPlus::get_instance();
+		/*auto plus = MiraiPlus::get_instance();
 		auto plus_def = plus->get_plus(auth_code);
 		if (!plus_def)
 		{
 			return -1;
 		}
-		std::string name = plus_def->get_name();
-		plus_def = nullptr; /* 尽快释放plus_def */
+		std::string name = plus_def->get_name();*/
+		//plus_def = nullptr; /* 尽快释放plus_def */
+		std::string name = "IPCPLUS";
 		MiraiLog::get_instance()->add_info_log(std::string("[") + name + std::string("] ") + (category ? category : ""), (log_msg ? log_msg : ""));
 		return 0;
 	},

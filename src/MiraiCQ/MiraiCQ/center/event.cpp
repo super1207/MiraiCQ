@@ -10,6 +10,7 @@
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
 #include <websocketpp/base64/base64.hpp>
+#include "../../IPC/ipc.h"
 
 
 using namespace std;
@@ -528,6 +529,19 @@ void Center::deal_type_message_group(Json::Value& evt)
 	int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
+
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_message";
+	to_send["data"]["sub_type"] = 1;
+	to_send["data"]["msg_id"] = message_id;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["from_qq"] = user_id;
+	to_send["data"]["anonymous"] = from_anonymous_base64;
+	to_send["data"]["msg"] = cq_str;
+	to_send["data"]["font"] = font;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	
 
 	/* 调用事件函数 */
 	normal_cal_plus_fun(2, [&](const void* fun_ptr, void* user_data)->int {

@@ -44,6 +44,12 @@
     <Filter Include="thirdpart\StackWalker">
       <UniqueIdentifier>{89d8b525-31f3-4b4b-bd6b-10607c5c635a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="mainprocess">
+      <UniqueIdentifier>{e5b235b7-9bc1-4d1e-ae8d-6d92f1daf216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plusprocess">
+      <UniqueIdentifier>{d468bd48-aa9f-46e8-b7e4-b80b17a28cf2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test.cpp">
@@ -202,6 +208,12 @@
     <ClCompile Include="test_ipc.cpp">
       <Filter>export</Filter>
     </ClCompile>
+    <ClCompile Include="mainprocess\mainprocess.cpp">
+      <Filter>mainprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="plusprocess\plusprocess.cpp">
+      <Filter>plusprocess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -263,6 +275,12 @@
     </ClInclude>
     <ClInclude Include="tool\ThreadTool.h">
       <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="mainprocess\mainprocess.h">
+      <Filter>mainprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="plusprocess\plusprocess.h">
+      <Filter>plusprocess</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
