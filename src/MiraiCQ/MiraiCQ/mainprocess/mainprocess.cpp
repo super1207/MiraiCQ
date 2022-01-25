@@ -23,12 +23,12 @@ static void deal_api_thread(const std::string& sender,const std::string & flag,c
 	}
 	std::string action = StrTool::get_str_from_json(root, "action", "");
 	Json::Value params = root.get("params", Json::Value());
-	if (!params.isObject())
-	{
-		MiraiLog::get_instance()->add_debug_log("TEST_IPC", "收到不规范的Json" + std::string(msg));
-		IPC_ApiReply(sender.c_str(), flag.c_str(), NULL);
-		return;
-	}
+	//if (!params.isObject())
+	//{
+	//	MiraiLog::get_instance()->add_debug_log("TEST_IPC", "收到不规范的Json" + std::string(msg));
+	//	IPC_ApiReply(sender.c_str(), flag.c_str(), NULL);
+	//	return;
+	//}
 	if (action == "CQ_addLog")
 	{
 		auto ret = Center::get_instance()->CQ_addLog(
@@ -79,6 +79,12 @@ static void fun(const char* sender, const char* flag,const char* msg)
 
 void mainprocess()
 {
+	// 初始化IPC服务
+	if (IPC_Init("F6C3D957-BFDF-431a-997C-EE8857E595FF") != 0)
+	{
+		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "IPC_Init 执行失败");
+		exit(-1);
+	}
 	auto  net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
 	net->set_config("ws_url", Config::get_instance()->get_ws_url());
 	net->set_config("access_token", Config::get_instance()->get_access_token());
@@ -94,12 +100,8 @@ void mainprocess()
 		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "Center运行失败");
 		exit(-1);
 	}
-	MiraiLog::get_instance()->add_debug_log("TEST_IPC", std::to_string(_getpid()));
-	if (IPC_Init("") != 0)
-	{
-		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "IPC_Init 执行失败");
-		exit(-1);
-	}
+	MiraiLog::get_instance()->add_debug_log("TEST_IPC",IPC_GetFlag());
+	
 	std::thread([&]() {
 		while(true){
 			IPC_ApiRecv(fun);

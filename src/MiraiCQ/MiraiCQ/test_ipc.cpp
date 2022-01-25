@@ -36,9 +36,10 @@ int main(int argc,char * argv[])
 	}
 	else
 	{
-		int main_pid = std::stoi(argv[1]);
+		std::string main_flag = argv[1];
+		std::string plus_flag = argv[2];
 		std::string plus_file = websocketpp::base64_decode(argv[3]);
-		plusprocess(main_pid, plus_file);
+		plusprocess(main_flag,plus_flag, plus_file);
 	}
 	while (true) {
 		TimeTool::sleep(1000);

@@ -1,4 +1,4 @@
 #pragma once
 
 #include <string>
-void plusprocess(int main_pid,std::string plus_name);
+void plusprocess(const std::string & main_flag,const std::string & plus_flag,const std::string & plus_name);

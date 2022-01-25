@@ -9,6 +9,7 @@
 #include <objbase.h>
 #include <condition_variable>
 #include <chrono>
+#include "ipc.h"
 
 static std::map<std::string, std::pair<std::shared_ptr<std::condition_variable>, std::shared_ptr<std::string>>> g_api_map;
 static std::mutex g_mx_api_map;
@@ -53,7 +54,7 @@ public:
 		std::thread([&]() {
 			ipc::route cc{ flag.c_str(), ipc::receiver };
 			while (true) {
-				ipc::buff_t dd = cc.recv();
+				ipc::buff_t dd = cc.recv(); 
 				std::string dat(dd.size(), '\0');
 				memcpy_s((void*)dat.data(), dat.size(), dd.data(), dd.size());
 				std::lock_guard<std::mutex> lock(mx_recv_list);
@@ -189,6 +190,12 @@ int IPC_Init(const char * uuid)
 	return 0;
 }
 
+const char* IPC_GetFlag()
+{
+	g_ret_str = IPCSerClass::getInstance()->get_flag();
+	return g_ret_str.c_str();
+}
+
 void IPC_SendEvent(const char* msg)
 {
 	if (!msg)
@@ -235,7 +242,7 @@ void IPC_ApiReply(const char* sender, const char* flag, const char* msg)
 	IPCSerClass::send_api(sender, std::string(flag) + (msg ? msg : ""));
 }
 
-const char* IPC_ApiSend(const char* remote, const char* msg)
+const char* IPC_ApiSend(const char* remote, const char* msg,int tm)
 {
 	if (!remote || !msg)
 	{
@@ -248,10 +255,10 @@ const char* IPC_ApiSend(const char* remote, const char* msg)
 	std::string ret_dat;
 
 	std::thread th([&]() {
-		std::string t = "API+" + flag;
+		std::string t = "API" + flag;
 		ipc::channel cc{ t.c_str(), ipc::receiver};
 		is_run = true;
-		ipc::buff_t dd = cc.recv(15000);
+		ipc::buff_t dd = cc.recv(tm);
 		if (!dd.empty())
 		{
 			ret_dat = (char *)dd.data();
