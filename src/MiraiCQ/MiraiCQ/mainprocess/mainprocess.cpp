@@ -56,7 +56,7 @@ static void deal_api_thread(const std::string& sender,const std::string & flag,c
 	}
 	else
 	{
-		IPC_ApiReply(sender.c_str(), flag.c_str(), NULL);
+		IPC_ApiReply(sender.c_str(), flag.c_str(), "");
 		// 无法处理的函数
 	}
 	

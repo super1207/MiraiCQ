@@ -180,6 +180,9 @@ private:
 	std::condition_variable cv_api;
 };
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
 int IPC_Init(const char * uuid)
 {
@@ -213,7 +216,7 @@ const char* IPC_GetEvent(const char * flag)
 	return g_ret_str.c_str();
 }
 
-void IPC_ApiRecv(void((*fun)(const char*, const char*, const char*)))
+void IPC_ApiRecv(void((*fun)(const char* sender_uuid, const char* flag, const char* msg)))
 {
 	
 	std::string ret = IPCSerClass::getInstance()->get_api();
@@ -275,5 +278,10 @@ const char* IPC_ApiSend(const char* remote, const char* msg,int tm)
 	g_ret_str =  ret_dat.substr(36);
 	return g_ret_str.c_str();
 }
+
+
+#ifdef  __cplusplus
+}
+#endif
 
 
