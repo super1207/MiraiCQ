@@ -56,14 +56,6 @@ ThreadTool::ThreadTool()
 	std::thread([&]() {
 		int i = 0;
 		while (true) {
-			++i;
-			if (i == 300)
-			{
-				MiraiLog::get_instance()->add_debug_log("ThreadTool", fmt::format("cur_thread_nums:{}", cur_thread_nums));
-				MiraiLog::get_instance()->add_debug_log("ThreadTool", fmt::format("unused_thread_nums:{}", unused_thread_nums));
-				MiraiLog::get_instance()->add_debug_log("ThreadTool", fmt::format("task_nums:{}", get_task_list_nums()));
-				i = 0;
-			}
 			// 没有获取到任务，睡眠一会儿
 			TimeTool::sleep(100);
 			// 如果没有未使用的线程,但是有任务，则增加一个线程

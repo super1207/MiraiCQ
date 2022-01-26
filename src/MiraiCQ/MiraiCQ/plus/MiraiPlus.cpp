@@ -10,6 +10,9 @@
 #include "../tool/StrTool.h"
 #include "../tool/TimeTool.h"
 #include <jsoncpp/json.h>
+#include <assert.h>
+#include "../../IPC/ipc.h"
+#include <websocketpp/base64/base64.hpp>
 
 using namespace std;
 MiraiPlus::MiraiPlus()
@@ -25,20 +28,11 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 	err_msg.clear();
 	std::string bin_path = PathTool::get_exe_dir() + "";
 	PathTool::create_dir(bin_path);
-	//SetDllDirectoryA(bin_path.c_str()); 
 	std::string cqp_path = bin_path + "CQP.dll";
 	if (!PathTool::is_file_exist(cqp_path.c_str()))
 	{
 		err_msg = "CQP.dll不在目录下";
 		return false;
-	}
-	if (GetModuleHandleA(cqp_path.c_str()) == NULL)
-	{
-		if (!LoadLibraryA(cqp_path.c_str()))
-		{
-			err_msg = "CQP.dll加载失败";
-			return false;
-		}
 	}
 	/* 创建图片目录 */ 
 	PathTool::create_dir(PathTool::get_exe_dir() + "data\\");
@@ -72,12 +66,6 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 	}
 	json_fp.close();
 	std::shared_ptr<PlusDef> plus_def(new PlusDef);
-	plus_def->module_hand = LoadLibraryA(dll_path.c_str());
-	if (!plus_def->module_hand)
-	{
-		err_msg = "模块dll文件加载失败";
-		return false;
-	}
 
 	plus_def->filename = dll_name;
 
@@ -177,16 +165,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 					MiraiLog::get_instance()->add_debug_log("load_plus", msg);
 				}
 			}
-			
-			{
-				void* dll_func = GetProcAddress((HMODULE)plus_def->module_hand, event->fun_name.c_str());
-				if (dll_func == NULL)
-				{
-					err_msg = "函数`"+ event->fun_name +"`加载失败";
-					return false;
-				}
-				event->function = dll_func;
-			}
+		
 			plus_def->event_vec.push_back(event);
 		}
 	}
@@ -218,30 +197,56 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 					return false;
 				}
 			}
-			{
-				void* dll_func = GetProcAddress((HMODULE)plus_def->module_hand, menu->fun_name.c_str());
-				if (dll_func == NULL)
-				{
-					err_msg = "函数`" + menu->fun_name + "`加载失败";
-					return false;
-				}
-				menu->function = dll_func;
-			}
 			plus_def->menu_vec.push_back(menu);
 		}
 	}
-
+	plus_def->uuid = StrTool::gen_uuid();
 	plus_def->ac = StrTool::gen_ac();
+
+	char path_str[MAX_PATH + 1] = { 0 };
+	if (GetModuleFileNameA(NULL, path_str, MAX_PATH) == 0)
 	{
-		typedef __int32(__stdcall* fun_ptr_type_1)(__int32);
-		fun_ptr_type_1 fun_ptr1 = (fun_ptr_type_1)GetProcAddress((HMODULE)plus_def->module_hand, "Initialize");
-		if (!fun_ptr1)
+		err_msg = "获得当前进程名失败";
+		return false;
+	}
+	IPC_Init("");
+	std::string cmd = path_str;
+	cmd += " ";
+	cmd += IPC_GetFlag();
+	cmd += " ";
+	cmd += plus_def->uuid;
+	cmd += " ";
+	cmd += websocketpp::base64_encode(dll_name);
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	MiraiLog::get_instance()->add_debug_log("PLUSLOAD", cmd);
+	BOOL bRet = CreateProcessA(path_str, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+	if (bRet != TRUE) {
+		err_msg = "创建插件进程失败";
+		return false;
+	}
+	else
+	{
+		/* 关闭不需要的句柄,MiraiCQ通过uuid与共享内存与插件进程通信，不需要句柄 */
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+		Json::Value to_send;
+		to_send["action"] = "is_load";
+		bool is_load = false;
+		for (int i = 0;i < 100;++i)
 		{
-			err_msg = "函数Initialize获取失败";
+			const char* ret = IPC_ApiSend(plus_def->uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 100);
+			if (strcmp(ret, "OK") == 0)
+			{
+				is_load = true;
+				break;
+			}
+		}
+		if (!is_load)
+		{
+			err_msg = "插件无响应";
 			return false;
 		}
-		fun_ptr1(plus_def->ac);
-		MiraiLog::get_instance()->add_debug_log("PLUS", plus_def->name + "的auth_code:" + std::to_string(plus_def->ac));
 	}
 
 	{
@@ -255,125 +260,58 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 bool MiraiPlus::enable_plus(int ac, std::string & err_msg) 
 {
 	err_msg.clear();
-	auto plus = get_plus(ac);
-	if (!plus)
+	auto sptr = this->get_plus(ac);
+	if (!sptr)
 	{
-		err_msg = "ac不存在";
+		err_msg = "插件不存在";
 		return false;
 	}
-
-	if (plus->is_enable) /* 插件已经被启用 */
 	{
-		return true;
-	}
-	else
-	{
-		plus->is_enable = true;
-	}
-	
-	/* 插件第一次启用 */
-	if (plus->is_first_enable)
-	{
-		plus->is_first_enable = false;
-		auto fun =  plus->get_event_fun(1001); /* 框架启动 */
-		if (fun)
-		{ 
-			/* shared_lock<shared_mutex> lock(plus->mx); */
-			typedef __int32(__stdcall* fun_ptr_type_1)();
-			int ret = ((fun_ptr_type_1)fun->function)();
-			if (ret != 0)
+		Json::Value to_send;
+		auto fptr = sptr->get_event_fun(1001);
+		if (fptr) {
+			to_send["action"] = "start";
+			to_send["params"]["fun_name"] = fptr->fun_name;
+			std::string ret = IPC_ApiSend(sptr->uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 15000);
+			if (ret != "OK")
 			{
-				err_msg = "插件`"+ plus->name+"`拒绝启动";
-				plus->is_enable = false;
+				err_msg = "插件拒绝启用或无响应";
 				return false;
 			}
 		}
-			
 	}
 
-	auto fun = plus->get_event_fun(1003); /* 插件启用 */
-	if (fun)
 	{
-		/* shared_lock<shared_mutex> lock(plus->mx); */
-		typedef __int32(__stdcall* fun_ptr_type_1)();
-		int ret = ((fun_ptr_type_1)fun->function)();
-		if (ret != 0)
-		{
-			err_msg = "插件`" + plus->name + "`拒绝启用";
-			plus->is_enable = false;
-			return false;
+		Json::Value to_send;
+		auto fptr = sptr->get_event_fun(1003);
+		if (fptr) {
+			to_send["action"] = "start";
+			to_send["params"]["fun_name"] = fptr->fun_name;
+			std::string ret = IPC_ApiSend(sptr->uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 15000);
+			if (ret != "OK")
+			{
+				err_msg = "插件拒绝启用或无响应";
+				return false;
+			}
 		}
 	}
+	sptr->is_enable = true;
 	return true;
 }
 
 bool MiraiPlus::disable_plus(int ac, std::string & err_msg) 
 {
 	err_msg.clear();
-	auto plus = get_plus(ac);
-	if (!plus)
-	{
-		err_msg = "ac不存在";
-		return false;
-	}
-	if (!plus->is_enable) /* 插件没有启用 */
-	{
-		return true;
-	}
-	else 
-	{
-		plus->is_enable = false;
-	}
-	auto fun = plus->get_event_fun(1004); /* 插件禁用 */
-	if (fun)
-	{
-		/* shared_lock<shared_mutex> lock(plus->mx); */
-		typedef __int32(__stdcall* fun_ptr_type_1)();
-		int ret = ((fun_ptr_type_1)fun->function)();
-		if (ret != 0)
-		{
-			plus->is_enable = true;
-			err_msg = "插件`" + plus->name + "`拒绝被禁用";
-			return false;
-		}
-	}
 	return true;
 }
 
 bool MiraiPlus::is_enable(int ac) 
 {
-	auto plus = get_plus(ac);
-	if (!plus)
-	{
-		return false;
-	}
-	return plus->is_enable;
+	return true;
 }
 
 bool MiraiPlus::del_plus(int ac) 
 {
-	auto plus = get_plus(ac);
-	if (!plus)
-	{
-		/* ac不存在，说明已经被卸载 */
-		return true;
-	}
-	if (!plus->is_first_enable) /* 初始化的插件才能调用卸载函数 */
-	{
-		auto fun =plus->get_event_fun(1002); /* 框架退出事件 */
-		if (fun)
-		{
-			/* shared_lock<shared_mutex> lock(plus->mx); */
-			typedef __int32(__stdcall* fun_ptr_type_1)();
-			int ret = ((fun_ptr_type_1)fun->function)();
-			if (ret != 0)
-			{
-				plus->is_enable = true;
-				//err_msg = "插件`" + plus->name + "`拒绝被卸载";
-				return false;
-			}
-		}
-	}
 	return true;
 }
 

@@ -140,12 +140,15 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(11, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_upload)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char* file_base64);
-		return ((cq_event_group_upload)fun_ptr)(1, time_, group_id, user_id, file_base64.c_str());
-	}, 0);
-	
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_upload";
+	to_send["data"]["sub_type"] = 1;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["from_qq"] = user_id;
+	to_send["data"]["file_base64"] = file_base64;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_admin(Json::Value& evt)
@@ -163,11 +166,14 @@ void Center::deal_type_notice_group_admin(Json::Value& evt)
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(101, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_admin)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 being_operate_qq);
-		return ((cq_event_group_admin)fun_ptr)(sub_type, time_, group_id, user_id);
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_admin";
+	to_send["data"]["sub_type"] = sub_type;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["being_operate_qq"] = user_id;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_decrease(Json::Value& evt)
@@ -190,11 +196,15 @@ void Center::deal_type_notice_group_decrease(Json::Value& evt)
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	int64_t operator_id = StrTool::get_int64_from_json(evt, "operator_id", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(102, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_member_decrease)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq);
-		return ((cq_event_group_member_decrease)fun_ptr)(sub_type, time_, group_id, operator_id, user_id);
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_member_decrease";
+	to_send["data"]["sub_type"] = sub_type;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["from_qq"] = operator_id;
+	to_send["data"]["being_operate_qq"] = user_id;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_increase(Json::Value& evt)
@@ -213,11 +223,15 @@ void Center::deal_type_notice_group_increase(Json::Value& evt)
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	int64_t operator_id = StrTool::get_int64_from_json(evt, "operator_id", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(103, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_member_increase)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq);
-		return ((cq_event_group_member_increase)fun_ptr)(sub_type, time_, group_id,operator_id,user_id);
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_member_increase";
+	to_send["data"]["sub_type"] = sub_type;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["from_qq"] = operator_id;
+	to_send["data"]["being_operate_qq"] = user_id;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_ban(Json::Value& evt)
@@ -237,22 +251,29 @@ void Center::deal_type_notice_group_ban(Json::Value& evt)
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	int64_t operator_id = StrTool::get_int64_from_json(evt, "operator_id", 0);
 	int64_t duration = StrTool::get_int64_from_json(evt, "duration", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(104, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_ban)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, __int64 being_operate_qq, __int64 duration);
-		return ((cq_event_group_ban)fun_ptr)(sub_type, time_, group_id, operator_id, user_id, duration);
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_ban";
+	to_send["data"]["sub_type"] = sub_type;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["from_qq"] = operator_id;
+	to_send["data"]["being_operate_qq"] = user_id;
+	to_send["data"]["duration"] = duration;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_friend_add(Json::Value& evt)
 {
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(201, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_friend_add)(__int32 sub_type, __int32 send_time, __int64 from_qq);
-		return ((cq_event_friend_add)fun_ptr)(1,time_, user_id);
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_friend_add";
+	to_send["data"]["sub_type"] = 1;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_qq"] = user_id;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_request_friend(Json::Value& evt)
@@ -261,11 +282,15 @@ void Center::deal_type_request_friend(Json::Value& evt)
 	std::string response_flag = StrTool::to_ansi(StrTool::get_str_from_json(evt, "flag", ""));
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
-	/* 调用事件函数 */
-	normal_cal_plus_fun(301, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_friend_request)(__int32 sub_type, __int32 send_time, __int64 from_qq, const char* msg, const char* response_flag);
-		return ((cq_event_friend_request)fun_ptr)(1,time_, user_id, comment.c_str(), response_flag.c_str());
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_friend_request";
+	to_send["data"]["sub_type"] = 1;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_qq"] = user_id;
+	to_send["data"]["msg"] = comment;
+	to_send["data"]["response_flag"] = response_flag;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_request_group(Json::Value& evt)
@@ -285,11 +310,16 @@ void Center::deal_type_request_group(Json::Value& evt)
 	{
 		sub_type = 2; //invite
 	}
-	/* 调用事件函数 */
-	normal_cal_plus_fun(302, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_request)(__int32 sub_type, __int32 send_time, __int64 from_group, __int64 from_qq, const char* msg, const char* response_flag);
-		return ((cq_event_group_request)fun_ptr)(sub_type, time_, group_id, user_id, comment.c_str(), response_flag.c_str());
-	}, 0);
+
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_group_request";
+	to_send["data"]["sub_type"] = sub_type;
+	to_send["data"]["send_time"] = time_;
+	to_send["data"]["from_group"] = group_id;
+	to_send["data"]["from_qq"] = user_id;
+	to_send["data"]["msg"] = comment;
+	to_send["data"]["response_flag"] = response_flag;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_request(Json::Value& evt)
@@ -487,11 +517,14 @@ void Center::deal_type_message_private(Json::Value& evt)
 	int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 
-	/* 调用事件函数 */
-	normal_cal_plus_fun(21, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_private_message)(int sub_type, int msg_id, int64_t from_qq, const char* msg, int font);
-		return ((cq_event_private_message)fun_ptr)(subtype_int, message_id, user_id, cq_str.c_str(), font);
-	}, 0);
+	Json::Value to_send;
+	to_send["event_type"] = "cq_event_private_message";
+	to_send["data"]["sub_type"] = subtype_int;
+	to_send["data"]["msg_id"] = message_id;
+	to_send["data"]["from_qq"] = user_id;
+	to_send["data"]["msg"] = cq_str;
+	to_send["data"]["font"] = font;
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }
 
 
@@ -541,23 +574,13 @@ void Center::deal_type_message_group(Json::Value& evt)
 	to_send["data"]["msg"] = cq_str;
 	to_send["data"]["font"] = font;
 	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
-	
-
-	/* 调用事件函数 */
-	normal_cal_plus_fun(2, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_event_group_message)(int sub_type, int msg_id, int64_t from_group,int64_t from_qq, const char* anonymous,const char* msg, int font);
-		return ((cq_event_group_message)fun_ptr)(1, message_id,group_id, user_id, from_anonymous_base64.c_str(), cq_str.c_str(), font);
-	}, 0);
-	
 }
 
 
 void Center::deal_1207_event(Json::Value& evt)
 {
-	/* 调用事件函数 */
-	normal_cal_plus_fun(1207, [&](const void* fun_ptr, void* user_data)->int {
-		typedef int(__stdcall* cq_1207_event)(const char* msg);
-		return ((cq_1207_event)fun_ptr)(Json::FastWriter().write(evt).c_str());
-	}, 0);
-
+	Json::Value to_send;
+	to_send["event_type"] = "cq_1207_event";
+	to_send["data"]["msg"] = Json::FastWriter().write(evt);
+	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
 }

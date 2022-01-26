@@ -16,7 +16,6 @@ public:
 		struct Event
 		{
 			int type;
-			void* function = 0;
 			int priority = 30000;
 			std::string fun_name;
 		};
@@ -24,15 +23,14 @@ public:
 		{
 			std::string fun_name;
 			std::string name;
-			void* function = 0;
 		};
-		void * module_hand = 0; /* dll模块的句柄 HMODULE */
 		std::string name; /* 插件名字 */
 		std::string filename; /* 插件的文件名 */
 		std::string version; /* 插件版本 */
 		std::string author; /* 插件作者 */
 		std::string description; /* 插件描述 */
 		int ac; /* 插件ac */
+		std::string uuid;
 		std::vector<std::shared_ptr<const Event>> event_vec;
 		std::vector<std::shared_ptr<const Menu>> menu_vec;
 		std::set<int> auth_vec;

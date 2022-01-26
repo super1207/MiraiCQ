@@ -1,18 +1,14 @@
 #include "pch.h"
-#include <libipc/ipc.h>
+
 #include <libipc/ipc.h>
 #include <thread>
 #include <list>
 #include <mutex>
-#include <map>
-#include <Windows.h>
 #include <objbase.h>
 #include <condition_variable>
-#include <chrono>
+
 #include "ipc.h"
 
-static std::map<std::string, std::pair<std::shared_ptr<std::condition_variable>, std::shared_ptr<std::string>>> g_api_map;
-static std::mutex g_mx_api_map;
 static thread_local std::string g_ret_str;
 
 static std::string gen_uuid()
@@ -35,7 +31,7 @@ static std::string gen_uuid()
 class EventRecvIPC
 {
 public:
-	static EventRecvIPC* get_instance(const std::string & uuid)
+	static EventRecvIPC* get_instance(const std::string& uuid)
 	{
 		static EventRecvIPC t(uuid);
 		return &t;
@@ -48,13 +44,13 @@ public:
 		recv_list.pop_front();
 		return ret;
 	}
-	EventRecvIPC(const std::string & uuid)
+	EventRecvIPC(const std::string& uuid)
 	{
 		flag = "EVENT" + uuid;
 		std::thread([&]() {
 			ipc::route cc{ flag.c_str(), ipc::receiver };
 			while (true) {
-				ipc::buff_t dd = cc.recv(); 
+				ipc::buff_t dd = cc.recv();
 				std::string dat(dd.size(), '\0');
 				memcpy_s((void*)dat.data(), dat.size(), dd.data(), dd.size());
 				std::lock_guard<std::mutex> lock(mx_recv_list);
@@ -77,7 +73,7 @@ private:
 class IPCSerClass
 {
 public:
-	static IPCSerClass* getInstance(const std::string & uuid = "")
+	static IPCSerClass* getInstance(const std::string& uuid = "")
 	{
 		static IPCSerClass t(uuid);
 		return &t;
@@ -86,7 +82,7 @@ public:
 	{
 		return uuid;
 	}
-	void send_event(const std::string & evt)
+	void send_event(const std::string& evt)
 	{
 		std::lock_guard<std::mutex> lock(mx_event_send_list);
 		if (event_send_list.size() > max_send_list) {
@@ -103,10 +99,10 @@ public:
 		api_recv_list.pop_front();
 		return ret;
 	}
-	static bool send_api(const std::string &flag, const std::string& s)
+	static bool send_api(const std::string& flag, const std::string& s)
 	{
 		std::string t = "API" + flag;
-		ipc::channel cc{ t.c_str()};
+		ipc::channel cc{ t.c_str() };
 		return cc.try_send(s);
 	}
 	static std::string get_event(const std::string& flag)
@@ -114,7 +110,7 @@ public:
 		return EventRecvIPC::get_instance(flag)->recv();
 	}
 private:
-	IPCSerClass(const std::string & uuid_)
+	IPCSerClass(const std::string& uuid_)
 	{
 		if (uuid_ == "")
 		{
@@ -143,26 +139,26 @@ private:
 					cc.send(to_send);
 				}
 			}
-		}).detach();
-		std::thread([&]() {
-			ipc::channel cc{ api_flag.c_str(), ipc::receiver };
-			++run_flag;
-			while (true) {
-				ipc::buff_t dd = cc.recv();
-				std::string dat(dd.size(), '\0');
-				memcpy_s((void*)dat.data(), dat.size(), dd.data(), dd.size());
-				std::lock_guard<std::mutex> lock(mx_api_recv_list);
-				if (api_recv_list.size() > max_recv_list) {
-					api_recv_list.clear();
+			}).detach();
+			std::thread([&]() {
+				ipc::channel cc{ api_flag.c_str(), ipc::receiver };
+				++run_flag;
+				while (true) {
+					ipc::buff_t dd = cc.recv();
+					std::string dat(dd.size(), '\0');
+					memcpy_s((void*)dat.data(), dat.size(), dd.data(), dd.size());
+					std::lock_guard<std::mutex> lock(mx_api_recv_list);
+					if (api_recv_list.size() > max_recv_list) {
+						api_recv_list.clear();
+					}
+					api_recv_list.push_back(dat);
+					cv_api.notify_all();
 				}
-				api_recv_list.push_back(dat);
-				cv_api.notify_all();
-			}
-		}).detach();
-		while (true)
-		{
-			if (run_flag == 2)break;
-		}
+				}).detach();
+				while (true)
+				{
+					if (run_flag == 2)break;
+				}
 	}
 	std::string uuid;
 	std::string event_flag;
@@ -184,100 +180,136 @@ private:
 extern "C" {
 #endif
 
-int IPC_Init(const char * uuid)
-{
-	if (!IPCSerClass::getInstance(uuid?uuid:""))
+	int IPC_Init(const char* uuid)
 	{
-		return -1;
-	}
-	return 0;
-}
-
-const char* IPC_GetFlag()
-{
-	g_ret_str = IPCSerClass::getInstance()->get_flag();
-	return g_ret_str.c_str();
-}
-
-void IPC_SendEvent(const char* msg)
-{
-	if (!msg)
-		return;
-	IPCSerClass::getInstance()->send_event(msg);
-}
-
-const char* IPC_GetEvent(const char * flag)
-{
-	if (!flag)
-	{
-		return "";
-	}
-	g_ret_str =  IPCSerClass::get_event(flag);
-	return g_ret_str.c_str();
-}
-
-void IPC_ApiRecv(void((*fun)(const char* sender_uuid, const char* flag, const char* msg)))
-{
-	
-	std::string ret = IPCSerClass::getInstance()->get_api();
-	if (ret == "")
-	{
-		return;
-	}
-	size_t flaglen = 36;
-	size_t pos = ret.find_first_of('#');
-	std::string sender = ret.substr(0, pos);
-	std::string flag = ret.substr(pos + 1, flaglen);
-	std::string dat = ret.substr(pos + flaglen + 1);
-	std::string ret_str;
-	if (fun)
-	{
-		fun(sender.c_str(), flag.c_str(), dat.c_str());
-	}
-}
-
-void IPC_ApiReply(const char* sender, const char* flag, const char* msg)
-{
-	if (!sender || !flag)
-	{
-		return;
-	}
-	IPCSerClass::send_api(sender, std::string(flag) + (msg ? msg : ""));
-}
-
-const char* IPC_ApiSend(const char* remote, const char* msg,int tm)
-{
-	if (!remote || !msg)
-	{
-		return "";
-	}
-	std::string flag = gen_uuid(); //len:36
-	std::string send_str = flag + "#" + flag + msg;
-	
-	std::atomic_bool is_run = false;
-	std::string ret_dat;
-
-	std::thread th([&]() {
-		std::string t = "API" + flag;
-		ipc::channel cc{ t.c_str(), ipc::receiver};
-		is_run = true;
-		ipc::buff_t dd = cc.recv(tm);
-		if (!dd.empty())
+		try
 		{
-			ret_dat = (char *)dd.data();
+			if (!IPCSerClass::getInstance(uuid ? uuid : ""))
+			{
+				return -1;
+			}
 		}
-	});
+		catch (const std::exception&) {
+			return -1;
+		}
 
-	while (!is_run);
-	IPCSerClass::send_api(remote, send_str);
-	th.join();
-	if (ret_dat.size() < 36)
-	{
-		return "";
+		return 0;
 	}
-	g_ret_str =  ret_dat.substr(36);
-	return g_ret_str.c_str();
-}
+
+	const char* IPC_GetFlag()
+	{
+		try {
+			g_ret_str = IPCSerClass::getInstance()->get_flag();
+			return g_ret_str.c_str();
+		}
+		catch (const std::exception&) {
+			return "";
+		}
+	}
+
+	void IPC_SendEvent(const char* msg)
+	{
+		if (!msg)
+			return;
+		try {
+			IPCSerClass::getInstance()->send_event(msg);
+		}
+		catch (const std::exception&) {
+			return;
+		}
+	}
+
+	const char* IPC_GetEvent(const char* flag)
+	{
+		if (!flag)
+		{
+			return "";
+		}
+		try {
+			g_ret_str = IPCSerClass::get_event(flag);
+			return g_ret_str.c_str();
+		}
+		catch (const std::exception&) {
+			return "";
+		}
+	}
+
+	void IPC_ApiRecv(void((*fun)(const char* sender_uuid, const char* flag, const char* msg)))
+	{
+		try {
+			std::string ret = IPCSerClass::getInstance()->get_api();
+			if (ret == "")
+			{
+				return;
+			}
+			size_t flaglen = 36;
+			size_t pos = ret.find_first_of('#');
+			std::string sender = ret.substr(0, pos);
+			std::string flag = ret.substr(pos + 1, flaglen);
+			std::string dat = ret.substr(pos + flaglen + 1);
+			std::string ret_str;
+			if (fun)
+			{
+				fun(sender.c_str(), flag.c_str(), dat.c_str());
+			}
+		}
+		catch (const std::exception&) {
+			return;
+		}
+	}
+
+	void IPC_ApiReply(const char* sender, const char* flag, const char* msg)
+	{
+		try {
+			if (!sender || !flag)
+			{
+				return;
+			}
+			IPCSerClass::send_api(sender, std::string(flag) + (msg ? msg : ""));
+		}
+		catch (const std::exception&) {
+			return;
+		}
+	}
+
+	const char* IPC_ApiSend(const char* remote, const char* msg, int tm)
+	{
+		if (!remote || !msg)
+		{
+			return "";
+		}
+		try {
+			std::string flag = gen_uuid(); //len:36
+			std::string send_str = flag + "#" + IPC_GetFlag() + msg;
+
+			std::atomic_bool is_run = false;
+			std::string ret_dat;
+
+			std::thread th([&]() {
+				std::string t = "API" + flag;
+				ipc::channel cc{ t.c_str(), ipc::receiver };
+				is_run = true;
+				ipc::buff_t dd = cc.recv(tm);
+				if (!dd.empty())
+				{
+					ret_dat = (char*)dd.data();
+				}
+			});
+
+			while (!is_run);
+			IPCSerClass::send_api(remote, send_str);
+			th.join();
+			if (ret_dat.size() < 36)
+			{
+				return "";
+			}
+			g_ret_str = ret_dat.substr(36);
+			return g_ret_str.c_str();
+		}
+		catch (const std::exception&) {
+			return "";
+		}
+	}
 
 
 #ifdef  __cplusplus

@@ -7,6 +7,9 @@
 
 using namespace std;
 
+extern bool g_is_plus;
+extern std::string g_plus_name;
+
 MiraiLog* MiraiLog::get_instance()
 {
     static MiraiLog log;
@@ -63,8 +66,16 @@ static string get_exe_dir()
 MiraiLog::MiraiLog()
 {
     spdlog::set_level(spdlog::level::debug);
-    auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/daily.txt", 2, 30);
-    logger->set_level(spdlog::level::debug);
+    if (!g_is_plus)
+    {
+        auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/main_daily.txt", 2, 30);
+        logger->set_level(spdlog::level::debug);
+    }
+    else {
+        auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/" + g_plus_name + "_plus_daily.txt", 2, 30);
+        logger->set_level(spdlog::level::debug);
+    }
+    
 }
 
 /* 增加一条日志 */

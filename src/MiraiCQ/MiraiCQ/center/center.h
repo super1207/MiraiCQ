@@ -89,10 +89,8 @@ private:
 
 	std::atomic_bool is_run = false;
 	std::atomic_bool can_run = false;
-	std::thread run_thread;
 private:
 	Center();
-	void normal_cal_plus_fun(int fun_type,std::function<int(const void * fun_ptr,void * user_data)> fun_ptr, void* user_data);
 	void deal_event(MiraiNet::NetStruct evt) ;
 	void deal_type_message(Json::Value& evt);
 	void deal_type_notice(Json::Value& evt);

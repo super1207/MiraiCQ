@@ -6,6 +6,7 @@
 #include "../tool/TimeTool.h"
 #include "../config/config.h"
 #include "../tool/ThreadTool.h"
+#include "../../IPC/ipc.h"
 #include <cassert>
 #include <algorithm>
 
@@ -23,15 +24,7 @@ Center* Center::get_instance()
 
 Center::~Center()
 {
-	/*if (is_run)
-	{
-		can_run = false;
-	}
-	run_thread.join();
-	MiraiLog::get_instance()->add_debug_log("Center","正在卸载所有插件");
-	this->del_all_plus();
-	HANDLE hself = GetCurrentProcess();
-	TerminateProcess(hself, 0);*/
+
 }
 
 void Center::set_net(std::weak_ptr<MiraiNet> net) 
@@ -96,40 +89,11 @@ int Center::enable_all_plus()
 
 int Center::del_all_plus() 
 {
-	auto plus = MiraiPlus::get_instance();
-	assert(plus);
-	std::vector <std::pair<int,std::string>> ac_name_vec;
-	/* 获得所有插件的ac */
-	{
-		auto plus_map = plus->get_all_plus();
-		for (auto& it : plus_map)
-		{
-			ac_name_vec.push_back({it.first,it.second->get_name()});
-		}
-	}
-	int success_num = 0;
-	for (auto & ac_name : ac_name_vec)
-	{
-		if (plus->del_plus(ac_name.first))
-		{
-			++success_num;
-			MiraiLog::get_instance()->add_info_log("Center", "插件`" + ac_name.second + "`卸载成功");
-		}
-		else
-		{
-			MiraiLog::get_instance()->add_info_log("Center", "插件`" + ac_name.second + "`卸载失败");
-		}
-	}
-	return success_num;
+	return 0;
 }
 
 bool Center::run() 
 {
-	/* 已经在运行，直接返回true */
-	if (is_run)
-	{
-		return true;
-	}
 	auto plus = MiraiPlus::get_instance();
 	assert(plus);
 	{
@@ -139,13 +103,10 @@ bool Center::run()
 			return false;
 		}
 	}
-	can_run = true;
-	run_thread = std::thread([this]() {
+	std::thread([this]() {
 		auto pool = ThreadTool::get_instance();
-		//pool->init();
-		is_run = true;
 		MiraiLog::get_instance()->add_info_log("Center", "Center已经开始运行");
-		while (can_run)
+		while (true)
 		{
 			/* 在这里处理所有Net事件即可 */
 			shared_ptr<MiraiNet> net;
@@ -183,16 +144,9 @@ bool Center::run()
 					}
 					
 				});
-				TimeTool::sleep(150);
 			}
 		}
-		is_run = false;
-	});
-	/* 等待线程启动 */
-	//while (!is_run)
-	//{
-	//	TimeTool::sleep(0);
-	//}
+	}).detach();
 	return true;
 }
 
@@ -259,63 +213,16 @@ void Center::call_menu_fun_by_ac(int ac, int pos)
 	{
 		return ;
 	}
-	try
-	{
-		typedef void(__stdcall* fun_type)();
-		((fun_type)pdf->menu_vec.at(pos)->function)();
+	Json::Value to_send;
+	to_send["action"] = "call_menu";
+	auto menu_vec = pdf->get_menu_vec();
+	try {
+		to_send["params"]["fun_name"] = menu_vec.at(pos)->fun_name;
+		IPC_ApiSend(pdf->uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 100);
 	}
-	catch (const std::exception&)
-	{
-		return;
+	catch (...) {
+
 	}
+
 }
 
-void Center::normal_cal_plus_fun(int fun_type, std::function<int(const void* fun_ptr, void * user_data)> fun_ptr,void * user_data)
-{
-	//不再调用事件函数
-	return ;
-	///* 开始调用插件的函数 */
-	//auto plus = MiraiPlus::get_instance();
-	//assert(plus);
-	//auto all_ac = plus->get_all_ac();
-	///* 按函数优先级从小到大排序 */
-	//std::sort(all_ac.begin(), all_ac.end(), [&](decltype(all_ac[0]) & p1,decltype(all_ac[0]) & p2) {
-	//	auto s1 = p1.second.lock();
-	//	auto s2 = p1.second.lock();
-	//	/* 插件不存在，不排序 */
-	//	if (!s1 || !s2)
-	//	{
-	//		return false;
-	//	}
-	//	auto fun1 = s1->get_event_fun(fun_type);
-	//	auto fun2 = s1->get_event_fun(fun_type);
-	//	/* 事件不存在，不排序 */
-	//	if (!fun1 || !fun2)
-	//	{
-	//		return false;
-	//	}
-	//	return fun1->priority < fun2->priority;
-	//});
-	//for (auto ac : all_ac)
-	//{
-	//	/* 获得插件的共享指针 */
-	//	auto plus_def = ac.second.lock();
-	//	if (!plus_def || !plus_def->is_enable)
-	//	{
-	//		//若插件未启用或者获取共享指针失败，则不处理
-	//		continue;
-	//	}
-	//	auto fun = plus_def->get_event_fun(fun_type);/* 获得事件函数 */
-	//	if (!fun)
-	//	{
-	//		/* 获取函数失败，则不处理 */
-	//		continue;
-	//	}
-	//	int ret = fun_ptr(fun->function, user_data);
-	//	if (ret != 0)
-	//	{
-	//		/*  拦截事件，阻止事件继续传递 */
-	//		break;
-	//	}
-	//}
-}
