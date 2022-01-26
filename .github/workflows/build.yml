@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - MiraiCQ-Cli
+    - MiraiCQ-Dev
     paths:
     - .github/workflows/**
     - src/**
