@@ -425,12 +425,12 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 					continue;
 				}
 				try {
-					/*ThreadTool::get_instance()->submit([=]() {
+					ThreadTool::get_instance()->submit([=]() {
 						Json::Value root_ = root;
 						do_event(root_);
-					});*/
+					});
 					// 目前事件先不做多线程，防止莫些插件不能正确处理
-					do_event(root);
+					// do_event(root);
 				}
 				catch (const std::exception& e) {
 					MiraiLog::get_instance()->add_warning_log("EVENTRECV", std::string("do_event发生异常：") + e.what());
