@@ -1,19 +1,26 @@
 #include "plusprocess.h"
-#include "../../IPC/ipc.h"
+
+
 #include<thread>
-#include "../log/MiraiLog.h"
-#include "../tool/TimeTool.h"
-#include "../tool/StrTool.h"
-#include "../tool/PathTool.h"
 #include <jsoncpp/json.h>
 #include <Windows.h>
 #include <assert.h>
 #include <FL/Fl.H>
 
+#include "../../IPC/ipc.h"
+#include "../log/MiraiLog.h"
+#include "../tool/TimeTool.h"
+#include "../tool/StrTool.h"
+#include "../tool/PathTool.h"
+#include "../tool/ThreadTool.h"
+
+
+extern std::string g_main_flag;
 static std::string g_dll_path;
-std::string g_main_flag;
 
+static std::atomic_bool g_close_heartbeat = false;
 
+/* 用于从插件dll中获取函数地址 */
 static void* get_fun_ptr(const std::string& dll_path, const std::string& fun_name)
 {
 	HMODULE hand = GetModuleHandleA(dll_path.c_str());
@@ -28,6 +35,7 @@ static void* get_fun_ptr(const std::string& dll_path, const std::string& fun_nam
 	return GetProcAddress(hand, fun_name.c_str());
 }
 
+/* 用于向主进程查询函数名字 */
 static std::string get_fun_name(int funtype)
 {
 	Json::Value to_send;
@@ -37,6 +45,7 @@ static std::string get_fun_name(int funtype)
 	return ret;
 }
 
+/* 用于判断主进程是否还存在，若不存在，则结束当前进程 */
 static void do_heartbeat(const std::string& main_flag)
 {
 	Json::Value to_send;
@@ -46,6 +55,9 @@ static void do_heartbeat(const std::string& main_flag)
 		const char* ret = IPC_ApiSend(main_flag.c_str(), Json::FastWriter().write(to_send).c_str(), 3000);
 		if (strcmp(ret, "") == 0)
 		{
+			if (g_close_heartbeat){
+				break;
+			}
 			MiraiLog::get_instance()->add_warning_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
 			exit(-1);
 		}
@@ -53,6 +65,8 @@ static void do_heartbeat(const std::string& main_flag)
 	}
 }
 
+
+/* 用于加载插件dll,并且设置静态全局变量`g_dll_path` */
 static void load_plus(const std::string& plus_name)
 {
 	/* 获得插件绝对路径，不含后缀 */
@@ -86,7 +100,7 @@ static void load_plus(const std::string& plus_name)
 	fun_ptr1(1); //这里ac直接传1
 }
 
-
+/* 用于调用插件的start和enable函数 */
 void call_start(void* user_data)
 {
 	typedef __int32(__stdcall* fun_ptr_type_1)();
@@ -97,11 +111,14 @@ void call_start(void* user_data)
 	}
 }
 
+/* 用于调用插件菜单 */
 void call_menu(void* user_data)
 {
 	typedef __int32(__stdcall* fun_ptr_type_1)();
-	int ret = ((fun_ptr_type_1)user_data)();
+	((fun_ptr_type_1)user_data)();
 }
+
+/* IPC_ApiRecv的回调函数，用于接收主进程的指令 */
 static void fun(const char* sender, const char* flag, const char* msg)
 {
 	assert(msg);
@@ -125,11 +142,13 @@ static void fun(const char* sender, const char* flag, const char* msg)
 			std::string action = StrTool::get_str_from_json(root, "action", "");
 			if (action == "is_load")
 			{
+				// 用于主进程判断插件进程是否正常启动
 				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
 				return;
 			}
 			else if (action == "start")
 			{
+				// CQ的启动函数
 				void* fptr = get_fun_ptr(g_dll_path, root["params"]["fun_name"].asString());
 				if (!fptr) {
 					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
@@ -141,6 +160,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 			}
 			else if (action == "enable")
 			{
+				// 插件启用函数
 				void* fptr = get_fun_ptr(g_dll_path, root["params"]["fun_name"].asString());
 				if (!fptr) {
 					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
@@ -152,6 +172,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 			}
 			else if (action == "call_menu") 
 			{
+				// 插件菜单
 				void* fptr = get_fun_ptr(g_dll_path, root["params"]["fun_name"].asString());
 				if (!fptr) {
 					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
@@ -163,6 +184,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 			}
 			else if (action == "heartbeat")
 			{
+				// 心跳，用于主进程判断插件进程是否存活（意外崩溃）
 				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
 				return;
 			}
@@ -170,13 +192,13 @@ static void fun(const char* sender, const char* flag, const char* msg)
 		}
 		catch (const std::exception& e)
 		{
-			MiraiLog::get_instance()->add_debug_log("PLUS_API_FUN", "抛出异常" + std::string(e.what()));
+			MiraiLog::get_instance()->add_warning_log("PLUS_API_FUN", "抛出异常" + std::string(e.what()));
 		}
 		
 	}).detach();
 }
 
-
+/* 用于处理主进程传来的事件 */
 static void do_event(Json::Value & root) {
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
 	if (event_type == "cq_event_group_message")
@@ -352,6 +374,24 @@ static void do_event(Json::Value & root) {
 				);
 		}
 	}
+	else if (event_type == "exit")
+	{
+		g_close_heartbeat = true;
+		MiraiLog::get_instance()->add_info_log("PLUS", "接收到主进程发送的退出事件，正在安全退出...");
+		std::thread([]() {
+			TimeTool::sleep(5000);
+			/* 安全退出(指强制结束进程 */
+			exit(-1);
+		}).detach();
+		std::string fun_name = get_fun_name(1004);
+		void* fun_ptr = get_fun_ptr(g_dll_path, fun_name);
+		if (fun_ptr)
+		{
+			typedef int(__stdcall* exit_event)();
+			((exit_event)fun_ptr)();
+		}
+		exit(-1);
+	}
 	else { 
 		MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到未知的事件类型:" + root.toStyledString());
 	}
@@ -360,8 +400,6 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 {
 	try
 	{
-		g_main_flag = main_flag;
-
 		/* 初始化IPC */
 		if (IPC_Init(plus_flag.c_str()) != 0)
 		{
@@ -387,6 +425,11 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 					continue;
 				}
 				try {
+					/*ThreadTool::get_instance()->submit([=]() {
+						Json::Value root_ = root;
+						do_event(root_);
+					});*/
+					// 目前事件先不做多线程，防止莫些插件不能正确处理
 					do_event(root);
 				}
 				catch (const std::exception& e) {
@@ -407,6 +450,7 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 			}
 		}).detach();
 
+		/* 窗口循环 */
 		while (true) {
 			TimeTool::sleep(0);
 			Fl::wait(1e20);

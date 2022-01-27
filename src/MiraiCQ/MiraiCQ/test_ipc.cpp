@@ -20,6 +20,7 @@
 
 bool g_is_plus = false;
 std::string g_plus_name;
+std::string g_main_flag;
 
 
 
@@ -39,11 +40,11 @@ int main(int argc,char * argv[])
 	else
 	{
 		g_is_plus = true;
-		std::string main_flag = argv[1];
+		g_main_flag = argv[1];
 		std::string plus_flag = argv[2];
 		g_plus_name = websocketpp::base64_decode(argv[3]);
 		std::string plus_file = g_plus_name;
-		plusprocess(main_flag,plus_flag, plus_file);
+		plusprocess(g_main_flag,plus_flag, plus_file);
 	}
 	while (true) {
 		TimeTool::sleep(1000);

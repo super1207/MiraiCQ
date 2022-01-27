@@ -285,7 +285,7 @@ bool MiraiPlus::enable_plus(int ac, std::string & err_msg)
 		Json::Value to_send;
 		auto fptr = sptr->get_event_fun(1003);
 		if (fptr) {
-			to_send["action"] = "start";
+			to_send["action"] = "enable";
 			to_send["params"]["fun_name"] = fptr->fun_name;
 			std::string ret = IPC_ApiSend(sptr->uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 15000);
 			if (ret != "OK")

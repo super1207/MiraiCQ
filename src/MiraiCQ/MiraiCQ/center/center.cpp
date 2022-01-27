@@ -89,6 +89,10 @@ int Center::enable_all_plus()
 
 int Center::del_all_plus() 
 {
+	// 发送主进程退出事件
+	Json::Value to_send;
+	to_send["event_type"] = "exit";
+	IPC_SendEvent(to_send.toStyledString().c_str());
 	return 0;
 }
 

@@ -1,15 +1,6 @@
 #include "mainprocess.h"
-#include "../log/MiraiLog.h"
-#include "../tool/StrTool.h"
-#include "../center/center.h"
-#include "../../IPC/ipc.h"
-#include "../tool/TimeTool.h"
-#include "../config/config.h"
-#include "../tool/ThreadTool.h"
-#include <jsoncpp/json.h>
-#include <assert.h>
 
-#pragma warning(disable : 4996)
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Button.H>
@@ -22,24 +13,22 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Multiline_Input.H>
 
-#include <StackWalker/BaseException.h>
+
+#include "../log/MiraiLog.h"
+#include "../center/center.h"
+#include "../config/config.h"
+#include "../tool/PathTool.h"
+#include "../tool/StrTool.h"
+#include "../tool/TimeTool.h"
+#include "../tool/ThreadTool.h"
 #include "../../IPC/ipc.h"
 
+#include <StackWalker/BaseException.h>
+
+#include <assert.h>
 
 
 
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <vector>
-
-#include "../config/config.h"
-#include "../log/MiraiLog.h"
-#include "../tool/TimeTool.h"
-#include "../tool/InputTool.h"
-#include "../tool/StrTool.h"
-#include "../center/center.h"
-#include "../tool/PathTool.h"
 
 struct LOGIN_INFO
 {
@@ -186,11 +175,11 @@ class MyTable2 : public Fl_Table {
 			fl_font(FL_HELVETICA, 16);              // set the font for our drawing operations
 			return;
 		case CONTEXT_COL_HEADER:                  // Draw column headers
-			sprintf(s, "%s", arr[COL]);                // "A", "B", "C", etc.
+			sprintf_s(s, "%s", arr[COL]);                // "A", "B", "C", etc.
 			DrawHeader(s, X, Y, W, H);
 			return;
 		case CONTEXT_CELL:                        // Draw data in cells
-			sprintf(s, "%s", data.at(ROW).c_str());
+			sprintf_s(s, "%s", data.at(ROW).c_str());
 			DrawData(s, X, Y, W, H);
 			return;
 		default:
@@ -272,11 +261,11 @@ class MyTable : public Fl_Table {
 			fl_font(FL_HELVETICA, 16);              // set the font for our drawing operations
 			return;
 		case CONTEXT_COL_HEADER:                  // Draw column headers
-			sprintf(s, "%s", arr[COL]);                // "A", "B", "C", etc.
+			sprintf_s(s, "%s", arr[COL]);                // "A", "B", "C", etc.
 			DrawHeader(s, X, Y, W, H);
 			return;
 		case CONTEXT_CELL:                        // Draw data in cells
-			sprintf(s, "%s", StrTool::to_utf8(data.at(ROW).second->name).c_str());
+			sprintf_s(s, "%s", StrTool::to_utf8(data.at(ROW).second->name).c_str());
 			DrawData(s, X, Y, W, H);
 			return;
 		default:
@@ -409,6 +398,18 @@ static std::string get_fun_name_by_type(const std::string& uuid, int tp)
 	return "";
 }
 
+static int get_auth_code_by_uuid(const std::string& uuid)
+{
+	 auto plus = MiraiPlus::get_instance()->get_all_plus();
+	 for (auto i : plus) {
+		 if (uuid == i.second->uuid) {
+			 return i.first;
+		 }
+	 }
+	 MiraiLog::get_instance()->add_fatal_log("GETAUTHCODEERR", uuid);
+	 exit(-1);
+}
+
 static void deal_api_thread_(const std::string& sender, const std::string& flag, const std::string& msg)
 {
 	Json::Value root;
@@ -422,6 +423,10 @@ static void deal_api_thread_(const std::string& sender, const std::string& flag,
 	}
 	std::string action = StrTool::get_str_from_json(root, "action", "");
 	Json::Value params = root.get("params", Json::Value());
+	if (params.isObject())
+	{
+		params["auth_code"] = get_auth_code_by_uuid(flag);
+	}
 	if (action == "CQ_sendPrivateMsg") {
 		auto ret = Center::get_instance()->CQ_sendPrivateMsg(
 			StrTool::get_int_from_json(params, "auth_code", 0)
@@ -807,7 +812,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 	std::string sender_str = sender;
 	ThreadTool::get_instance()->submit([msg_str, flag_str, sender_str]() {
 		deal_api_thread(sender_str, flag_str, msg_str);
-		});
+	});
 
 }
 
@@ -832,6 +837,8 @@ void mainprocess()
 		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "IPC_Init 执行失败");
 		exit(-1);
 	}
+
+	/* 登录逻辑 */
 	while (true)
 	{
 		if (!PathTool::is_file_exist(PathTool::get_exe_dir() + "config\\config.ini"))
@@ -861,40 +868,89 @@ void mainprocess()
 		}
 	}
 
+	/* 接收api调用 */
 	std::thread([&]() {
 		while (true) {
 			IPC_ApiRecv(fun);
 		}
-		}).detach();
+	}).detach();
 
-		Center::get_instance()->load_all_plus();
-		Center::get_instance()->enable_all_plus();
+	/* 加载并启用所有插件 */
+	Center::get_instance()->load_all_plus();
+	Center::get_instance()->enable_all_plus();
 
-		std::thread([&]() {
-			while (true) {
+	/* 插件守护，发现有插件崩溃则主进程boom */
+	std::atomic_bool is_protect = false;
+	std::atomic_bool can_protect = true;
+	std::thread([&]() {
+		while (can_protect) {
+			{
+				is_protect = true;
+				auto plus_vec = MiraiPlus::get_instance()->get_all_plus();
+				for (auto plus : plus_vec)
 				{
-					auto plus_vec = MiraiPlus::get_instance()->get_all_plus();
-					for (auto plus : plus_vec)
-					{
-						Json::Value to_send;
-						to_send["action"] = "heartbeat";
-						std::string ret = IPC_ApiSend(plus.second->uuid.c_str(), to_send.toStyledString().c_str(), 2000);
-						if (ret == "") {
-							MiraiLog::get_instance()->add_fatal_log("检测到插件异常退出", plus.second->get_filename());
-							exit(-1);
-						}
+					Json::Value to_send;
+					to_send["action"] = "heartbeat";
+					std::string ret = IPC_ApiSend(plus.second->uuid.c_str(), to_send.toStyledString().c_str(), 2000);
+					if (ret == "") {
+						MiraiLog::get_instance()->add_fatal_log("检测到插件异常退出", plus.second->get_filename());
+						exit(-1);
 					}
 				}
-				TimeTool::sleep(5000);
 			}
-			}).detach();
+			for (int i = 0;i < 100;++i)
+			{
+				if (!can_protect)
+					break;
+				TimeTool::sleep(50);
+			}
+			
+		}
+		is_protect = false;
+	}).detach();
 
-			plus_dlg();
-			/* 退出 */
-			auto center = Center::get_instance();
-			std::thread([]() {
-				exit(0);
-				}).detach();
-				center->del_all_plus();
-				exit(0);
+	while (!is_protect);
+
+	/* 打开插件菜单 */
+	plus_dlg();
+
+	auto center = Center::get_instance();
+
+	/* 结束守护线程 */
+	can_protect = false;
+	while (is_protect);
+
+	/* 7秒后强行退出退出 */
+	std::thread([]() {
+		TimeTool::sleep(7000);
+		MiraiLog::get_instance()->add_warning_log("EXIT", "有插件不愿意自己结束自己.jpg");
+		exit(0);
+	}).detach();
+
+	/* 发送插件卸载事件 */
+	center->del_all_plus();
+
+	/* 等待插件进程全部结束 */
+	MiraiLog::get_instance()->add_info_log("EXIT", "正在安全卸载所有插件");
+	while (true) {
+		auto plus_vec = MiraiPlus::get_instance()->get_all_plus();
+		bool is_all_close = true;
+		for (auto plus : plus_vec)
+		{
+			Json::Value to_send;
+			to_send["action"] = "heartbeat";
+			std::string ret = IPC_ApiSend(plus.second->uuid.c_str(), to_send.toStyledString().c_str(), 2000);
+			if (ret == "OK") {
+				is_all_close = false;
+			}
+		}
+		if (is_all_close) {
+			break;
+		}
+	}
+
+	MiraiLog::get_instance()->add_info_log("EXIT", "已经安全卸载所有插件");
+
+	/* 退出 */
+	exit(0);
 }
