@@ -86,10 +86,21 @@ static void load_plus(const std::string& plus_name)
 	fun_ptr1(1); //这里ac直接传1
 }
 
+
+void call_start(void* user_data)
+{
+	typedef __int32(__stdcall* fun_ptr_type_1)();
+	int ret = ((fun_ptr_type_1)user_data)();
+	if (ret != 0) {
+		MiraiLog::get_instance()->add_fatal_log("START","插件拒绝启用, 强制退出");
+		exit(-1);
+	}
+}
+
 void call_menu(void* user_data)
 {
 	typedef __int32(__stdcall* fun_ptr_type_1)();
-	((fun_ptr_type_1)user_data)();
+	int ret = ((fun_ptr_type_1)user_data)();
 }
 static void fun(const char* sender, const char* flag, const char* msg)
 {
@@ -124,13 +135,8 @@ static void fun(const char* sender, const char* flag, const char* msg)
 					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
 					return;
 				}
-				typedef __int32(__stdcall* fun_ptr_type_1)();
-				int ret = ((fun_ptr_type_1)fptr)();
-				if (ret != 0) {
-					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
-					return;
-				}
 				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
+				Fl::awake(call_start, fptr);
 				return;
 			}
 			else if (action == "enable")
@@ -140,13 +146,8 @@ static void fun(const char* sender, const char* flag, const char* msg)
 					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
 					return;
 				}
-				typedef __int32(__stdcall* fun_ptr_type_1)();
-				int ret = ((fun_ptr_type_1)fptr)();
-				if (ret != 0) {
-					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
-					return;
-				}
 				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
+				Fl::awake(call_start, fptr);
 				return;
 			}
 			else if (action == "call_menu") 

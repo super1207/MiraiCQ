@@ -392,26 +392,6 @@ static bool is_rub_in_cmd()
 	return (GetConsoleProcessList(ids, 2) > 1);
 }
 
-int  mmmain(int argc, char* argv[])
-{
-	// 设置崩溃打印
-
-
-
-	/* 登录 */
-
-	/* 插件菜单 */
-	plus_dlg();
-	/* 退出 */
-	auto center = Center::get_instance();
-	std::thread([]() {
-		exit(0);
-		}).detach();
-		center->del_all_plus();
-		exit(0);
-		return 0;
-}
-
 static std::string get_fun_name_by_type(const std::string& uuid, int tp)
 {
 	auto all_plus = MiraiPlus::get_instance()->get_all_plus();
@@ -852,7 +832,6 @@ void mainprocess()
 		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "IPC_Init 执行失败");
 		exit(-1);
 	}
-
 	while (true)
 	{
 		if (!PathTool::is_file_exist(PathTool::get_exe_dir() + "config\\config.ini"))
@@ -881,22 +860,6 @@ void mainprocess()
 			break;
 		}
 	}
-
-	/*auto  net = MiraiNet::get_instance(Config::get_instance()->get_adapter());
-	net->set_config("ws_url", Config::get_instance()->get_ws_url());
-	net->set_config("access_token", Config::get_instance()->get_access_token());
-	net->set_config("verifyKey", Config::get_instance()->get_verifyKey());
-	net->set_config("http_url", Config::get_instance()->get_http_url());
-	if (!net->connect()) {
-		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "网络连接错误");
-		exit(-1);
-	}
-	MiraiLog::get_instance()->add_debug_log("TESTIPC", "网络连接成功");
-	Center::get_instance()->set_net(net);
-	if (!Center::get_instance()->run()) {
-		MiraiLog::get_instance()->add_fatal_log("TESTIPC", "Center运行失败");
-		exit(-1);
-	}*/
 
 	std::thread([&]() {
 		while (true) {
