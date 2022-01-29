@@ -269,8 +269,9 @@ extern "C" {
 				return -1;
 			}
 		}
-		catch (const std::exception&) {
-			return -1;
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_Init：") + e.what()).c_str(), "ERROR", MB_OK);
+			exit(-1);
 		}
 
 		return 0;
@@ -282,8 +283,9 @@ extern "C" {
 			g_ret_str = IPCSerClass::getInstance()->get_flag();
 			return g_ret_str.c_str();
 		}
-		catch (const std::exception&) {
-			return "";
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_GetFlag：") + e.what()).c_str(), "ERROR", MB_OK);
+			exit(-1);
 		}
 	}
 
@@ -294,8 +296,9 @@ extern "C" {
 		try {
 			IPCSerClass::getInstance()->send_event(msg);
 		}
-		catch (const std::exception&) {
-			return;
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_SendEvent：") + e.what()).c_str(), "ERROR", MB_OK);
+			exit(-1);
 		}
 	}
 
@@ -309,8 +312,9 @@ extern "C" {
 			g_ret_str = IPCSerClass::get_event(flag);
 			return g_ret_str.c_str();
 		}
-		catch (const std::exception&) {
-			return "";
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_GetEvent：") + e.what()).c_str(), "ERROR", MB_OK);
+			exit(-1);
 		}
 	}
 
@@ -333,8 +337,9 @@ extern "C" {
 				fun(sender.c_str(), flag.c_str(), dat.c_str());
 			}
 		}
-		catch (const std::exception&) {
-			return;
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_ApiRecv：") + e.what()).c_str(), "ERROR", MB_OK);
+			exit(-1);
 		}
 	}
 
@@ -356,8 +361,9 @@ extern "C" {
 			}
 			IPCSerClass::send_api(sender, std::string(flag) + (msg ? msg : ""));
 		}
-		catch (const std::exception&) {
-			return;
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_ApiReply：") + e.what()).c_str(), "ERROR", MB_OK);
+			exit(-1);
 		}
 	}
 
@@ -396,8 +402,9 @@ extern "C" {
 			g_ret_str = ret_dat.substr(36);
 			return g_ret_str.c_str();
 		}
-		catch (const std::exception&) {
-			return "";
+		catch (const std::exception& e) {
+			MessageBoxA(NULL, (std::string("未知异常 in IPC_ApiSend：") + e.what()).c_str(), "ERROR",MB_OK);
+			exit(-1);
 		}
 	}
 

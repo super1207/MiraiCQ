@@ -38,10 +38,23 @@ static void* get_fun_ptr(const std::string& dll_path, const std::string& fun_nam
 /* 用于向主进程查询函数名字 */
 static std::string get_fun_name(int funtype)
 {
+	static std::map<int, std::string> mmap;
+	static std::mutex mx;
+	{
+		std::lock_guard<std::mutex>lk(mx);
+		if (mmap.find(funtype) != mmap.end()) {
+			return mmap.at(funtype);
+		}
+	}
+	
 	Json::Value to_send;
 	to_send["action"] = "get_fun_name";
 	to_send["params"] = funtype;
 	const char* ret = IPC_ApiSend(g_main_flag.c_str(), Json::FastWriter().write(to_send).c_str(), 3000);
+	if (strcmp(ret, "") != 0) {
+		std::lock_guard<std::mutex>lk(mx);
+		mmap[funtype] = ret;
+	}
 	return ret;
 }
 
@@ -201,6 +214,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 /* 用于处理主进程传来的事件 */
 static void do_event(Json::Value & root) {
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
+	MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
 	if (event_type == "cq_event_group_message")
 	{
 		std::string fun_name = get_fun_name(2);
@@ -452,7 +466,7 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 
 		/* 窗口循环 */
 		while (true) {
-			TimeTool::sleep(0);
+			TimeTool::sleep(20);
 			Fl::wait(1e20);
 		}
 	}
