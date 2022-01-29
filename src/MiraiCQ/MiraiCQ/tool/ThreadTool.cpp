@@ -11,7 +11,7 @@ bool ThreadTool::submit(const std::function<void()> & task)
 	/* 当前任务过多，拒绝提交新任务 */
 	if (get_task_list_nums() > max_task_nums)
 	{
-		MiraiLog::get_instance()->add_debug_log("ThreadTool","提交新任务失败，累积任务数量过多");
+		MiraiLog::get_instance()->add_fatal_log("ThreadTool","提交新任务失败，累积任务数量过多");
 		return false;
 	}
 	// 将任务放入任务队列
@@ -75,6 +75,7 @@ void ThreadTool::add_new_thread()
 	// 如果当前线程数量过多，则拒绝增加新的线程
 	if (cur_thread_nums > max_thread_nums)
 	{
+		MiraiLog::get_instance()->add_fatal_log("ThreadTool", "已有线程过多，增加新线程失败");
 		return;
 	}
 	++cur_thread_nums;
@@ -105,13 +106,20 @@ void ThreadTool::add_new_thread()
 			else {
 				// 如果没拿到，说明任务队列为空，
 				if (is_unused){
-					// 如果已经被标记为空闲，说明两次没拿到task，则退出
-					break;
+					// 如果已经被标记为空闲，说明两次没拿到task，则
+					// 如果空闲线程大于5，则退出，否则，删除空闲标记，继续循环
+					if (unused_thread_nums > 5) {
+						break;
+					}
+					else {
+						TimeTool::sleep(100);
+						continue;
+					}
 				}
-				TimeTool::sleep(100);
-				// 将此线程标记为空闲,然后继续循环
 				++unused_thread_nums;
 				is_unused = true;
+				TimeTool::sleep(100);
+				// 将此线程标记为空闲,然后继续循环
 			}
 
 		}

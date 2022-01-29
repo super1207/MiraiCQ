@@ -11,7 +11,7 @@
 #include "../tool/TimeTool.h"
 #include <jsoncpp/json.h>
 #include <assert.h>
-#include "../../IPC/ipc.h"
+#include "../tool/IPCTool.h"
 #include <websocketpp/base64/base64.hpp>
 
 using namespace std;

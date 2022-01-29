@@ -6,7 +6,7 @@
 #include "../tool/TimeTool.h"
 #include "../config/config.h"
 #include "../tool/ThreadTool.h"
-#include "../../IPC/ipc.h"
+#include "../tool/IPCTool.h"
 #include <cassert>
 #include <algorithm>
 

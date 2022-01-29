@@ -52,9 +52,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp">
-      <Filter>export</Filter>
-    </ClCompile>
     <ClCompile Include="log\MiraiLog.cpp">
       <Filter>log</Filter>
     </ClCompile>
@@ -190,9 +187,6 @@
     <ClCompile Include="net\MiraiHttp\MiraiHttpEventDeal.cpp">
       <Filter>net\MiraiHttp</Filter>
     </ClCompile>
-    <ClCompile Include="test_gui.cpp">
-      <Filter>export</Filter>
-    </ClCompile>
     <ClCompile Include="tool\MsgIdTool.cpp">
       <Filter>tool</Filter>
     </ClCompile>
@@ -213,6 +207,9 @@
     </ClCompile>
     <ClCompile Include="plusprocess\plusprocess.cpp">
       <Filter>plusprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="tool\IPCTool.cpp">
+      <Filter>tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -281,6 +278,9 @@
     </ClInclude>
     <ClInclude Include="plusprocess\plusprocess.h">
       <Filter>plusprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\IPCTool.h">
+      <Filter>tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

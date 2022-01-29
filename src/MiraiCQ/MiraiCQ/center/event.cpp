@@ -10,7 +10,7 @@
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
 #include <websocketpp/base64/base64.hpp>
-#include "../../IPC/ipc.h"
+#include "../tool/IPCTool.h"
 
 
 using namespace std;

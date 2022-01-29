@@ -21,7 +21,7 @@
 #include "../tool/StrTool.h"
 #include "../tool/TimeTool.h"
 #include "../tool/ThreadTool.h"
-#include "../../IPC/ipc.h"
+#include "../tool/IPCTool.h"
 
 #include <StackWalker/BaseException.h>
 

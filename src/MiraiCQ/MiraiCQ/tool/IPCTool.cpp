@@ -1,5 +1,3 @@
-#include "pch.h"
-
 #include <string>
 #include <vector>
 #include <thread>
@@ -9,8 +7,8 @@
 #include <condition_variable>
 #include <assert.h>
 #include <shared_mutex>
-
-#include "ipc.h"
+#include "./IPCTool.h"
+#include "../log/MiraiLog.h"
 
 static thread_local std::string g_ret_str;
 
@@ -90,7 +88,7 @@ private:
 			AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
 			HANDLE hMailslot = ah.get_handle();
 			if (INVALID_HANDLE_VALUE == hMailslot) {
-				MessageBoxA(NULL, ("--EventRecvIPC CreateMailslotA Failed" + std::to_string(GetLastError())).c_str(), "ERROR", MB_OK);
+				MiraiLog::get_instance()->add_fatal_log("EventRecvIPC", "CreateMailslotA Failed" + std::to_string(GetLastError()));
 				exit(-1);
 			}
 			while (true) {
@@ -215,7 +213,7 @@ private:
 				AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + api_flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
 				HANDLE hMailslot = ah.get_handle();
 				if (INVALID_HANDLE_VALUE == hMailslot) {
-					MessageBoxA(NULL, "CreateMailslotA Failed", "ERROR", MB_OK);
+					MiraiLog::get_instance()->add_fatal_log("IPCSerClass", "CreateMailslotA Failed" + std::to_string(GetLastError()));
 					exit(-1);
 				}
 
@@ -270,7 +268,7 @@ extern "C" {
 			}
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_Init：") + e.what()).c_str(), "ERROR", MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_Init", "未知异常 in IPC_Init：" + std::string(e.what()));
 			exit(-1);
 		}
 
@@ -284,7 +282,7 @@ extern "C" {
 			return g_ret_str.c_str();
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_GetFlag：") + e.what()).c_str(), "ERROR", MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_GetFlag", "未知异常 in IPC_GetFlag：" + std::string(e.what()));
 			exit(-1);
 		}
 	}
@@ -297,7 +295,7 @@ extern "C" {
 			IPCSerClass::getInstance()->send_event(msg);
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_SendEvent：") + e.what()).c_str(), "ERROR", MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_SendEvent", "未知异常 in IPC_SendEvent：" + std::string(e.what()));
 			exit(-1);
 		}
 	}
@@ -313,7 +311,7 @@ extern "C" {
 			return g_ret_str.c_str();
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_GetEvent：") + e.what()).c_str(), "ERROR", MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_GetEvent", "未知异常 in IPC_GetEvent：" + std::string(e.what()));
 			exit(-1);
 		}
 	}
@@ -338,7 +336,7 @@ extern "C" {
 			}
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_ApiRecv：") + e.what()).c_str(), "ERROR", MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_ApiRecv", "未知异常 in IPC_ApiRecv：" + std::string(e.what()));
 			exit(-1);
 		}
 	}
@@ -362,7 +360,7 @@ extern "C" {
 			IPCSerClass::send_api(sender, std::string(flag) + (msg ? msg : ""));
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_ApiReply：") + e.what()).c_str(), "ERROR", MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_ApiReply", "未知异常 in IPC_ApiReply：" + std::string(e.what()));
 			exit(-1);
 		}
 	}
@@ -385,7 +383,7 @@ extern "C" {
 				AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + t).c_str(), 0, tm, NULL));
 				HANDLE hMailslot = ah.get_handle();
 				if (INVALID_HANDLE_VALUE == hMailslot) {
-					MessageBoxA(NULL, "CreateMailslotA Failed", "ERROR", MB_OK);
+					MiraiLog::get_instance()->add_fatal_log("IPC_ApiSend", "CreateMailslotA Error:" + std::to_string(GetLastError()));
 					exit(-1);
 				}
 				is_run = true;
@@ -403,7 +401,7 @@ extern "C" {
 			return g_ret_str.c_str();
 		}
 		catch (const std::exception& e) {
-			MessageBoxA(NULL, (std::string("未知异常 in IPC_ApiSend：") + e.what()).c_str(), "ERROR",MB_OK);
+			MiraiLog::get_instance()->add_fatal_log("IPC_ApiSend", "未知异常 in IPC_ApiSend：" + std::string(e.what()));
 			exit(-1);
 		}
 	}

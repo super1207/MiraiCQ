@@ -11,7 +11,6 @@
 #include "./center/center.h"
 #include <iostream>
 
-#include "../IPC/ipc.h"
 #include "mainprocess/mainprocess.h"
 #include "plusprocess/plusprocess.h"
 #include <assert.h>

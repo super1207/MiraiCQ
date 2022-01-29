@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <FL/Fl.H>
 
-#include "../../IPC/ipc.h"
+#include "../tool/IPCTool.h"
 #include "../log/MiraiLog.h"
 #include "../tool/TimeTool.h"
 #include "../tool/StrTool.h"
@@ -71,8 +71,15 @@ static void do_heartbeat(const std::string& main_flag)
 			if (g_close_heartbeat){
 				break;
 			}
-			MiraiLog::get_instance()->add_warning_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
-			exit(-1);
+			TimeTool::sleep(1000);
+			const char* ret2 = IPC_ApiSend(main_flag.c_str(), Json::FastWriter().write(to_send).c_str(), 5000);
+			if (strcmp(ret2, "") == 0) {
+				if (g_close_heartbeat) {
+					break;
+				}
+				MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
+				exit(-1);
+			}
 		}
 		TimeTool::sleep(5000);
 	}

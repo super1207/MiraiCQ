@@ -5,7 +5,7 @@
 #include "center.h"
 #include "../log/MiraiLog.h"
 #include <spdlog/fmt/fmt.h>
-#include "../../IPC/ipc.h"
+#include "../tool/IPCTool.h"
 
 extern std::string g_main_flag;
 static thread_local std::string ret_str;

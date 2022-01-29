@@ -5,7 +5,6 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiraiCQ", "MiraiCQ\MiraiCQ.vcxproj", "{B5F83780-0BEE-45BF-B3E8-54715796CF96}"
 	ProjectSection(ProjectDependencies) = postProject
-		{3BC02730-F7EC-4E2A-BC3F-5855381F5B19} = {3BC02730-F7EC-4E2A-BC3F-5855381F5B19}
 		{6AA81CC8-5E10-4869-AA37-DFB362AEEA5F} = {6AA81CC8-5E10-4869-AA37-DFB362AEEA5F}
 		{E070AAFC-9D03-41A3-BC7D-30887EA0D50F} = {E070AAFC-9D03-41A3-BC7D-30887EA0D50F}
 	EndProjectSection
@@ -13,8 +12,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CQP", "CQP\CQP.vcxproj", "{6AA81CC8-5E10-4869-AA37-DFB362AEEA5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fltk", "MiraiCQ\thirdpart\include\fltk-1.3.8\ide\VisualC2010\fltk.lib.vcxproj", "{E070AAFC-9D03-41A3-BC7D-30887EA0D50F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IPC", "IPC\IPC.vcxproj", "{3BC02730-F7EC-4E2A-BC3F-5855381F5B19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +30,6 @@ Global
 		{E070AAFC-9D03-41A3-BC7D-30887EA0D50F}.Debug|x86.Build.0 = Debug|Win32
 		{E070AAFC-9D03-41A3-BC7D-30887EA0D50F}.Release|x86.ActiveCfg = Release|Win32
 		{E070AAFC-9D03-41A3-BC7D-30887EA0D50F}.Release|x86.Build.0 = Release|Win32
-		{3BC02730-F7EC-4E2A-BC3F-5855381F5B19}.Debug|x86.ActiveCfg = Debug|Win32
-		{3BC02730-F7EC-4E2A-BC3F-5855381F5B19}.Debug|x86.Build.0 = Debug|Win32
-		{3BC02730-F7EC-4E2A-BC3F-5855381F5B19}.Release|x86.ActiveCfg = Release|Win32
-		{3BC02730-F7EC-4E2A-BC3F-5855381F5B19}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
