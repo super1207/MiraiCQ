@@ -35,11 +35,10 @@ static std::string read_sth_from_slot(HANDLE hMailslot)
 {
 	DWORD d;
 	std::string readBuff = std::string(1024, '\0');
-	ZeroMemory(readBuff.data(), readBuff.size());
 	while (ReadFile(hMailslot, readBuff.data(), readBuff.size(), &d, NULL) == FALSE) {
 		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-			readBuff.resize(readBuff.size() * 2);
 			ZeroMemory(readBuff.data(), readBuff.size());
+			readBuff.resize(readBuff.size() * 2);
 		}
 		else {
 			return "";
