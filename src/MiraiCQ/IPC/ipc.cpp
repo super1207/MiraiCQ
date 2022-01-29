@@ -39,6 +39,7 @@ static std::string read_sth_from_slot(HANDLE hMailslot)
 	while (ReadFile(hMailslot, readBuff.data(), readBuff.size(), &d, NULL) == FALSE) {
 		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
 			readBuff.resize(readBuff.size() * 2);
+			ZeroMemory(readBuff.data(), readBuff.size());
 		}
 		else {
 			return "";
