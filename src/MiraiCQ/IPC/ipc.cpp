@@ -182,7 +182,7 @@ private:
 		//event_flag = "EVENT" + uuid;
 		api_flag = "API" + uuid;
 
-		std::thread([=]() {
+		std::thread([&]() {
 			//ipc::route cc{ event_flag.c_str() };
 			++run_flag;
 			while (true) {
@@ -211,7 +211,7 @@ private:
 			}
 			}).detach();
 
-			std::thread([=]() {
+			std::thread([&]() {
 				AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + api_flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
 				HANDLE hMailslot = ah.get_handle();
 				if (INVALID_HANDLE_VALUE == hMailslot) {

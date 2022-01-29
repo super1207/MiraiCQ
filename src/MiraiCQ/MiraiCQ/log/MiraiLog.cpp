@@ -131,5 +131,10 @@ void MiraiLog::default_backend_sinks(const Level& lv, const string& category, co
     default:
         break;
     }
-    daily_logger->flush();
+    //插件才总是刷新，主进程不刷新
+    if (g_is_plus)
+    {
+        daily_logger->flush();
+    }
 }
+    

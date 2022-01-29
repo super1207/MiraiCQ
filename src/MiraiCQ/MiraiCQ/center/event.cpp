@@ -492,7 +492,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 	{
 		return;
 	}
-	MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:\n"+ cq_str);
+	//MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:\n"+ cq_str);
 	std::string sub_type_str = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	int subtype_int;
 	if (sub_type_str == "friend")
@@ -557,7 +557,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 	{
 		return;
 	}
-	MiraiLog::get_instance()->add_debug_log("Center", "传入GroupEvent的Msg:\n" + cq_str);
+	//MiraiLog::get_instance()->add_debug_log("Center", "传入GroupEvent的Msg:\n" + cq_str);
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
 	int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
