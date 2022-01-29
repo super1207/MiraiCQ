@@ -33,6 +33,8 @@ void IPC_ApiReply(const char* sender_uuid, const char* flag, const char* msg);
 /* 用于mainprocess获取main_uuid，然后传给子进程*/
 const char* IPC_GetFlag();
 
+int IPC_AddUUID(const char* uuid);
+
 #ifdef  __cplusplus
 }
 #endif

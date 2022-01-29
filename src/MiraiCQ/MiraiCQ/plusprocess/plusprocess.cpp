@@ -411,10 +411,10 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 		load_plus(plus_name);
 
 		/* 用于处理主进程下发的事件 */
-		std::thread([main_flag]() {
+		std::thread([plus_flag]() {
 			while (true)
 			{
-				const char* evt = IPC_GetEvent(main_flag.c_str());
+				const char* evt = IPC_GetEvent(plus_flag.c_str());
 				
 				Json::Value root;
 				Json::Reader reader;

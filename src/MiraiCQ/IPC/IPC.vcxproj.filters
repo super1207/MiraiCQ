@@ -13,21 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="thirdpart">
-      <UniqueIdentifier>{94a4e757-4e0f-493d-a632-bb22264bb743}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="thirdpart\libipc">
-      <UniqueIdentifier>{94a03b90-90dc-4c03-8fb7-29e50fc19fb9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="thirdpart\libipc\platform">
-      <UniqueIdentifier>{b74a741a-3bd3-454d-ace2-757cff938dff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="thirdpart\libipc\sync">
-      <UniqueIdentifier>{210aa1f3-9682-446b-be7b-b2673aa15498}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="thirdpart\libipc\platform\win">
-      <UniqueIdentifier>{d4261065-1981-45aa-a5e1-7547a7429b6b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -49,30 +34,6 @@
     </ClCompile>
     <ClCompile Include="ipc.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\buffer.cpp">
-      <Filter>thirdpart\libipc</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\ipc.cpp">
-      <Filter>thirdpart\libipc</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\pool_alloc.cpp">
-      <Filter>thirdpart\libipc</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\shm.cpp">
-      <Filter>thirdpart\libipc</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\platform\win\shm_win.cpp">
-      <Filter>thirdpart\libipc\platform\win</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\sync\condition.cpp">
-      <Filter>thirdpart\libipc\sync</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\sync\mutex.cpp">
-      <Filter>thirdpart\libipc\sync</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\sync\semaphore.cpp">
-      <Filter>thirdpart\libipc\sync</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

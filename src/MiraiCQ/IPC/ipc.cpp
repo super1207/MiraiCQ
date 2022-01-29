@@ -1,15 +1,19 @@
 #include "pch.h"
 
-#include <libipc/ipc.h>
+#include <string>
+#include <vector>
 #include <thread>
 #include <list>
 #include <mutex>
 #include <objbase.h>
 #include <condition_variable>
+#include <assert.h>
+#include <shared_mutex>
 
 #include "ipc.h"
 
 static thread_local std::string g_ret_str;
+
 
 static std::string gen_uuid()
 {
@@ -27,6 +31,40 @@ static std::string gen_uuid()
 		guid.Data4[6], guid.Data4[7]);
 	return buf;
 }
+static std::string read_sth_from_slot(HANDLE hMailslot)
+{
+	DWORD d;
+	std::string readBuff = std::string(1024, '\0');
+	ZeroMemory(readBuff.data(), readBuff.size());
+	while (ReadFile(hMailslot, readBuff.data(), readBuff.size(), &d, NULL) == FALSE) {
+		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+			readBuff.resize(readBuff.size() * 2);
+		}
+		else {
+			return "";
+		}
+	}
+	return readBuff;
+
+}
+
+/* 用于自动关闭handle */
+class AutoCloseHandle {
+public:
+	AutoCloseHandle(HANDLE handle) :handle_t(handle) {
+
+	}
+	~AutoCloseHandle() {
+		if (handle_t != INVALID_HANDLE_VALUE) {
+			CloseHandle(handle_t);
+		}
+	}
+	HANDLE get_handle() {
+		return handle_t;
+	}
+private:
+	HANDLE handle_t;
+};
 
 class EventRecvIPC
 {
@@ -44,25 +82,28 @@ public:
 		recv_list.pop_front();
 		return ret;
 	}
+private:
 	EventRecvIPC(const std::string& uuid)
 	{
 		flag = "EVENT" + uuid;
 		std::thread([&]() {
-			ipc::route cc{ flag.c_str(), ipc::receiver };
+			AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
+			HANDLE hMailslot = ah.get_handle();
+			if (INVALID_HANDLE_VALUE == hMailslot) {
+				MessageBoxA(NULL, ("--EventRecvIPC CreateMailslotA Failed" + std::to_string(GetLastError())).c_str(), "ERROR", MB_OK);
+				exit(-1);
+			}
 			while (true) {
-				ipc::buff_t dd = cc.recv();
-				std::string dat(dd.size(), '\0');
-				memcpy_s((void*)dat.data(), dat.size(), dd.data(), dd.size());
+				std::string tt = read_sth_from_slot(hMailslot);
 				std::lock_guard<std::mutex> lock(mx_recv_list);
 				if (recv_list.size() > max_recv_list) {
 					recv_list.clear();
 				}
-				recv_list.push_back(dat);
+				recv_list.push_back(tt);
 				cv.notify_one();
 			}
 			}).detach();
 	}
-private:
 	std::mutex mx_recv_list;
 	std::list<std::string> recv_list;
 	size_t max_recv_list = 1024;
@@ -99,11 +140,29 @@ public:
 		api_recv_list.pop_front();
 		return ret;
 	}
+	bool add_uuid(const std::string& uuid)
+	{
+		if (uuid.size() != 36) {
+			return false;
+		}
+		std::unique_lock<std::shared_mutex> lock(mx_uuid_vec);
+		uuid_vec.push_back(uuid);
+		return true;
+	}
+
 	static bool send_api(const std::string& flag, const std::string& s)
 	{
 		std::string t = "API" + flag;
-		ipc::channel cc{ t.c_str() };
-		return cc.try_send(s);
+		AutoCloseHandle ah(CreateFileA(("\\\\.\\mailslot\\" + t).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL));
+		HANDLE hMailslot = ah.get_handle();
+		if (INVALID_HANDLE_VALUE == hMailslot) {
+			return false;
+		}
+		DWORD d;
+		if (!WriteFile(hMailslot, s.data(), s.size(), &d, NULL)) {
+			return false;
+		}
+		return  true;
 	}
 	static std::string get_event(const std::string& flag)
 	{
@@ -120,11 +179,11 @@ private:
 		{
 			uuid = uuid_;
 		}
-		event_flag = "EVENT" + uuid;
+		//event_flag = "EVENT" + uuid;
 		api_flag = "API" + uuid;
 
-		std::thread([&]() {
-			ipc::route cc{ event_flag.c_str() };
+		std::thread([=]() {
+			//ipc::route cc{ event_flag.c_str() };
 			++run_flag;
 			while (true) {
 				std::string to_send;
@@ -136,25 +195,43 @@ private:
 				}
 				if (to_send != "")
 				{
-					cc.send(to_send);
+					std::shared_lock<std::shared_mutex> lock(mx_uuid_vec);
+					// 发给每一个客户端
+					for (auto& id : uuid_vec) {
+						std::string t = "EVENT" + id;
+						AutoCloseHandle ah(CreateFileA(("\\\\.\\mailslot\\" + t).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL));
+						HANDLE hMailslot = ah.get_handle();
+						if (INVALID_HANDLE_VALUE == hMailslot) {
+							continue;
+						}
+						DWORD d;
+						WriteFile(hMailslot, to_send.data(), to_send.size(), &d, NULL);
+					}
 				}
 			}
 			}).detach();
-			std::thread([&]() {
-				ipc::channel cc{ api_flag.c_str(), ipc::receiver };
+
+			std::thread([=]() {
+				AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + api_flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
+				HANDLE hMailslot = ah.get_handle();
+				if (INVALID_HANDLE_VALUE == hMailslot) {
+					MessageBoxA(NULL, "CreateMailslotA Failed", "ERROR", MB_OK);
+					exit(-1);
+				}
+
 				++run_flag;
 				while (true) {
-					ipc::buff_t dd = cc.recv();
-					std::string dat(dd.size(), '\0');
-					memcpy_s((void*)dat.data(), dat.size(), dd.data(), dd.size());
+					std::string tt = read_sth_from_slot(hMailslot);
 					std::lock_guard<std::mutex> lock(mx_api_recv_list);
 					if (api_recv_list.size() > max_recv_list) {
 						api_recv_list.clear();
 					}
-					api_recv_list.push_back(dat);
+					api_recv_list.push_back(tt);
 					cv_api.notify_all();
 				}
 				}).detach();
+
+
 				while (true)
 				{
 					if (run_flag == 2)break;
@@ -174,6 +251,9 @@ private:
 	std::list<std::string> api_recv_list;
 	const size_t max_recv_list = 1024;
 	std::condition_variable cv_api;
+
+	std::vector<std::string> uuid_vec;
+	std::shared_mutex mx_uuid_vec;
 };
 
 #ifdef  __cplusplus
@@ -258,6 +338,15 @@ extern "C" {
 		}
 	}
 
+	int IPC_AddUUID(const char* uuid)
+	{
+		if (!uuid) {
+			return -1;
+		}
+		bool ret = IPCSerClass::getInstance()->add_uuid(uuid);
+		return (ret ? 0 : -1);
+	}
+
 	void IPC_ApiReply(const char* sender, const char* flag, const char* msg)
 	{
 		try {
@@ -287,14 +376,15 @@ extern "C" {
 
 			std::thread th([&]() {
 				std::string t = "API" + flag;
-				ipc::channel cc{ t.c_str(), ipc::receiver };
-				is_run = true;
-				ipc::buff_t dd = cc.recv(tm);
-				if (!dd.empty())
-				{
-					ret_dat = (char*)dd.data();
+				AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + t).c_str(), 0, tm, NULL));
+				HANDLE hMailslot = ah.get_handle();
+				if (INVALID_HANDLE_VALUE == hMailslot) {
+					MessageBoxA(NULL, "CreateMailslotA Failed", "ERROR", MB_OK);
+					exit(-1);
 				}
-			});
+				is_run = true;
+				ret_dat = read_sth_from_slot(hMailslot);
+				});
 
 			while (!is_run);
 			IPCSerClass::send_api(remote, send_str);

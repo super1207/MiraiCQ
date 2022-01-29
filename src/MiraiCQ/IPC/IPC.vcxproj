@@ -176,14 +176,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="thirdpart\include\libipc\buffer.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\ipc.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\platform\win\shm_win.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\pool_alloc.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\shm.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\sync\condition.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\sync\mutex.cpp" />
-    <ClCompile Include="thirdpart\include\libipc\sync\semaphore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="export.def" />

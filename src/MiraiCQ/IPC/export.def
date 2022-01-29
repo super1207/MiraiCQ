@@ -7,3 +7,4 @@ IPC_ApiRecv
 IPC_ApiReply
 IPC_Init
 IPC_GetFlag
+IPC_AddUUID
