@@ -376,8 +376,11 @@ extern "C" {
 			std::string flag = gen_uuid(); //len:36
 			std::string send_str = flag + "#" + IPC_GetFlag() + msg;
 
-			std::atomic_bool is_run = false;
+			bool is_run = false;
 			std::string ret_dat;
+
+			std::condition_variable cv;
+			std::mutex mx;
 
 			std::thread th([&]() {
 				std::string t = "API" + flag;
@@ -387,13 +390,21 @@ extern "C" {
 					MiraiLog::get_instance()->add_fatal_log("IPC_ApiSend", "CreateMailslotA Error:" + std::to_string(GetLastError()));
 					exit(-1);
 				}
-				is_run = true;
+				{
+					std::lock_guard<std::mutex> lk(mx);
+					is_run = true;
+					cv.notify_one();
+				}
+				
 				ret_dat = read_sth_from_slot(hMailslot);
-				});
+			});
 
-			while (!is_run) {
-				Sleep(10);
+			/* µÈ´ýslot´´½¨ */
+			{
+				std::unique_lock<std::mutex> lock(mx);
+				cv.wait(lock, [&] {return is_run == true;});
 			}
+			
 			IPCSerClass::send_api(remote, send_str);
 			th.join();
 			if (ret_dat.size() < 36)
