@@ -227,6 +227,7 @@ public:
 			}
 			data.push_back(StrTool::to_utf8(name));
 		}
+		rows(0);
 		rows(data.size());
 	}
 	~MyTable2() { }
