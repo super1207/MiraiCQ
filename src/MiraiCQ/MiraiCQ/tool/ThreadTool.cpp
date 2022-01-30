@@ -14,16 +14,18 @@ bool ThreadTool::submit(const std::function<void()> & task)
 		MiraiLog::get_instance()->add_fatal_log("ThreadTool","提交新任务失败，累积任务数量过多");
 		return false;
 	}
-	// 将任务放入任务队列
-	{
-		std::unique_lock<std::shared_mutex> lock(mx_task_list);
-		task_list.push_back(task);
-	}
 	// 没有空余线程，则新增一个线程，保证任务能顺利进行
 	if (unused_thread_nums == 0)
 	{
 		add_new_thread();
 	}
+	// 将任务放入任务队列
+	{
+		std::lock_guard<std::mutex> lock(mx_task_list);
+		task_list.push_back(task);
+		cv.notify_one();
+	}
+
 	return true;
 }
 
@@ -45,7 +47,7 @@ int ThreadTool::get_unused_thread_nums() const
 
 size_t ThreadTool::get_task_list_nums()
 {
-	std::shared_lock<std::shared_mutex> lock(mx_task_list);
+	std::lock_guard<std::mutex> lock(mx_task_list);
 	return task_list.size();
 }
 
@@ -57,7 +59,7 @@ ThreadTool::ThreadTool()
 		int i = 0;
 		while (true) {
 			// 没有获取到任务，睡眠一会儿
-			TimeTool::sleep(100);
+			TimeTool::sleep(200);
 			// 如果没有未使用的线程,但是有任务，则增加一个线程
 			if (unused_thread_nums == 0 && (get_task_list_nums() > 0))
 			{
@@ -75,59 +77,35 @@ void ThreadTool::add_new_thread()
 	// 如果当前线程数量过多，则拒绝增加新的线程
 	if (cur_thread_nums > max_thread_nums)
 	{
-		MiraiLog::get_instance()->add_fatal_log("ThreadTool", "已有线程过多，增加新线程失败");
+		MiraiLog::get_instance()->add_warning_log("ThreadTool", "已有线程过多，增加新线程失败");
 		return;
 	}
 	++cur_thread_nums;
-	std::thread([&]() {
-		// 用于标记是否空闲
-		bool is_unused = false;
+	std::thread([this]() {
 		while (true)
 		{
 			std::function<void()> task = nullptr;
 			{
-				// 从任务队列拿一个任务
-				std::unique_lock<std::shared_mutex> lock(mx_task_list);
-				if (task_list.size() > 0) {
+				++unused_thread_nums;
+				/* 等待一个任务 */
+				std::unique_lock<std::mutex> lock(mx_task_list);
+				bool is_get = cv.wait_for(lock, std::chrono::seconds(5), [this]() {
+					return task_list.size() > 0;
+				});
+				--unused_thread_nums;
+				if (is_get) {
+					/* 成功等到一个任务 */
 					task = (*task_list.begin());
 					task_list.pop_front();
 				}
-			}
-			if (task) {
-				// 如果拿到了，就执行
-				if (is_unused)
-				{
-					// 删除空闲标记
-					is_unused = false;
-					--unused_thread_nums;
+				else {
+					/* 没有成功等到一个任务，则结束线程 */
+					break;
 				}
-				task();
 			}
-			else {
-				// 如果没拿到，说明任务队列为空，
-				if (is_unused){
-					// 如果已经被标记为空闲，说明两次没拿到task，则
-					// 如果空闲线程大于5，则退出，否则，删除空闲标记，继续循环
-					if (unused_thread_nums > 5) {
-						break;
-					}
-					else {
-						TimeTool::sleep(100);
-						continue;
-					}
-				}
-				++unused_thread_nums;
-				is_unused = true;
-				TimeTool::sleep(100);
-				// 将此线程标记为空闲,然后继续循环
-			}
-
+			/* 执行任务 */
+			task();
 		}
-		// 删除空闲标记
-		if (is_unused) {
-			--unused_thread_nums;
-		}
-		// 线程退出了
 		--cur_thread_nums;
 	}).detach();
 }
