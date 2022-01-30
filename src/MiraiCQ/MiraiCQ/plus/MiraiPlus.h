@@ -30,6 +30,7 @@ public:
 		std::string author; /* 插件作者 */
 		std::string description; /* 插件描述 */
 		int ac; /* 插件ac */
+		void* process_handle = NULL;
 		std::string uuid;
 		std::vector<std::shared_ptr<const Event>> event_vec;
 		std::vector<std::shared_ptr<const Menu>> menu_vec;

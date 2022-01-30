@@ -816,6 +816,17 @@ static void fun(const char* sender, const char* flag, const char* msg)
 
 }
 
+static bool is_process_exist(HANDLE handle) {
+	if (handle == NULL) {
+		return false;
+	}
+	DWORD dw = WaitForSingleObject(handle, 1);
+	if (dw == WAIT_OBJECT_0 || dw == WAIT_FAILED) {
+		return false;
+	}
+	return true;
+}
+
 void mainprocess()
 {
 	SET_DEFULTER_HANDLER();
@@ -889,10 +900,8 @@ void mainprocess()
 				auto plus_vec = MiraiPlus::get_instance()->get_all_plus();
 				for (auto plus : plus_vec)
 				{
-					Json::Value to_send;
-					to_send["action"] = "heartbeat";
-					std::string ret = IPC_ApiSend(plus.second->uuid.c_str(), to_send.toStyledString().c_str(), 2000);
-					if (ret == "") {
+					bool ret = is_process_exist(plus.second->process_handle);
+					if (ret == false) {
 						MiraiLog::get_instance()->add_fatal_log("检测到插件异常退出", plus.second->get_filename());
 						exit(-1);
 					}

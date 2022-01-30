@@ -229,7 +229,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 	{
 		/* 关闭不需要的句柄,MiraiCQ通过uuid与共享内存与插件进程通信，不需要句柄 */
 		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
+		plus_def->process_handle = pi.hProcess;
 		IPC_AddUUID(plus_def->uuid.c_str());
 		Json::Value to_send;
 		to_send["action"] = "is_load";
@@ -246,6 +246,9 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		if (!is_load)
 		{
 			err_msg = "插件无响应";
+			TerminateProcess((HANDLE)plus_def->process_handle,-1);
+			CloseHandle(plus_def->process_handle);
+			plus_def = NULL;
 			return false;
 		}
 	}
