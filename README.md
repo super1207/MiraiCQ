@@ -14,7 +14,7 @@ MiraiCQ
 
 1. 更加稳定，高效，占用资源更少（可执行文件大小不到3M
 3. **多进程**框架，每个插件都在独立的进程中运行，瞬间定位问题插件。
-3. 简介明了的操作界面，一看就懂。
+3. 简洁明了的操作界面，一看就懂。
 
 #### 下载地址
 1. [releases](https://github.com/super1207/MiraiCQ/releases)
@@ -51,5 +51,5 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 2. 某些原酷Q插件会依赖一些酷Q的dll,可以自行将其放入指定目录，一般是bin目录（自行创建）或者MiraiCQ.exe目录（不清楚可以两个目录都放）。
 3. 原酷Q中的[dll下载地址](https://super1207.lanzoui.com/iVNkJttuf2f)。
 4. MiraiCQ不会支持获取txqq的cookie，csrf token，也不会支持点赞，钱包相关内容。
-5. MiraiCQ"暂时"不支持语音收发
+5. MiraiCQ"暂时"不支持语音收发。
 		
