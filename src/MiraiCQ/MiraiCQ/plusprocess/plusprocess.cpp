@@ -14,6 +14,8 @@
 #include "../tool/PathTool.h"
 #include "../tool/ThreadTool.h"
 
+#include <tlhelp32.h>
+
 
 extern std::string g_main_flag;
 static std::string g_dll_path;
@@ -58,31 +60,52 @@ static std::string get_fun_name(int funtype)
 	return ret;
 }
 
+static bool is_parent_exist() {
+	DWORD dwID, dwParentID;
+	HANDLE hParent = NULL;
+	HANDLE  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	dwID = GetCurrentProcessId();
+	if (hSnapshot != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe32 = { sizeof(PROCESSENTRY32) };
+		BOOL bRet = Process32First(hSnapshot, &pe32);
+		if (pe32.th32ProcessID == dwID)
+		{
+			dwParentID = pe32.th32ParentProcessID;
+			hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
+		}
+		else
+		{
+			while (Process32Next(hSnapshot, &pe32))
+			{
+				if (pe32.th32ProcessID == dwID)
+				{
+					dwParentID = pe32.th32ParentProcessID;
+					hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
+					break;
+				}
+			}
+		}
+		CloseHandle(hSnapshot);
+	}
+	if (hParent != NULL) {
+		CloseHandle(hParent);
+		return true;
+	}
+	return false;
+}
+
 /* 用于判断主进程是否还存在，若不存在，则结束当前进程 */
 static void do_heartbeat(const std::string& main_flag)
 {
-	Json::Value to_send;
-	to_send["action"] = "heartbeat";
 	while (true)
 	{
-		const char* ret = IPC_ApiSend(main_flag.c_str(), Json::FastWriter().write(to_send).c_str(), 3000);
-		if (strcmp(ret, "") == 0)
-		{
-			if (g_close_heartbeat){
-				break;
-			}
-			TimeTool::sleep(1000);
-			const char* ret2 = IPC_ApiSend(main_flag.c_str(), Json::FastWriter().write(to_send).c_str(), 5000);
-			if (strcmp(ret2, "") == 0) {
-				if (g_close_heartbeat) {
-					break;
-				}
-				MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
-				exit(-1);
-			}
+		if (!is_parent_exist()) {
+			MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
+			exit(-1);
 		}
 		TimeTool::sleep(5000);
-	}
+	}	
 }
 
 
