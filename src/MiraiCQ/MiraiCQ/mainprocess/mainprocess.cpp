@@ -946,10 +946,8 @@ void mainprocess()
 		bool is_all_close = true;
 		for (auto plus : plus_vec)
 		{
-			Json::Value to_send;
-			to_send["action"] = "heartbeat";
-			std::string ret = IPC_ApiSend(plus.second->uuid.c_str(), to_send.toStyledString().c_str(), 2000);
-			if (ret == "OK") {
+			bool ret = is_process_exist(plus.second->process_handle);
+			if (ret == true) {
 				is_all_close = false;
 			}
 		}
