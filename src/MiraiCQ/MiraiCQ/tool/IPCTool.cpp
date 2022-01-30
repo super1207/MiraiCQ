@@ -233,6 +233,7 @@ private:
 				while (true)
 				{
 					if (run_flag == 2)break;
+					Sleep(10);
 				}
 	}
 	std::string uuid;
@@ -390,7 +391,9 @@ extern "C" {
 				ret_dat = read_sth_from_slot(hMailslot);
 				});
 
-			while (!is_run);
+			while (!is_run) {
+				Sleep(10);
+			}
 			IPCSerClass::send_api(remote, send_str);
 			th.join();
 			if (ret_dat.size() < 36)

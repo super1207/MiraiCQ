@@ -903,6 +903,7 @@ void mainprocess()
 					bool ret = is_process_exist(plus.second->process_handle);
 					if (ret == false) {
 						MiraiLog::get_instance()->add_fatal_log("检测到插件异常退出", plus.second->get_filename());
+						Center::get_instance()->del_all_plus();
 						exit(-1);
 					}
 				}
@@ -933,7 +934,7 @@ void mainprocess()
 	std::thread([]() {
 		TimeTool::sleep(7000);
 		MiraiLog::get_instance()->add_warning_log("EXIT", "有插件不愿意自己结束自己.jpg");
-		exit(0);
+		exit(-1);
 	}).detach();
 
 	/* 发送插件卸载事件 */

@@ -98,7 +98,7 @@ static bool is_parent_exist() {
 /* 用于判断主进程是否还存在，若不存在，则结束当前进程 */
 static void do_heartbeat(const std::string& main_flag)
 {
-	while (true)
+	while (!g_close_heartbeat)
 	{
 		if (!is_parent_exist()) {
 			MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
@@ -434,7 +434,7 @@ static void do_event(Json::Value & root) {
 			typedef int(__stdcall* exit_event)();
 			((exit_event)fun_ptr)();
 		}
-		exit(-1);
+		exit(0);
 	}
 	else { 
 		MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到未知的事件类型:" + root.toStyledString());

@@ -128,7 +128,7 @@ bool Center::run()
 			/* 如果没获取到事件，则睡眠一下,缓解cpu压力 */
 			if (event_vec.size() == 0)
 			{
-				TimeTool::sleep(0);
+				TimeTool::sleep(10);
 			}
 			for (auto evt : event_vec)
 			{
