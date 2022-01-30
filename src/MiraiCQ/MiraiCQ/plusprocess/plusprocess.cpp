@@ -45,10 +45,15 @@ static std::string get_fun_name(int funtype)
 	{
 		std::lock_guard<std::mutex>lk(mx);
 		if (mmap.find(funtype) != mmap.end()) {
-			return mmap.at(funtype);
+			auto ret =  mmap.at(funtype);
+			if (ret == "?") {
+				return "";
+			}
+			else {
+				return ret;
+			}
 		}
 	}
-	
 	Json::Value to_send;
 	to_send["action"] = "get_fun_name";
 	to_send["params"] = funtype;
@@ -56,6 +61,9 @@ static std::string get_fun_name(int funtype)
 	if (strcmp(ret, "") != 0) {
 		std::lock_guard<std::mutex>lk(mx);
 		mmap[funtype] = ret;
+	}
+	if (strcmp(ret, "?") == 0) {
+		return "";
 	}
 	return ret;
 }

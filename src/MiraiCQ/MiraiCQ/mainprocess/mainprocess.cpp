@@ -393,10 +393,15 @@ static std::string get_fun_name_by_type(const std::string& uuid, int tp)
 			if (fun->type != tp) {
 				continue;
 			}
-			return fun->fun_name;
+			std::string ret =  fun->fun_name;
+			if (ret == "?") {
+				MiraiLog::get_instance()->add_fatal_log("mainprocess", "`?` can not be a plus's event name");
+				exit(-1);
+			}
+			return ret;
 		}
 	}
-	return "";
+	return "?";
 }
 
 static int get_auth_code_by_uuid(const std::string& uuid)
