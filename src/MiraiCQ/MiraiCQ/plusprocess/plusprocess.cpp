@@ -244,7 +244,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 /* 用于处理主进程传来的事件 */
 static void do_event(Json::Value & root) {
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
-	MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
+	// MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
 	if (event_type == "cq_event_group_message")
 	{
 		std::string fun_name = get_fun_name(2);

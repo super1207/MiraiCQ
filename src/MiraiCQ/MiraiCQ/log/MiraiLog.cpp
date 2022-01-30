@@ -66,14 +66,17 @@ static string get_exe_dir()
 MiraiLog::MiraiLog()
 {
     spdlog::set_level(spdlog::level::debug);
+    spdlog::flush_every(std::chrono::seconds(3));
     if (!g_is_plus)
     {
         auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/main_daily.txt", 2, 30);
         logger->set_level(spdlog::level::debug);
+        logger->flush_on(spdlog::level::info);
     }
     else {
         auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/" + g_plus_name + "_plus_daily.txt", 2, 30);
         logger->set_level(spdlog::level::debug);
+        logger->flush_on(spdlog::level::info);
     }
     
 }
@@ -132,9 +135,9 @@ void MiraiLog::default_backend_sinks(const Level& lv, const string& category, co
         break;
     }
     //插件才总是刷新，主进程不刷新
-    if (g_is_plus)
+    /*if (g_is_plus)
     {
         daily_logger->flush();
-    }
+    }*/
 }
     
