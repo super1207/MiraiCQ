@@ -7,7 +7,7 @@ MiraiCQ
 
 #### 软件说明：
 
-1. 本软件的编写初衷为兼容酷Q插件，除此之外，还会提供一些额外的功能(见[rand_pic](https://github.com/super1207/rand_pic)),来收发原始onebot数据。
+1. 本软件的编写初衷为兼容酷Q插件，除此之外，还会提供一些额外的功能(见[rand_pic](https://github.com/super1207/rand_pic))，来收发原始onebot数据。
 2. 对接[OneBot v11](https://github.com/botuniverse/onebot-11)标准，软件长期可用。
 
 #### 特色：
@@ -48,7 +48,7 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 
 #### 常见问题解答：
 1. 插件的json文件需要使用 GBK 编码。
-2. 某些原酷Q插件会依赖一些酷Q的dll,可以自行将其放入指定目录，一般是bin目录（自行创建）或者MiraiCQ.exe目录（不清楚可以两个目录都放）。
+2. 某些原酷Q插件会依赖一些酷Q的dll，可以自行将其放入指定目录，一般是bin目录（自行创建）或者MiraiCQ.exe目录（不清楚可以两个目录都放）。
 3. 原酷Q中的[dll下载地址](https://super1207.lanzoui.com/iVNkJttuf2f)。
 4. MiraiCQ不会支持获取txqq的cookie，csrf token，也不会支持点赞，钱包相关内容。
 5. MiraiCQ"暂时"不支持语音收发。
