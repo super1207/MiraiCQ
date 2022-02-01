@@ -435,7 +435,7 @@ static void do_event(Json::Value & root) {
 			/* 安全退出(指强制结束进程 */
 			exit(-1);
 		}).detach();
-		std::string fun_name = get_fun_name(1004);
+		std::string fun_name = get_fun_name(1002);
 		void* fun_ptr = get_fun_ptr(g_dll_path, fun_name);
 		if (fun_ptr)
 		{
