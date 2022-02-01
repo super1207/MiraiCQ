@@ -45,7 +45,7 @@ static std::string get_fun_name(int funtype)
 	{
 		std::lock_guard<std::mutex>lk(mx);
 		if (mmap.find(funtype) != mmap.end()) {
-			auto ret =  mmap.at(funtype);
+			auto ret = mmap.at(funtype);
 			if (ret == "?") {
 				return "";
 			}
@@ -113,7 +113,7 @@ static void do_heartbeat(const std::string& main_flag)
 			exit(-1);
 		}
 		TimeTool::sleep(5000);
-	}	
+	}
 }
 
 
@@ -157,7 +157,7 @@ void call_start(void* user_data)
 	typedef __int32(__stdcall* fun_ptr_type_1)();
 	int ret = ((fun_ptr_type_1)user_data)();
 	if (ret != 0) {
-		MiraiLog::get_instance()->add_fatal_log("START","插件拒绝启用, 强制退出");
+		MiraiLog::get_instance()->add_fatal_log("START", "插件拒绝启用, 强制退出");
 		exit(-1);
 	}
 }
@@ -221,7 +221,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 				Fl::awake(call_start, fptr);
 				return;
 			}
-			else if (action == "call_menu") 
+			else if (action == "call_menu")
 			{
 				// 插件菜单
 				void* fptr = get_fun_ptr(g_dll_path, root["params"]["fun_name"].asString());
@@ -245,12 +245,12 @@ static void fun(const char* sender, const char* flag, const char* msg)
 		{
 			MiraiLog::get_instance()->add_warning_log("PLUS_API_FUN", "抛出异常" + std::string(e.what()));
 		}
-		
-	}).detach();
+
+		}).detach();
 }
 
 /* 用于处理主进程传来的事件 */
-static void do_event(Json::Value & root) {
+static void do_event(Json::Value& root) {
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
 	// MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
 	if (event_type == "cq_event_group_message")
@@ -434,17 +434,17 @@ static void do_event(Json::Value & root) {
 			TimeTool::sleep(5000);
 			/* 安全退出(指强制结束进程 */
 			exit(-1);
-		}).detach();
-		std::string fun_name = get_fun_name(1002);
-		void* fun_ptr = get_fun_ptr(g_dll_path, fun_name);
-		if (fun_ptr)
-		{
-			typedef int(__stdcall* exit_event)();
-			((exit_event)fun_ptr)();
-		}
-		exit(0);
+			}).detach();
+			std::string fun_name = get_fun_name(1002);
+			void* fun_ptr = get_fun_ptr(g_dll_path, fun_name);
+			if (fun_ptr)
+			{
+				typedef int(__stdcall* exit_event)();
+				((exit_event)fun_ptr)();
+			}
+			exit(0);
 	}
-	else { 
+	else {
 		MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到未知的事件类型:" + root.toStyledString());
 	}
 }
@@ -467,7 +467,7 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 			while (true)
 			{
 				const char* evt = IPC_GetEvent(plus_flag.c_str());
-				
+
 				Json::Value root;
 				Json::Reader reader;
 				if (!reader.parse(evt, root))
@@ -476,37 +476,40 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 					MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到不规范的Json" + std::string(evt));
 					continue;
 				}
-				try {
-					ThreadTool::get_instance()->submit([=]() {
+
+				ThreadTool::get_instance()->submit([=]() {
+					try {
 						Json::Value root_ = root;
 						do_event(root_);
-					});
-					// 目前事件先不做多线程，防止莫些插件不能正确处理
-					// do_event(root);
-				}
-				catch (const std::exception& e) {
-					MiraiLog::get_instance()->add_warning_log("EVENTRECV", std::string("do_event发生异常：") + e.what());
-				}
+					}
+					catch (const std::exception& e) {
+						MiraiLog::get_instance()->add_fatal_log("EVENTRECV", std::string("do_event发生异常：") + e.what());
+						exit(-1);
+					}
+				});
+				// 目前事件先不做多线程，防止莫些插件不能正确处理
+				// do_event(root);
+
 			}
-		}).detach();
+			}).detach();
 
-		/* 用于判断主进程是否结束，来结束自己 */
-		std::thread([main_flag]() {
-			do_heartbeat(main_flag);
-		}).detach();
+			/* 用于判断主进程是否结束，来结束自己 */
+			std::thread([main_flag]() {
+				do_heartbeat(main_flag);
+				}).detach();
 
-		/* 处理主进程的API调用 */
-		std::thread([&]() {
-			while (true) {
-				IPC_ApiRecv(fun);
-			}
-		}).detach();
+				/* 处理主进程的API调用 */
+				std::thread([&]() {
+					while (true) {
+						IPC_ApiRecv(fun);
+					}
+					}).detach();
 
-		/* 窗口循环 */
-		while (true) {
-			TimeTool::sleep(20);
-			Fl::wait(1e20);
-		}
+					/* 窗口循环 */
+					while (true) {
+						TimeTool::sleep(20);
+						Fl::wait(1e20);
+					}
 	}
 	catch (const std::exception& e)
 	{
