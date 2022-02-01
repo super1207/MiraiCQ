@@ -104,7 +104,14 @@ void ThreadTool::add_new_thread()
 				}
 			}
 			/* 执行任务 */
-			task();
+			try {
+				task();
+			}
+			catch (const std::exception& e) {
+				MiraiLog::get_instance()->add_fatal_log("ThreadTool", std::string("在ThreadTool中发生未知错误:") + e.what());
+				exit(-1);
+			}
+			
 		}
 		--cur_thread_nums;
 	}).detach();
