@@ -26,7 +26,7 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 	auto post_type = StrTool::get_str_from_json((*evt), "post_type", "");
 	if (post_type == "")
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "post_type不存在");
+		MiraiLog::get_instance()->add_warning_log("Center", "post_type不存在");
 		/* 失败，不再继续处理 */
 		return;
 	}
@@ -53,12 +53,12 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 		}
 		else
 		{
-			MiraiLog::get_instance()->add_debug_log("Center", "未知的post_type:"+ post_type);
+			MiraiLog::get_instance()->add_warning_log("Center", "未知的post_type:"+ post_type);
 		}
 	}
 	catch (const std::exception& e)
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", string("处理事件时发送错误：") + e.what());
+		MiraiLog::get_instance()->add_warning_log("Center", string("处理事件时发送错误：") + e.what());
 	}
 
 }
@@ -80,7 +80,7 @@ void Center::deal_type_message(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的message_type:"+ message_type);
+		MiraiLog::get_instance()->add_warning_log("Center", "未知的message_type:"+ message_type);
 	}
 }
 
@@ -113,7 +113,7 @@ void Center::deal_type_notice(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的notice_type:"+ notice_type);
+		//MiraiLog::get_instance()->add_debug_log("Center", "未知的notice_type:"+ notice_type);
 	}
 }
 
@@ -124,7 +124,7 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 	Json::Value file = evt.get("file", Json::Value());
 	if (!file.isObject())
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "错误的deal_type_notice_group_upload 事件");
+		MiraiLog::get_instance()->add_warning_log("Center", "错误的deal_type_notice_group_upload 事件");
 		return;
 	}
 	std::string id = StrTool::to_ansi(StrTool::get_str_from_json(file, "id", ""));
@@ -335,7 +335,7 @@ void Center::deal_type_request(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的request_type:" + request_type);
+		MiraiLog::get_instance()->add_warning_log("Center", "未知的request_type:" + request_type);
 	}
 }
 
@@ -369,6 +369,20 @@ static std::string get_md5_from_file_str(const std::string& file_str)
 	}
 }
 
+
+/* 判断url是否是qq的url */
+static bool is_qq_url(const Json::Value & dat_json) 
+{
+	std::string url = StrTool::get_str_from_json(dat_json, "url", "");
+	if (url.find("gchat") != url.npos) {
+		return true;
+	}
+	if (url.find("c2cpicdw") != url.npos) {
+		return true;
+	}
+	return false;
+}
+
 static bool deal_json_array(Json::Value & json_arr)
 {
 	if (!json_arr.isArray())
@@ -393,38 +407,40 @@ static bool deal_json_array(Json::Value & json_arr)
 		if (type_str == "image")
 		{
 			Json::Value dat_json = node.get("data", Json::Value());
-			std::string url = StrTool::get_str_from_json(dat_json, "url", "");
-			if (url == "")
+			std::string md5_str;
+			std::string url;
+			std::string file_str = StrTool::get_str_from_json(dat_json, "file", "");
+			if (is_qq_url(dat_json)) {
+				md5_str = get_md5_from_file_str(file_str);
+				if (md5_str == "") {
+					md5_str = get_md5_from_imgurl(StrTool::get_str_from_json(dat_json, "url", ""));
+				}
+				url = "https://gchat.qpic.cn/gchatpic_new/0/0-0-" + md5_str + "/0?term=2";
+			}
+			else {
+				md5_str = get_md5_from_file_str(file_str);
+				url = StrTool::get_str_from_json(dat_json, "url", "");
+			}
+			
+			if (md5_str == "") 
 			{
-				/* 
-					没有url字段，MiraiCQ 无法处理，
-					MiraiCQ目前需要从图片的url中获取图片的md5，长，宽，大小，格式 
-				*/
-				MiraiLog::get_instance()->add_debug_log("Center", "检测到图片中没有url");
+				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取图片的md5");
 				node = Json::Value();
 				continue;
 			}
-			std::string md5_str = get_md5_from_imgurl(url);
-			if (md5_str == "")
-			{
-				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取md5:"+url);
-				// 尝试从file字段获取MD5
-				std::string file_str = StrTool::get_str_from_json(dat_json, "file", "");
-				md5_str = get_md5_from_file_str(file_str);
-				if (md5_str == "")
-				{
-					MiraiLog::get_instance()->add_debug_log("Center", "无法从file中获取md5:" + file_str);
-					/* MiraiCQ要使用md5作为文件名的一部分，如果没有获取到md5，则无法继续处理下去 */
-					node = Json::Value();
-					continue;
-				}
+
+			if (url == "") {
+				MiraiLog::get_instance()->add_warning_log("Center", "无法构造图片url");
+				node = Json::Value();
+				continue;
 			}
+			
 			/* 获得图片信息需要下载一部分图片 */
 			ImgTool::ImgInfo info;
 			/* 这里进行两次尝试，增大成功概率 */
 			if (!ImgTool::get_info(url, info) && !ImgTool::get_info(url, info))
 			{
-				MiraiLog::get_instance()->add_debug_log("Center", "无法从url中获取图片信息:" + url);
+				MiraiLog::get_instance()->add_warning_log("Center", "无法从url中获取图片信息:" + url);
 				/* 
 					即使无法获得图片信息，也需要写入url,md5等信息到cqimg文件
 					node = Json::Value();
@@ -451,7 +467,7 @@ static bool deal_json_array(Json::Value & json_arr)
 			if (!PathTool::is_file_exist(cqimg_path))
 			{
 				/* 再次检查cqmig是否存在 */
-				MiraiLog::get_instance()->add_debug_log("Center", "cqimg文件写入失败，检查`data\\image`下的文件权限");
+				MiraiLog::get_instance()->add_warning_log("Center", "cqimg文件写入失败，检查`data\\image`下的文件权限");
 				node = Json::Value();
 				continue;
 			}
@@ -483,7 +499,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 	/* 处理json array,比如要生成cqimg文件，或者要将多余的字段去掉 */
 	if (!deal_json_array(jsonarr))
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr预处理失败");
+		MiraiLog::get_instance()->add_warning_log("Center", "jsonarr预处理失败");
 		return;
 	}
 	auto s = Json::FastWriter().write(jsonarr);
@@ -510,7 +526,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 	}
 	else
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "未知的私聊消息来源:"+ sub_type_str +"，不进行处理");
+		MiraiLog::get_instance()->add_warning_log("Center", "未知的私聊消息来源:"+ sub_type_str +"，不进行处理");
 		return;
 	}
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
@@ -548,7 +564,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 	/* 处理json array,比如要生成cqimg文件，或者要将多余的字段去掉 */
 	if (!deal_json_array(jsonarr))
 	{
-		MiraiLog::get_instance()->add_debug_log("Center", "jsonarr预处理失败");
+		MiraiLog::get_instance()->add_warning_log("Center", "jsonarr预处理失败");
 		return;
 	}
 	auto s = Json::FastWriter().write(jsonarr);
