@@ -121,14 +121,16 @@ public:
 	{
 		return uuid;
 	}
-	void send_event(const std::string& evt)
+	void send_event(const std::string & uuid,const std::string& evt)
 	{
-		std::lock_guard<std::mutex> lock(mx_event_send_list);
-		if (event_send_list.size() > max_send_list) {
-			event_send_list.clear();
+
+		AutoCloseHandle ah(CreateFileA(("\\\\.\\mailslot\\EVENT" + uuid).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL));
+		HANDLE hMailslot = ah.get_handle();
+		if (INVALID_HANDLE_VALUE == hMailslot) {
+			return;
 		}
-		event_send_list.push_back(evt);
-		cv_event.notify_one();
+		DWORD d;
+		WriteFile(hMailslot, evt.data(), evt.size(), &d, NULL);
 	}
 	std::string get_api()
 	{
@@ -137,15 +139,6 @@ public:
 		std::string ret = (*api_recv_list.begin());
 		api_recv_list.pop_front();
 		return ret;
-	}
-	bool add_uuid(const std::string& uuid)
-	{
-		if (uuid.size() != 36) {
-			return false;
-		}
-		std::unique_lock<std::shared_mutex> lock(mx_uuid_vec);
-		uuid_vec.push_back(uuid);
-		return true;
 	}
 
 	static bool send_api(const std::string& flag, const std::string& s)
@@ -179,80 +172,42 @@ private:
 		}
 		//event_flag = "EVENT" + uuid;
 		api_flag = "API" + uuid;
-
 		std::thread([&]() {
-			//ipc::route cc{ event_flag.c_str() };
+			AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + api_flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
+			HANDLE hMailslot = ah.get_handle();
+			if (INVALID_HANDLE_VALUE == hMailslot) {
+				MiraiLog::get_instance()->add_fatal_log("IPCSerClass", "CreateMailslotA Failed" + std::to_string(GetLastError()));
+				exit(-1);
+			}
+
 			++run_flag;
 			while (true) {
-				std::string to_send;
-				{
-					std::unique_lock<std::mutex> lock(mx_event_send_list);
-					cv_event.wait(lock, [&] {return event_send_list.size() > 0;});
-					to_send = (*event_send_list.begin());
-					event_send_list.pop_front();
+				std::string tt = read_sth_from_slot(hMailslot);
+				std::lock_guard<std::mutex> lock(mx_api_recv_list);
+				if (api_recv_list.size() > max_recv_list) {
+					api_recv_list.clear();
 				}
-				if (to_send != "")
-				{
-					std::shared_lock<std::shared_mutex> lock(mx_uuid_vec);
-					// 发给每一个客户端
-					for (auto& id : uuid_vec) {
-						std::string t = "EVENT" + id;
-						AutoCloseHandle ah(CreateFileA(("\\\\.\\mailslot\\" + t).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL));
-						HANDLE hMailslot = ah.get_handle();
-						if (INVALID_HANDLE_VALUE == hMailslot) {
-							continue;
-						}
-						DWORD d;
-						WriteFile(hMailslot, to_send.data(), to_send.size(), &d, NULL);
-					}
-				}
+				api_recv_list.push_back(tt);
+				cv_api.notify_all();
 			}
 			}).detach();
 
-			std::thread([&]() {
-				AutoCloseHandle ah(CreateMailslotA(("\\\\.\\mailslot\\" + api_flag).c_str(), 0, MAILSLOT_WAIT_FOREVER, NULL));
-				HANDLE hMailslot = ah.get_handle();
-				if (INVALID_HANDLE_VALUE == hMailslot) {
-					MiraiLog::get_instance()->add_fatal_log("IPCSerClass", "CreateMailslotA Failed" + std::to_string(GetLastError()));
-					exit(-1);
-				}
 
-				++run_flag;
-				while (true) {
-					std::string tt = read_sth_from_slot(hMailslot);
-					std::lock_guard<std::mutex> lock(mx_api_recv_list);
-					if (api_recv_list.size() > max_recv_list) {
-						api_recv_list.clear();
-					}
-					api_recv_list.push_back(tt);
-					cv_api.notify_all();
-				}
-				}).detach();
-
-
-				while (true)
-				{
-					if (run_flag == 2)break;
-					Sleep(10);
-				}
+		while (true)
+		{
+			if (run_flag == 1)break;
+			Sleep(10);
+		}
 	}
 	std::string uuid;
 	std::string event_flag;
 	std::string api_flag;
 	std::atomic_int run_flag = 0;
 
-	std::mutex mx_event_send_list;
-	std::list<std::string> event_send_list;
-	const size_t max_send_list = 1024;
-	std::condition_variable cv_event;
-
 	std::mutex mx_api_recv_list;
 	std::list<std::string> api_recv_list;
 	const size_t max_recv_list = 1024;
 	std::condition_variable cv_api;
-
-	std::vector<std::string> uuid_vec;
-	std::shared_mutex mx_uuid_vec;
 };
 
 #ifdef  __cplusplus
@@ -288,12 +243,12 @@ extern "C" {
 		}
 	}
 
-	void IPC_SendEvent(const char* msg)
+	void IPC_SendEvent(const char * uuid,const char* msg)
 	{
 		if (!msg)
 			return;
 		try {
-			IPCSerClass::getInstance()->send_event(msg);
+			IPCSerClass::getInstance()->send_event(uuid,msg);
 		}
 		catch (const std::exception& e) {
 			MiraiLog::get_instance()->add_fatal_log("IPC_SendEvent", "未知异常 in IPC_SendEvent：" + std::string(e.what()));
@@ -340,15 +295,6 @@ extern "C" {
 			MiraiLog::get_instance()->add_fatal_log("IPC_ApiRecv", "未知异常 in IPC_ApiRecv：" + std::string(e.what()));
 			exit(-1);
 		}
-	}
-
-	int IPC_AddUUID(const char* uuid)
-	{
-		if (!uuid) {
-			return -1;
-		}
-		bool ret = IPCSerClass::getInstance()->add_uuid(uuid);
-		return (ret ? 0 : -1);
 	}
 
 	void IPC_ApiReply(const char* sender, const char* flag, const char* msg)

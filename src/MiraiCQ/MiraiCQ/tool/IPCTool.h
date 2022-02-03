@@ -19,7 +19,7 @@ extern "C" {
 	const char* IPC_ApiSend(const char* remote_uuid, const char* msg, int tm);
 
 	/* mainproess发送事件 */
-	void IPC_SendEvent(const char* msg);
+	void IPC_SendEvent(const char *uuic,const char* msg);
 
 	/* plusprocess接收事件，此函数会阻塞到接收事件为止 */
 	const char* IPC_GetEvent(const char* flag);
@@ -33,7 +33,6 @@ extern "C" {
 	/* 用于mainprocess获取main_uuid，然后传给子进程*/
 	const char* IPC_GetFlag();
 
-	int IPC_AddUUID(const char* uuid);
 
 #ifdef  __cplusplus
 }

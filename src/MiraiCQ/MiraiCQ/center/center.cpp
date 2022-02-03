@@ -87,12 +87,25 @@ int Center::enable_all_plus()
 	return success_num;
 }
 
+static void IPC_SendEvent_T(const char* msg)
+{
+	auto plus = MiraiPlus::get_instance()->get_all_plus();
+	for (auto p : plus) {
+		IPC_SendEvent(p.second->uuid.c_str(), msg);
+	}
+}
+
 int Center::del_all_plus() 
 {
+	//先禁用插件，防止插件再收到事件
+	auto plus = MiraiPlus::get_instance()->get_all_plus();
+	for (auto p : plus) {
+		p.second->is_enable = false;
+	}
 	// 发送主进程退出事件
 	Json::Value to_send;
 	to_send["event_type"] = "exit";
-	IPC_SendEvent(to_send.toStyledString().c_str());
+	IPC_SendEvent_T(to_send.toStyledString().c_str());
 	return 0;
 }
 

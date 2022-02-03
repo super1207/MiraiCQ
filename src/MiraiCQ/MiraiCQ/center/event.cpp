@@ -63,6 +63,16 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 
 }
 
+static void IPC_SendEvent_T(const char * msg)
+{
+	auto plus = MiraiPlus::get_instance()->get_all_plus();
+	for (auto p : plus) {
+		if (p.second->is_enable) {
+			IPC_SendEvent(p.second->uuid.c_str(), msg);
+		}
+	}
+}
+
 void Center::deal_type_message(Json::Value& evt)
 {
 	// 处理message事件中的message_id
@@ -148,7 +158,7 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["file_base64"] = file_base64;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_admin(Json::Value& evt)
@@ -173,7 +183,7 @@ void Center::deal_type_notice_group_admin(Json::Value& evt)
 	to_send["data"]["send_time"] = time_;
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["being_operate_qq"] = user_id;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_decrease(Json::Value& evt)
@@ -204,7 +214,7 @@ void Center::deal_type_notice_group_decrease(Json::Value& evt)
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["from_qq"] = operator_id;
 	to_send["data"]["being_operate_qq"] = user_id;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_increase(Json::Value& evt)
@@ -231,7 +241,7 @@ void Center::deal_type_notice_group_increase(Json::Value& evt)
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["from_qq"] = operator_id;
 	to_send["data"]["being_operate_qq"] = user_id;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_group_ban(Json::Value& evt)
@@ -260,7 +270,7 @@ void Center::deal_type_notice_group_ban(Json::Value& evt)
 	to_send["data"]["from_qq"] = operator_id;
 	to_send["data"]["being_operate_qq"] = user_id;
 	to_send["data"]["duration"] = duration;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_notice_friend_add(Json::Value& evt)
@@ -273,7 +283,7 @@ void Center::deal_type_notice_friend_add(Json::Value& evt)
 	to_send["data"]["sub_type"] = 1;
 	to_send["data"]["send_time"] = time_;
 	to_send["data"]["from_qq"] = user_id;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_request_friend(Json::Value& evt)
@@ -290,7 +300,7 @@ void Center::deal_type_request_friend(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = comment;
 	to_send["data"]["response_flag"] = response_flag;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_request_group(Json::Value& evt)
@@ -319,7 +329,7 @@ void Center::deal_type_request_group(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = comment;
 	to_send["data"]["response_flag"] = response_flag;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 void Center::deal_type_request(Json::Value& evt)
@@ -540,7 +550,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = cq_str;
 	to_send["data"]["font"] = font;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 
@@ -589,7 +599,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 	to_send["data"]["anonymous"] = from_anonymous_base64;
 	to_send["data"]["msg"] = cq_str;
 	to_send["data"]["font"] = font;
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
 
@@ -598,5 +608,5 @@ void Center::deal_1207_event(Json::Value& evt)
 	Json::Value to_send;
 	to_send["event_type"] = "cq_1207_event";
 	to_send["data"]["msg"] = Json::FastWriter().write(evt);
-	IPC_SendEvent(Json::FastWriter().write(to_send).c_str());
+	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
