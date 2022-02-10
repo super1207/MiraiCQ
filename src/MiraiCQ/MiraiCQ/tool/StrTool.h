@@ -137,12 +137,19 @@ public:
 	static std::vector<std::string> match(const std::string& content, const std::string& pattern);
 
 	/*
-	* 描述： 使用正则来匹配所有
+	* 描述：使用正则来匹配所有
 	* 参数`content`：要匹配的内容
 	* 参数`pattern`：正则表达式
 	* 返回值：匹配得到的数组
 	*/
 	static std::vector<std::vector<std::string>> match_all(const std::string& content, const std::string& pattern);
+
+	/*
+	* 描述：判断是否是utf8编码
+	* 参数`text`：要判断的内容
+	* 返回值：是否是utf8编码
+	*/
+	static bool is_utf8(const std::string& text);
 
 private:
 	StrTool();

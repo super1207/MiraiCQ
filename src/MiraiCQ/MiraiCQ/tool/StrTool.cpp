@@ -513,6 +513,52 @@ std::vector<std::vector<std::string>> StrTool::match_all(const std::string& cont
 	return ret_vec;
 }
 
+static int preNUm(unsigned char byte) {
+	unsigned char mask = 0x80;
+	int num = 0;
+	for (int i = 0; i < 8; i++) {
+		if ((byte & mask) == mask) {
+			mask = mask >> 1;
+			num++;
+		}
+		else {
+			break;
+		}
+	}
+	return num;
+}
+
+
+static bool isUtf8(const std::string& data) {
+	int num = 0;
+	size_t i = 0;
+	while (i < data.size()) {
+		if ((data.at(i) & 0x80) == 0x00) {
+			i++;
+			continue;
+		}
+		else if ((num = preNUm(data.at(i))) > 2) {
+			i++;
+			for (int j = 0; j < num - 1; j++) {
+				if ((data.at(i) & 0xc0) != 0x80) {
+					return false;
+				}
+				i++;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool StrTool::is_utf8(const std::string& text)
+{
+	// 此算法来自:https://www.jianshu.com/p/a83d398e3606
+	return isUtf8(text);
+}
+
 StrTool::StrTool()
 {
 }

@@ -23,6 +23,25 @@ MiraiPlus::~MiraiPlus()
 {
 }
 
+static std::string read_biniary_file(const std::string& file_path)
+{
+	using namespace std;
+	//ios::ate: move file point to end of file
+	ifstream in(file_path, ios::binary | ios::ate);
+	if (!in.is_open())
+		throw runtime_error("file " + file_path + " can't open");
+	//get the file's size
+	streampos file_size = in.tellg();
+	//pepare buf for read
+	string biniary_buf((size_t)file_size, '\0');
+	//move file point to start of file
+	in.seekg(0);
+	//read file
+	in.read(&biniary_buf[0], file_size);
+	//file will auto close
+	return biniary_buf;
+}
+
 bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) 
 {
 	err_msg.clear();
@@ -56,21 +75,26 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		err_msg = "模块json文件不存在";
 		return false;
 	}
-	ifstream json_fp;
-	json_fp.open(json_path);
-	if (!json_fp.is_open())
-	{
-		err_msg = "模块json文件打开失败";
+
+	std::string json_file;
+	try {
+		json_file = read_biniary_file(json_path);
+		if (StrTool::is_utf8(json_file)) {
+			json_file = StrTool::to_ansi(json_file);
+		}
+	}
+	catch (...) {
+		err_msg = "模块json文件读取失败";
 		return false;
 	}
 	Json::Value root;
 	Json::Reader reader;
-	if (!reader.parse(json_fp, root))
+	if (!reader.parse(json_file, root))
 	{
 		err_msg = "模块json文件解析失败";
 		return false;
 	}
-	json_fp.close();
+
 	std::shared_ptr<PlusDef> plus_def(new PlusDef);
 
 	plus_def->filename = dll_name;
