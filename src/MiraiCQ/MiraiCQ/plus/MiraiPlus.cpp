@@ -26,13 +26,19 @@ MiraiPlus::~MiraiPlus()
 bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) 
 {
 	err_msg.clear();
-	std::string bin_path = PathTool::get_exe_dir() + "";
-	PathTool::create_dir(bin_path);
-	std::string cqp_path = bin_path + "CQP.dll";
-	if (!PathTool::is_file_exist(cqp_path.c_str()))
 	{
-		err_msg = "CQP.dll不在目录下";
+		// 设置dll搜索目录
+		std::string path_str = PathTool::get_exe_dir() + "bin\\";
+		PathTool::create_dir(path_str);
+		SetDllDirectoryA(path_str.c_str());
+	}
+	HMODULE hHandle = LoadLibraryA("CQP.dll");
+	if (hHandle == NULL) {
+		err_msg = "CQP.dll加载失败，code:" + std::to_string(GetLastError());
 		return false;
+	}
+	else {
+		FreeLibrary(hHandle);
 	}
 	/* 创建图片目录 */ 
 	PathTool::create_dir(PathTool::get_exe_dir() + "data\\");

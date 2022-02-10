@@ -58,7 +58,8 @@ int Center::load_all_plus()
 		}
 		else
 		{
-			MiraiLog::get_instance()->add_info_log("Center", "²å¼þ`" + file_name + "`¼ÓÔØÊ§°Ü£º"+ err);
+			MiraiLog::get_instance()->add_fatal_log("Center", "²å¼þ`" + file_name + "`¼ÓÔØÊ§°Ü£º"+ err);
+			exit(-1);
 		}
 
 	}
@@ -81,7 +82,7 @@ int Center::enable_all_plus()
 		}
 		else
 		{
-			MiraiLog::get_instance()->add_info_log("Center", "²å¼þ`" + p.second->get_name() + "`Æô¶¯Ê§°Ü£º" + err);
+			MiraiLog::get_instance()->add_warning_log("Center", "²å¼þ`" + p.second->get_name() + "`Æô¶¯Ê§°Ü£º" + err);
 		}
 	}
 	return success_num;

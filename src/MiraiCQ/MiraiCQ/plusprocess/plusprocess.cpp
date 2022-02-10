@@ -122,8 +122,8 @@ static void load_plus(const std::string& plus_name)
 {
 	/* 获得插件绝对路径，不含后缀 */
 	std::string plus_path = PathTool::get_exe_dir() + "app\\" + plus_name;
-	/* 获得CQP的绝对路径 */
-	std::string cqp_path = PathTool::get_exe_dir() + "CQP.dll";
+	/* 获得CQP的路径 */
+	std::string cqp_path = "CQP.dll";
 	/* 加载CQP.dll */
 	if (LoadLibraryA(cqp_path.c_str()) == NULL)
 	{
@@ -452,6 +452,11 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 {
 	try
 	{
+		// 设置dll搜索目录
+		std::string path_str = PathTool::get_exe_dir() + "bin\\";
+		PathTool::create_dir(path_str);
+		SetDllDirectoryA(path_str.c_str());
+
 		/* 初始化IPC */
 		if (IPC_Init(plus_flag.c_str()) != 0)
 		{
