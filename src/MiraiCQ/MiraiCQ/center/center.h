@@ -18,7 +18,6 @@ public:
 		std::string version;
 		std::string description;
 		std::string author;
-		bool is_enable;
 		bool is_load;
 	};
 	static Center * get_instance() ;

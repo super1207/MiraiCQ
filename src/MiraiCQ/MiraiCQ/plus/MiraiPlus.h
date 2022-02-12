@@ -24,19 +24,31 @@ public:
 			std::string fun_name;
 			std::string name;
 		};
+		struct Process
+		{
+			Process(const std::string& dll_name,const std::string & uuid);
+			/* 判断进程是否存在 */
+			bool is_exist();
+			/* 等待进程退出,返回函数执行完后进程是否 */
+			void wait_process_quit(int timeout);
+			~Process();
+		private:
+			void* process_handle = NULL;
+		};
 		std::string name; /* 插件名字 */
 		std::string filename; /* 插件的文件名 */
 		std::string version; /* 插件版本 */
 		std::string author; /* 插件作者 */
 		std::string description; /* 插件描述 */
+		std::string dll_name;  /* 插件的文件名(不含后缀) */
 		int ac; /* 插件ac */
-		void* process_handle = NULL;
-		std::string uuid;
 		std::vector<std::shared_ptr<const Event>> event_vec;
 		std::vector<std::shared_ptr<const Menu>> menu_vec;
 		std::set<int> auth_vec;
-		std::atomic_bool is_enable = false; /* 插件是否启用 */
-		std::atomic_bool is_first_enable = true; /* 第一次启用需要调用框架启动事件 */
+		std::shared_ptr<Process> process = nullptr;
+		std::shared_mutex mx_plus_def;
+		//std::atomic_bool is_enable = false; /* 插件是否启用 */
+
 		~PlusDef();
 		/*
 		* 描述：从插件中获得一个Event
@@ -62,6 +74,16 @@ public:
 		* 返回值：返回插件名字
 		*/
 		std::string get_filename() ;
+
+		std::string get_uuid();
+
+		void set_uuid(const std::string & uuid);
+
+		bool is_enable();
+
+		bool is_process_exist();
+	private:
+		std::string uuid;
 	};
 
 	~MiraiPlus();
@@ -85,10 +107,8 @@ public:
 	/*
 	* 描述：禁用一个插件
 	* 参数`ac`:插件标记
-	* 参数`err_msg`,禁用失败时说明原因
-	* 返回值：返回函数执行后插件是否被禁用
 	*/
-	bool disable_plus(int ac, std::string & err_msg) ;
+	void disable_plus(int ac) ;
 
 	/*
 	* 描述：判断一个插件是否被启用
@@ -96,14 +116,6 @@ public:
 	* 返回值：已经被启用返回`true`，未启用或者ac错误返回false
 	*/
 	bool is_enable(int ac) ;
-
-	/*
-	* 描述：卸载一个插件
-	* 参数`ac`:插件标记
-	* 参数`err_msg`,卸载失败时说明原因
-	* 返回值：返回函数执行后插件是否被卸载
-	*/
-	bool del_plus(int ac) ;
 
 	/*
 	* 描述：通过AC来获得一个插件
@@ -129,6 +141,5 @@ private:
 	MiraiPlus();
 	std::map<int, std::shared_ptr<PlusDef>> plus_map;
 	std::shared_mutex mx_plus_map;
-
 };
 

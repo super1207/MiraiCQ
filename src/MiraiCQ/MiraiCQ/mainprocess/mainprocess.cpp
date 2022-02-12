@@ -28,6 +28,8 @@
 #include <assert.h>
 
 
+static std::atomic_int gui_flush = 0;
+
 
 
 struct LOGIN_INFO
@@ -195,11 +197,40 @@ public:
 		if (context == 0x10 && evt == FL_RELEASE)
 		{
 			auto center = Center::get_instance();
-			center->call_menu_fun_by_ac(ac, R);
+			if (R == data.size() - 1) {
+				if (MiraiPlus::get_instance()->is_enable(ac)) {
+					MiraiPlus::get_instance()->disable_plus(ac);
+					++gui_flush;
+				}
+				else {
+					std::string err;
+					if (!MiraiPlus::get_instance()->enable_plus(ac,err)) {
+						MiraiLog::get_instance()->add_fatal_log("MAINPROCESS", err);
+						exit(-1);
+					}
+					++gui_flush;
+				}
+				
+			}
+			else {
+				center->call_menu_fun_by_ac(ac, R);
+			}
+			
 		}
 	}
 	static void event_callback(Fl_Widget*, void* v) {      // table's event callback (static)
 		((MyTable2*)v)->event_callback2();
+	}
+	static void callback_timer2(void* d) {
+		static int flushh = gui_flush;
+		MyTable2* instance = static_cast<MyTable2*>(d);
+		//MiraiLog::get_instance()->add_debug_log("TB", "TM");
+		if (flushh != gui_flush)
+		{
+			instance->set_ac(instance->ac);
+			flushh = gui_flush;
+		}
+		Fl::repeat_timeout(1.0, callback_timer2, d);
 	}
 	MyTable2(int X, int Y, int W, int H, const char* L = 0) : Fl_Table(X, Y, W, H, L) {
 		rows(data.size());             // how many rows
@@ -212,6 +243,7 @@ public:
 		col_resize(1);              // enable column resizing
 		end();                      // end the Fl_Table group
 		callback(&event_callback, (void*)this);
+		Fl::add_timeout(1.0, callback_timer2, (void*)this);
 	}
 	void set_ac(int ac)
 	{
@@ -227,6 +259,14 @@ public:
 			}
 			data.push_back(StrTool::to_utf8(name));
 		}
+		if (MiraiPlus::get_instance()->is_enable(ac)) {
+			data.push_back(StrTool::to_utf8("停用插件"));
+		}
+		else {
+			data.clear();
+			data.push_back(StrTool::to_utf8("启用插件"));
+		}
+		
 		rows(0);
 		rows(data.size());
 	}
@@ -266,9 +306,15 @@ class MyTable : public Fl_Table {
 			DrawHeader(s, X, Y, W, H);
 			return;
 		case CONTEXT_CELL:                        // Draw data in cells
-			sprintf_s(s, "%s", StrTool::to_utf8(data.at(ROW).second->name).c_str());
-			DrawData(s, X, Y, W, H);
-			return;
+			{
+				sprintf_s(s, "%s", StrTool::to_utf8(data.at(ROW).second->name).c_str());
+				bool is_enable = MiraiPlus::get_instance()->is_enable(data.at(ROW).second->ac);
+				if (!is_enable) {
+					sprintf_s(s, "[X] %s", std::string(s).c_str());
+				}
+				DrawData(s, X, Y, W, H);
+				return;
+			}	
 		default:
 			return;
 		}
@@ -295,6 +341,18 @@ public:
 	}
 	static void event_callback(Fl_Widget*, void* v) {      // table's event callback (static)
 		((MyTable*)v)->event_callback2();
+	}
+	static void callback_timer(void* d) {
+		//static int flush = gui_flush;
+		MyTable* instance = static_cast<MyTable*>(d);
+		//MiraiLog::get_instance()->add_debug_log("TB", "TM");
+		//if (flush != gui_flush)
+		{
+			instance->rows(0);
+			instance->rows(instance->data.size());
+		//	flush = gui_flush;
+		}
+		Fl::repeat_timeout(1.0, callback_timer, d);
 	}
 	MyTable(int X, int Y, int W, int H, MyTable2* tb2,
 		Fl_Box* box_name,
@@ -327,6 +385,7 @@ public:
 		this->box_author = box_author;
 		this->box_version = box_version;
 		this->edit_des = edit_des;
+		Fl::add_timeout(1.0, callback_timer, (void*)this);
 	}
 	~MyTable() { }
 };
@@ -386,7 +445,7 @@ static std::string get_fun_name_by_type(const std::string& uuid, int tp)
 {
 	auto all_plus = MiraiPlus::get_instance()->get_all_plus();
 	for (auto plus : all_plus) {
-		if (uuid != plus.second->uuid) {
+		if (uuid != plus.second->get_uuid()) {
 			continue;
 		}
 		for (auto fun : plus.second->event_vec) {
@@ -408,7 +467,7 @@ static int get_auth_code_by_uuid(const std::string& uuid)
 {
 	 auto plus = MiraiPlus::get_instance()->get_all_plus();
 	 for (auto i : plus) {
-		 if (uuid == i.second->uuid) {
+		 if (uuid == i.second->get_uuid()) {
 			 return i.first;
 		 }
 	 }
@@ -822,16 +881,6 @@ static void fun(const char* sender, const char* flag, const char* msg)
 
 }
 
-static bool is_process_exist(HANDLE handle) {
-	if (handle == NULL) {
-		return false;
-	}
-	DWORD dw = WaitForSingleObject(handle, 1);
-	if (dw == WAIT_OBJECT_0 || dw == WAIT_FAILED) {
-		return false;
-	}
-	return true;
-}
 
 void mainprocess()
 {
@@ -906,7 +955,10 @@ void mainprocess()
 				auto plus_vec = MiraiPlus::get_instance()->get_all_plus();
 				for (auto plus : plus_vec)
 				{
-					bool ret = is_process_exist(plus.second->process_handle);
+					if (!plus.second->is_enable()) {
+						continue;
+					}
+					bool ret = plus.second->is_process_exist();
 					if (ret == false) {
 						MiraiLog::get_instance()->add_fatal_log("检测到插件异常退出", plus.second->get_filename());
 						Center::get_instance()->del_all_plus();
@@ -953,7 +1005,7 @@ void mainprocess()
 		bool is_all_close = true;
 		for (auto plus : plus_vec)
 		{
-			bool ret = is_process_exist(plus.second->process_handle);
+			bool ret = plus.second->is_process_exist();
 			if (ret == true) {
 				is_all_close = false;
 			}

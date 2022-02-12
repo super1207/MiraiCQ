@@ -92,7 +92,7 @@ static void IPC_SendEvent_T(const char* msg)
 {
 	auto plus = MiraiPlus::get_instance()->get_all_plus();
 	for (auto p : plus) {
-		IPC_SendEvent(p.second->uuid.c_str(), msg);
+		IPC_SendEvent(p.second->get_uuid().c_str(), msg);
 	}
 }
 
@@ -101,12 +101,8 @@ int Center::del_all_plus()
 	//先禁用插件，防止插件再收到事件
 	auto plus = MiraiPlus::get_instance()->get_all_plus();
 	for (auto p : plus) {
-		p.second->is_enable = false;
+		MiraiPlus::get_instance()->disable_plus(p.first);
 	}
-	// 发送主进程退出事件
-	Json::Value to_send;
-	to_send["event_type"] = "exit";
-	IPC_SendEvent_T(to_send.toStyledString().c_str());
 	return 0;
 }
 
@@ -194,8 +190,6 @@ std::shared_ptr<Center::PlusInfo> Center::get_plus_by_ac(int ac)
 	std::shared_ptr<Center::PlusInfo> info(new Center::PlusInfo);
 	info->ac = pdf->ac;
 	info->description = pdf->description;
-	info->is_enable = pdf->is_enable;
-	info->is_load = !(pdf->is_first_enable);
 	info->name = pdf->name;
 	info->version = pdf->version;
 	info->author = pdf->author;
@@ -236,7 +230,7 @@ void Center::call_menu_fun_by_ac(int ac, int pos)
 	auto menu_vec = pdf->get_menu_vec();
 	try {
 		to_send["params"]["fun_name"] = menu_vec.at(pos)->fun_name;
-		IPC_ApiSend(pdf->uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 100);
+		IPC_ApiSend(pdf->get_uuid().c_str(), Json::FastWriter().write(to_send).c_str(), 100);
 	}
 	catch (...) {
 

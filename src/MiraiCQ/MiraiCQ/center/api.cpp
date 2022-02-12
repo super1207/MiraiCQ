@@ -52,10 +52,11 @@ static TER_TYPE normal_call(
 	{
 		auto plus = MiraiPlus::get_instance();
 		//assert(plus);
-		if (!plus->is_enable(auth_code))
+		// 插件总是开启的
+		/*if (!plus->is_enable(auth_code))
 		{
 			return RETERR(TP10086<TER_TYPE>());
-		}
+		}*/
 	}
 	else
 	{

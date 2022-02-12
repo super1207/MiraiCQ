@@ -67,8 +67,8 @@ static void IPC_SendEvent_T(const char * msg)
 {
 	auto plus = MiraiPlus::get_instance()->get_all_plus();
 	for (auto p : plus) {
-		if (p.second->is_enable) {
-			IPC_SendEvent(p.second->uuid.c_str(), msg);
+		if (p.second->is_enable()) {
+			IPC_SendEvent(p.second->get_uuid().c_str(), msg);
 		}
 	}
 }

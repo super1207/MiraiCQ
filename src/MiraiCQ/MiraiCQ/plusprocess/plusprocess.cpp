@@ -197,30 +197,6 @@ static void fun(const char* sender, const char* flag, const char* msg)
 				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
 				return;
 			}
-			else if (action == "start")
-			{
-				// CQ的启动函数
-				void* fptr = get_fun_ptr(g_dll_path, root["params"]["fun_name"].asString());
-				if (!fptr) {
-					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
-					return;
-				}
-				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
-				Fl::awake(call_start, fptr);
-				return;
-			}
-			else if (action == "enable")
-			{
-				// 插件启用函数
-				void* fptr = get_fun_ptr(g_dll_path, root["params"]["fun_name"].asString());
-				if (!fptr) {
-					IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
-					return;
-				}
-				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
-				Fl::awake(call_start, fptr);
-				return;
-			}
 			else if (action == "call_menu")
 			{
 				// 插件菜单
@@ -231,12 +207,6 @@ static void fun(const char* sender, const char* flag, const char* msg)
 				}
 				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
 				Fl::awake(call_menu, fptr);
-				return;
-			}
-			else if (action == "heartbeat")
-			{
-				// 心跳，用于主进程判断插件进程是否存活（意外崩溃）
-				IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "OK");
 				return;
 			}
 			IPC_ApiReply(sender_str.c_str(), flag_str.c_str(), "");
@@ -251,6 +221,10 @@ static void fun(const char* sender, const char* flag, const char* msg)
 
 /* 用于处理主进程传来的事件 */
 static void do_event(Json::Value& root) {
+	/* 已经收到退出事件，所以不在响应任何事件 */
+	if (g_close_heartbeat) {
+		return ;
+	}
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
 	// MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
 	if (event_type == "cq_event_group_message")
@@ -466,6 +440,20 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 
 		/* 加载插件，加载失败会强制退出进程 */
 		load_plus(plus_name);
+
+
+		// CQ的启动函数
+		std::string start_fun_name = get_fun_name(1001);
+		std::string enable_fun_name = get_fun_name(1003);
+		void* fptr = get_fun_ptr(g_dll_path, start_fun_name);
+		if (fptr) {
+			call_start(fptr);
+		}
+		fptr = get_fun_ptr(g_dll_path, enable_fun_name);
+		if (fptr) {
+			call_start(fptr);
+		}
+
 
 		/* 用于处理主进程下发的事件 */
 		std::thread([plus_flag]() {
