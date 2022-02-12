@@ -26,6 +26,7 @@ MiraiPlus::~MiraiPlus()
 {
 }
 
+// 用于读取文件
 static std::string read_biniary_file(const std::string& file_path)
 {
 	using namespace std;
@@ -54,6 +55,8 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		PathTool::create_dir(path_str);
 		SetDllDirectoryA(path_str.c_str());
 	}
+
+	//判断CQP.dll是否存在
 	HMODULE hHandle = LoadLibraryA("CQP.dll");
 	if (hHandle == NULL) {
 		err_msg = "CQP.dll加载失败，code:" + std::to_string(GetLastError());
@@ -255,27 +258,27 @@ bool MiraiPlus::enable_plus(int ac, std::string & err_msg)
 	}
 	
 	{
-		// 插件已经启用
+		// 插件进程存在，说明插件已经启用
 		shared_lock<shared_mutex> lock(plus->mx_plus_def);
 		if (plus->process) {
 			return true;
 		}
 	}
 
-	/* 创建UUID */
+	// 创建UUID,先设置uuid再启动进程，可以让插件始终能顺利调用API
 	std::string uuid = StrTool::gen_uuid();
+	plus->set_uuid(uuid);
 	assert(plus->uuid != "");
 
 	/* 创建插件进程 */
 	std::shared_ptr<MiraiPlus::PlusDef::Process> proc = std::make_shared<MiraiPlus::PlusDef::Process>(plus->dll_name,uuid);
 	
-	plus->set_uuid(uuid);
-
 	{
 		unique_lock<shared_mutex> lock(plus->mx_plus_def);
 		plus->process = proc;
 	}
 
+	// 等待插件进程加载
 	Json::Value to_send;
 	to_send["action"] = "is_load";
 	bool is_load = false;
@@ -293,22 +296,9 @@ bool MiraiPlus::enable_plus(int ac, std::string & err_msg)
 		err_msg = "插件无响应";
 		plus->set_uuid("");
 		{
-			
 			unique_lock<shared_mutex> lock(plus->mx_plus_def);
 			plus->process = nullptr;
 		}
-		return false;
-	}
-	return true;
-}
-
-// 返回调用此函数后进程是否存在
-static bool wait_process_exit(HANDLE handle) {
-	if (handle == NULL) {
-		return false;
-	}
-	DWORD dw = WaitForSingleObject(handle, 5000);
-	if (dw == WAIT_OBJECT_0 || dw == WAIT_FAILED) {
 		return false;
 	}
 	return true;
@@ -319,11 +309,15 @@ void MiraiPlus::disable_plus(int ac)
 	std::shared_ptr<PlusDef> plus = get_plus(ac);
 	
 	if (!plus) {
+		// 错误的AC
 		return ;
 	}
+
+	// 插件未启用
 	if (!plus->is_enable()) {
 		return ;
 	}
+
 	Json::Value to_send;
 	to_send["event_type"] = "exit";
 	// 发送退出事件
@@ -378,13 +372,6 @@ std::vector<std::pair<int,std::weak_ptr<MiraiPlus::PlusDef>>> MiraiPlus::get_all
 	}
 	return ret_vec;
 }
-
-//std::string MiraiPlus::get_uuid()
-//{
-//	std::shared_lock<std::shared_mutex> lk(this->mx_plus_map);
-//	return std::string();
-//}
-
 
 MiraiPlus* MiraiPlus::get_instance() 
 {

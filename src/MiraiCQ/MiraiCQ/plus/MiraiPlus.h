@@ -44,10 +44,9 @@ public:
 		int ac; /* 插件ac */
 		std::vector<std::shared_ptr<const Event>> event_vec;
 		std::vector<std::shared_ptr<const Menu>> menu_vec;
-		std::set<int> auth_vec;
-		std::shared_ptr<Process> process = nullptr;
+		// std::set<int> auth_vec;
+		std::shared_ptr<Process> process = nullptr; /* 插件的进程 */
 		std::shared_mutex mx_plus_def;
-		//std::atomic_bool is_enable = false; /* 插件是否启用 */
 
 		~PlusDef();
 		/*
@@ -75,12 +74,25 @@ public:
 		*/
 		std::string get_filename() ;
 
+		/*
+		* 描述：返回插件uuid，uuid可用于与插件进行IPC通讯，若插件未启用，则返回""
+		* 返回值：返回插件uuid
+		*/
 		std::string get_uuid();
 
+		/*
+		* 描述：设置插件的uuid
+		*/
 		void set_uuid(const std::string & uuid);
 
+		/*
+		* 描述：返回插件是否启用,注意，并不是插件启用，插件进程就一定存在，因为插件可能异常退出
+		*/
 		bool is_enable();
 
+		/*
+		*  描述：返回插件进程是否存在，注意，若插件没有启用，则插件进程一定不存在
+		*/
 		bool is_process_exist();
 	private:
 		std::string uuid;
