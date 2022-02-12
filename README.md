@@ -52,4 +52,13 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 3. 原酷Q中的[dll下载地址](https://super1207.lanzoui.com/iVNkJttuf2f)。
 4. MiraiCQ不会支持获取txqq的cookie，csrf token，也不会支持点赞，钱包相关内容。
 5. MiraiCQ"暂时"不支持语音收发。
+
+#### 相关项目：
+
+1. [botuniverse/onebot-11](https://github.com/botuniverse/onebot-11)(对接标准)
+2. [Mrs4s/go-cqhttp](https://github.com/Mrs4s/go-cqhttp)(一个onebotv11实现)
+3. [coolq-http-api](https://github.com/kyubotics/coolq-http-api)(主要测试插件以及部分源码参考)
+4. [iTXTech/mirai-native](https://github.com/iTXTech/mirai-native)(相似项目，部分逻辑上参考)
+5. [mamoe/mirai](https://github.com/mamoe/mirai)(起名)
+6. 此外，其他相关项目在thirdpart目录下可以找到，不一一列举。
 		
