@@ -513,7 +513,7 @@ void Center::deal_type_message_private(Json::Value& evt)
 		return;
 	}
 	auto s = Json::FastWriter().write(jsonarr);
-	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr,1));
+	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr,0));
 	if (cq_str == "")
 	{
 		return;
@@ -578,7 +578,7 @@ void Center::deal_type_message_group(Json::Value& evt)
 		return;
 	}
 	auto s = Json::FastWriter().write(jsonarr);
-	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr, 1));
+	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr, 0));
 	if (cq_str == "")
 	{
 		return;
