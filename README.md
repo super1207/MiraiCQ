@@ -47,7 +47,7 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 2. QQ群：920220179 (欢迎来玩
 
 #### 常见问题解答：
-1. 插件的json文件需要使用 GBK 编码。
+1. 插件的json文件需要使用 UTF-8 编码。
 2. 某些原酷Q插件会依赖一些酷Q的dll，可以自行将其放入指定目录，一般是bin目录（自行创建）或者MiraiCQ.exe目录（不清楚可以两个目录都放）。
 3. 原酷Q中的[dll下载地址](https://super1207.lanzoui.com/iVNkJttuf2f)。
 4. MiraiCQ不会支持获取txqq的cookie，csrf token，也不会支持点赞，钱包相关内容。
