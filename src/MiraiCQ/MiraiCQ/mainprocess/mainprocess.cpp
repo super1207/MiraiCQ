@@ -897,6 +897,9 @@ void mainprocess()
 		hide_all_window();
 	}
 
+	MiraiLog::get_instance()->add_info_log("VERSION", "V2.3.3");
+	MiraiLog::get_instance()->add_info_log("CORE", "开源地址：https://github.com/super1207/MiraiCQ");
+
 	// 初始化IPC服务
 	if (IPC_Init("") != 0)
 	{
