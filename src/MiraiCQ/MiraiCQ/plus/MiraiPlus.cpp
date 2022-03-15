@@ -444,9 +444,9 @@ MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::stri
 	if (GetModuleFileNameA(NULL, path_str, MAX_PATH) == 0)
 	{
 		MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "获得当前exe名称失败");
-		exit(-1);
+		exit(-1); 
 	}
-	std::string cmd = path_str;
+	std::string cmd = "\"" + string(path_str) + "\"";
 	cmd += " ";
 	cmd += IPC_GetFlag();
 	cmd += " ";

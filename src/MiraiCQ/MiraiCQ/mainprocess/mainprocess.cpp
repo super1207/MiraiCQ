@@ -125,7 +125,7 @@ static void login_dlg_cb(Fl_Widget* o, void* p) {
 static bool login_dlg()
 {
 	LOGIN_INFO login_info;
-	Fl_Window win(300, 180, "MiraiCQ V2.0");
+	Fl_Window win(300, 180, "MiraiCQ V2.3.3");
 	win.begin();
 	login_info.ws_url = Config::get_instance()->get_ws_url();
 	login_info.access_token = Config::get_instance()->get_access_token();
