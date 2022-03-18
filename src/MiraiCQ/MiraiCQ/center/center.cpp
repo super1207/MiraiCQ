@@ -125,7 +125,7 @@ bool Center::run()
 			/* 在这里处理所有Net事件即可 */
 			shared_ptr<MiraiNet> net;
 			{
-				shared_lock<shared_mutex>(mx_net);
+				shared_lock<shared_mutex> lk(mx_net);
 				net = this->net.lock();
 				if (!net)
 				{
