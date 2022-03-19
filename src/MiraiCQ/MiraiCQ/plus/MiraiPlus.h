@@ -34,6 +34,7 @@ public:
 			~Process();
 		private:
 			void* process_handle = NULL;
+			void* job_handle = NULL;
 		};
 		std::string name; /* 插件名字 */
 		std::string filename; /* 插件的文件名 */

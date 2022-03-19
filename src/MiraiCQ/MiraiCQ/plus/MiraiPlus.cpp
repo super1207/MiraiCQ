@@ -463,6 +463,31 @@ MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::stri
 	}
 	CloseHandle(pi.hThread);
 	this->process_handle = pi.hProcess;
+	//绑定主进程，确保主进程结束后子进程能强制退出
+	HANDLE job = CreateJobObjectA(NULL, NULL);
+	if (job == NULL) {
+		MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "CreateJobObjectA失败");
+		exit(-1);
+	}
+	this->job_handle = job;
+	BOOL ret = AssignProcessToJobObject(job, this->process_handle);
+	if (ret != TRUE) {
+		MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "将子进程附加到主进程失败1");
+		exit(-1);
+	}
+	assert(ret == TRUE);
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION limit_info = {0};
+	limit_info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+	ret = SetInformationJobObject(
+		job,
+		JobObjectExtendedLimitInformation,
+		&limit_info,
+		sizeof(limit_info)
+	);
+	if (ret != TRUE) {
+		MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "设置子进程自动结束失败");
+		exit(-1);
+	}
 }
 
 bool MiraiPlus::PlusDef::Process::is_exist()
@@ -482,6 +507,7 @@ void MiraiPlus::PlusDef::Process::wait_process_quit(int timeout)
 
 MiraiPlus::PlusDef::Process::~Process()
 {
-	TerminateProcess((HANDLE)process_handle, 0);
+	//TerminateProcess((HANDLE)process_handle, 0);
 	CloseHandle(process_handle);
+	CloseHandle(job_handle);
 }

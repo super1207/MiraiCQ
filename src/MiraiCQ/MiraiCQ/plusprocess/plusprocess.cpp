@@ -20,8 +20,6 @@
 extern std::string g_main_flag;
 static std::string g_dll_path;
 
-static std::atomic_bool g_close_heartbeat = false;
-
 /* 用于从插件dll中获取函数地址 */
 static void* get_fun_ptr(const std::string& dll_path, const std::string& fun_name)
 {
@@ -37,7 +35,7 @@ static void* get_fun_ptr(const std::string& dll_path, const std::string& fun_nam
 	return GetProcAddress(hand, fun_name.c_str());
 }
 
-/* 用于向主进程查询函数名字 */
+/* 用于向主进程查询函数名字,返回`""`代表没有查询到 */
 static std::string get_fun_name(int funtype)
 {
 	static std::map<int, std::string> mmap;
@@ -46,7 +44,7 @@ static std::string get_fun_name(int funtype)
 		std::lock_guard<std::mutex>lk(mx);
 		if (mmap.find(funtype) != mmap.end()) {
 			auto ret = mmap.at(funtype);
-			if (ret == "?") {
+			if (ret == "?") { // `?` 代表没有查询到
 				return "";
 			}
 			else {
@@ -67,55 +65,6 @@ static std::string get_fun_name(int funtype)
 	}
 	return ret;
 }
-
-static bool is_parent_exist() {
-	DWORD dwID, dwParentID;
-	HANDLE hParent = NULL;
-	HANDLE  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	dwID = GetCurrentProcessId();
-	if (hSnapshot != INVALID_HANDLE_VALUE)
-	{
-		PROCESSENTRY32 pe32 = { sizeof(PROCESSENTRY32) };
-		BOOL bRet = Process32First(hSnapshot, &pe32);
-		if (pe32.th32ProcessID == dwID)
-		{
-			dwParentID = pe32.th32ParentProcessID;
-			hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
-		}
-		else
-		{
-			while (Process32Next(hSnapshot, &pe32))
-			{
-				if (pe32.th32ProcessID == dwID)
-				{
-					dwParentID = pe32.th32ParentProcessID;
-					hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
-					break;
-				}
-			}
-		}
-		CloseHandle(hSnapshot);
-	}
-	if (hParent != NULL) {
-		CloseHandle(hParent);
-		return true;
-	}
-	return false;
-}
-
-/* 用于判断主进程是否还存在，若不存在，则结束当前进程 */
-static void do_heartbeat(const std::string& main_flag)
-{
-	while (!g_close_heartbeat)
-	{
-		if (!is_parent_exist()) {
-			MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
-			exit(-1);
-		}
-		TimeTool::sleep(5000);
-	}
-}
-
 
 /* 用于加载插件dll,并且设置静态全局变量`g_dll_path` */
 static void load_plus(const std::string& plus_name)
@@ -152,7 +101,7 @@ static void load_plus(const std::string& plus_name)
 }
 
 /* 用于调用插件的start和enable函数 */
-void call_start(void* user_data)
+static void call_start(void* user_data)
 {
 	typedef __int32(__stdcall* fun_ptr_type_1)();
 	int ret = ((fun_ptr_type_1)user_data)();
@@ -163,7 +112,7 @@ void call_start(void* user_data)
 }
 
 /* 用于调用插件菜单 */
-void call_menu(void* user_data)
+static void call_menu(void* user_data)
 {
 	typedef __int32(__stdcall* fun_ptr_type_1)();
 	((fun_ptr_type_1)user_data)();
@@ -221,10 +170,6 @@ static void fun(const char* sender, const char* flag, const char* msg)
 
 /* 用于处理主进程传来的事件 */
 static void do_event(Json::Value& root) {
-	/* 已经收到退出事件，所以不在响应任何事件 */
-	if (g_close_heartbeat) {
-		return ;
-	}
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
 	// MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
 	if (event_type == "cq_event_group_message")
@@ -400,24 +345,6 @@ static void do_event(Json::Value& root) {
 				);
 		}
 	}
-	else if (event_type == "exit")
-	{
-		g_close_heartbeat = true;
-		MiraiLog::get_instance()->add_info_log("PLUS", "接收到主进程发送的退出事件，正在安全退出...");
-		std::thread([]() {
-			TimeTool::sleep(5000);
-			/* 安全退出(指强制结束进程 */
-			exit(-1);
-			}).detach();
-			std::string fun_name = get_fun_name(1002);
-			void* fun_ptr = get_fun_ptr(g_dll_path, fun_name);
-			if (fun_ptr)
-			{
-				typedef int(__stdcall* exit_event)();
-				((exit_event)fun_ptr)();
-			}
-			exit(0);
-	}
 	else {
 		MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到未知的事件类型:" + root.toStyledString());
 	}
@@ -470,6 +397,33 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 					continue;
 				}
 
+				//检测是否是插件退出事件
+				try {
+					std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
+					if (event_type == "exit")
+					{
+						MiraiLog::get_instance()->add_info_log("PLUS", "接收到主进程发送的退出事件，正在安全退出...");
+						std::thread([]() {
+							TimeTool::sleep(5000);
+							/* 安全退出(指强制结束进程 */
+							exit(-1);
+						}).detach();
+
+						std::string fun_name = get_fun_name(1002);
+						void* fun_ptr = get_fun_ptr(g_dll_path, fun_name);
+						if (fun_ptr)
+						{
+							typedef int(__stdcall* exit_event)();
+							((exit_event)fun_ptr)();
+						}
+						exit(0);
+					}
+				}
+				catch (const std::exception& e) {
+					MiraiLog::get_instance()->add_fatal_log("EVENTRECV", std::string("插件退出时发生异常：") + e.what());
+					exit(-1);
+				}
+				// 将其放入线程池
 				ThreadTool::get_instance()->submit([=]() {
 					try {
 						Json::Value root_ = root;
@@ -480,29 +434,21 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 						exit(-1);
 					}
 				});
-				// 目前事件先不做多线程，防止莫些插件不能正确处理
-				// do_event(root);
-
 			}
-			}).detach();
+		}).detach();
 
-			/* 用于判断主进程是否结束，来结束自己 */
-			std::thread([main_flag]() {
-				do_heartbeat(main_flag);
-				}).detach();
+		/* 处理主进程的API调用 */
+		std::thread([&]() {
+			while (true) {
+				IPC_ApiRecv(fun);
+			}
+		}).detach();
 
-				/* 处理主进程的API调用 */
-				std::thread([&]() {
-					while (true) {
-						IPC_ApiRecv(fun);
-					}
-					}).detach();
-
-					/* 窗口循环 */
-					while (true) {
-						TimeTool::sleep(20);
-						Fl::wait(1e20);
-					}
+		/* 窗口循环 */
+		while (true) {
+			TimeTool::sleep(20);
+			Fl::wait(1e20);
+		}
 	}
 	catch (const std::exception& e)
 	{
