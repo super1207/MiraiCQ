@@ -19,6 +19,7 @@ MiraiCQ
 #### 下载地址
 1. [releases](https://github.com/super1207/MiraiCQ/releases)
 2. [actions](https://github.com/super1207/MiraiCQ/actions) (预览版本，可能不够稳定)
+3. [高速下载](http://www.super1207.top/howmany/miraicq_download) (国内下载速度快，但可能不会及时更新)
 
 #### 使用方法：
 
