@@ -27,6 +27,8 @@
 
 #include <assert.h>
 
+#include "../resource.h"
+
 
 static std::atomic_int gui_flush = 0;
 
@@ -125,7 +127,7 @@ static void login_dlg_cb(Fl_Widget* o, void* p) {
 static bool login_dlg()
 {
 	LOGIN_INFO login_info;
-	Fl_Window win(300, 180, "MiraiCQ V2.3.5");
+	Fl_Window win(300, 180, "MiraiCQ V2.3.6");
 	win.begin();
 	login_info.ws_url = Config::get_instance()->get_ws_url();
 	login_info.access_token = Config::get_instance()->get_access_token();
@@ -882,6 +884,40 @@ static void fun(const char* sender, const char* flag, const char* msg)
 }
 
 
+static void release_dll()
+{
+	std::string cqp1_dir = PathTool::get_exe_dir();
+	std::string cqp1_file = cqp1_dir + "CQP.dll";
+	std::string cqp2_dir = PathTool::get_exe_dir() + "bin\\";
+	std::string cqp2_file = cqp2_dir + "CQP.dll";
+	if (PathTool::is_file_exist(cqp1_file)) {
+		PathTool::del_file(cqp1_file);
+	}
+	if (PathTool::is_file_exist(cqp2_file)) {
+		PathTool::del_file(cqp2_file);
+	}
+	HRSRC hRes = FindResourceA(NULL, MAKEINTRESOURCEA(IDR_DLL_BIN1), "DLL_BIN");
+	if (hRes == NULL) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_CQP.dll", "FindResourceA err");
+		exit(-1);
+	}
+	HGLOBAL hMem = LoadResource(NULL, hRes);
+	DWORD dwSize = SizeofResource(NULL, hRes);
+	PathTool::create_dir(cqp2_dir);
+	HANDLE hFile = CreateFileA(cqp2_file.c_str(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_CQP.dll", "CreateFileA err");
+		exit(-1);
+	}
+	DWORD dwWrite = 0;
+	BOOL bRet = WriteFile(hFile, hMem, dwSize, &dwWrite, NULL);
+	if (bRet == FALSE) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_CQP.dll", "WriteFile err");
+		exit(-1);
+	}
+	CloseHandle(hFile);
+}
+
 void mainprocess()
 {
 	SET_DEFULTER_HANDLER();
@@ -897,8 +933,11 @@ void mainprocess()
 		hide_all_window();
 	}
 
-	MiraiLog::get_instance()->add_info_log("VERSION", "V2.3.5");
+	MiraiLog::get_instance()->add_info_log("VERSION", "V2.3.6");
 	MiraiLog::get_instance()->add_info_log("CORE", "开源地址：https://github.com/super1207/MiraiCQ");
+
+	// 释放CQP.dll
+	release_dll();
 
 	// 初始化IPC服务
 	if (IPC_Init("") != 0)

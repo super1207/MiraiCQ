@@ -21,14 +21,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -168,6 +168,7 @@
     <ClInclude Include="net\OneBot\OneBotImpl.h" />
     <ClInclude Include="plusprocess\plusprocess.h" />
     <ClInclude Include="plus\MiraiPlus.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="tool\BinTool.h" />
     <ClInclude Include="tool\ImgTool.h" />
     <ClInclude Include="tool\InputTool.h" />
@@ -180,7 +181,11 @@
     <ClInclude Include="tool\TimeTool.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\CQP_BIN\CQP.dll" />
     <None Include="cqpexport.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MiraiCQ.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
