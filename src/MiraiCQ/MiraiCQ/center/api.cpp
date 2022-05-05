@@ -134,6 +134,16 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				/* 没有file字段，说明是不规范的cq码，直接忽略（不做修改） */
 				continue;
 			}
+			if (file.rfind("http://", 0) == 0 || file.rfind("https://", 0) == 0) 
+			{
+				/* 说明是网络链接，本身是符合onebot标准的，直接忽略（不做修改） */
+				continue;
+			}
+			if (file.rfind("base64://", 0) == 0 )
+			{
+				/* 说明是base64链接，本身是符合onebot标准的，直接忽略（不做修改） */
+				continue;
+			}
 			file = PathTool::get_exe_dir() +"data\\image\\" + StrTool::to_ansi(file);
 			
 			/* 如果文件不存在，但是文件在cqimg里面存在，则以url方式发送 */
