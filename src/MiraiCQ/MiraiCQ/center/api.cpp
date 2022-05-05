@@ -144,8 +144,20 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				/* 说明是base64链接，本身是符合onebot标准的，直接忽略（不做修改） */
 				continue;
 			}
-			file = PathTool::get_exe_dir() +"data\\image\\" + StrTool::to_ansi(file);
-			
+			if (file.rfind("file:///", 0) == 0)
+			{
+				/* 说明是onebot路径格式*/
+				file = file.substr(8);
+			}
+			if (file.size() > 2 && file.at(1) == ':') 
+			{
+				/* 说明是绝对路径 */
+				file = StrTool::to_ansi(file);
+			}else
+			{
+				/* 说明是相对路径 */
+				file = PathTool::get_exe_dir() + "data\\image\\" + StrTool::to_ansi(file);
+			}
 			/* 如果文件不存在，但是文件在cqimg里面存在，则以url方式发送 */
 			if ((!PathTool::is_file_exist(file)) && (PathTool::is_file_exist((file + ".cqimg"))))
 			{
