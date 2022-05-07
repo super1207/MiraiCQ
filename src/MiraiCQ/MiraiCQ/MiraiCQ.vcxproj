@@ -67,7 +67,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;$(ProjectDir)thirdpart\include\fltk-1.3.8\lib;$(OutDirFullPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>plusprocess/cqpexport.def</ModuleDefinitionFile>
       <AdditionalDependencies>fltkd.lib;advapi32.lib;shell32.lib;user32.lib;gdi32.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
@@ -93,7 +93,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)thirdpart\lib;$(ProjectDir)thirdpart\include\fltk-1.3.8\lib;$(OutDirFullPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>cqpexport.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>plusprocess/cqpexport.def</ModuleDefinitionFile>
       <AdditionalDependencies>fltk.lib;advapi32.lib;shell32.lib;user32.lib;gdi32.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
@@ -102,7 +102,6 @@
   <ItemGroup>
     <ClCompile Include="center\api.cpp" />
     <ClCompile Include="center\center.cpp" />
-    <ClCompile Include="center\cqpexport.cpp" />
     <ClCompile Include="center\event.cpp" />
     <ClCompile Include="config\config.cpp" />
     <ClCompile Include="log\MiraiLog.cpp" />
@@ -114,6 +113,7 @@
     <ClCompile Include="net\OneBot\OneBotApiDeal.cpp" />
     <ClCompile Include="net\OneBot\OneBotEventDeal.cpp" />
     <ClCompile Include="net\OneBot\OneBotImpl.cpp" />
+    <ClCompile Include="plusprocess\cqpexport.cpp" />
     <ClCompile Include="plusprocess\plusprocess.cpp" />
     <ClCompile Include="plus\MiraiPlus.cpp" />
     <ClCompile Include="test_ipc.cpp" />
@@ -182,7 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
-    <None Include="cqpexport.def" />
+    <None Include="plusprocess\cqpexport.def" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />

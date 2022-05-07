@@ -90,9 +90,6 @@
     <ClCompile Include="center\center.cpp">
       <Filter>center</Filter>
     </ClCompile>
-    <ClCompile Include="center\cqpexport.cpp">
-      <Filter>center</Filter>
-    </ClCompile>
     <ClCompile Include="center\api.cpp">
       <Filter>center</Filter>
     </ClCompile>
@@ -207,6 +204,9 @@
     <ClCompile Include="tool\IPCTool.cpp">
       <Filter>tool</Filter>
     </ClCompile>
+    <ClCompile Include="plusprocess\cqpexport.cpp">
+      <Filter>plusprocess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -281,10 +281,10 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cqpexport.def">
-      <Filter>center</Filter>
-    </None>
     <None Include="..\CQP_BIN\CQP.dll" />
+    <None Include="plusprocess\cqpexport.def">
+      <Filter>plusprocess</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />
