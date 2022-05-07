@@ -189,6 +189,9 @@
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="luna_sama.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

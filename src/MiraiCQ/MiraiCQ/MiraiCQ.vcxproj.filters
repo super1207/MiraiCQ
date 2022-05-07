@@ -295,4 +295,7 @@
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="luna_sama.bmp" />
+  </ItemGroup>
 </Project>

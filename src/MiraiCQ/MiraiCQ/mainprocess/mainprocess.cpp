@@ -2,7 +2,7 @@
 
 
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Secret_Input.H>
@@ -12,6 +12,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Multiline_Input.H>
+#include <FL/Fl_BMP_Image.H>
 
 
 #include "../log/MiraiLog.h"
@@ -401,8 +402,9 @@ public:
 
 static void plus_dlg()
 {
+	//fl_register_images();
 	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理");
-	Fl_Window win(508, 400, str1.c_str());
+	Fl_Double_Window win(508, 400, str1.c_str());
 	win.color(fl_rgb_color(0, 255, 255));
 	win.size_range(500, 400, 500, 400);
 	// table2为插件菜单
@@ -414,8 +416,16 @@ static void plus_dlg()
 	Fl_Box box_author(200, 40, 300, 20, str3.c_str());
 	Fl_Box box_version(200, 70, 300, 20, str4.c_str());
 	Fl_Multiline_Input edit_des(200, 100, 300, 180);
+	// 头
+	Fl_Box luna_sama_box(50, 5, 100, 100); 
+	//char s[100] = { 0 };
+	Fl_BMP_Image tmp = Fl_BMP_Image((PathTool::get_exe_dir() + "\\config\\luna_sama.bmp").c_str());
+	//sprintf_s(s, 100, "%d", tmp.fail());
+	//MiraiLog::get_instance()->add_debug_log("IMAGELOAD", s);
+	Fl_Image* pImg = tmp.copy(100, 100);
+	luna_sama_box.image(pImg);
 	// table为插件列表
-	MyTable table(10, 10, 180, 380, &table2, &box_name, &box_author, &box_version, &edit_des);
+	MyTable table(10, 115, 180, 275, &table2, &box_name, &box_author, &box_version, &edit_des);
 	win.end();
 	win.show();
 	Fl::run();
@@ -488,6 +498,36 @@ static void release_dll()
 	CloseHandle(hFile);
 }
 
+static void release_bmp()
+{
+	std::string bmp_dir = PathTool::get_exe_dir() + "config\\";
+	std::string bmp_file = bmp_dir + "luna_sama.bmp";
+	if (PathTool::is_file_exist(bmp_file)) {
+		return;
+	}
+	HRSRC hRes = FindResourceA(NULL, MAKEINTRESOURCEA(IDR_DLL_BIN2), "DLL_BIN");
+	if (hRes == NULL) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_luna_sama.bmp", "FindResourceA err");
+		exit(-1);
+	}
+	HGLOBAL hMem = LoadResource(NULL, hRes);
+	DWORD dwSize = SizeofResource(NULL, hRes);
+	PathTool::create_dir(bmp_dir);
+	HANDLE hFile = CreateFileA(bmp_file.c_str(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_luna_sama.bmp", "CreateFileA err");
+		exit(-1);
+	}
+	DWORD dwWrite = 0;
+	BOOL bRet = WriteFile(hFile, hMem, dwSize, &dwWrite, NULL);
+	if (bRet == FALSE) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_luna_sama.bmp", "WriteFile err");
+		exit(-1);
+	}
+	CloseHandle(hFile);
+}
+
+
 
 static void do_login()
 {
@@ -542,6 +582,8 @@ void mainprocess()
 
 	// 释放CQP.dll
 	release_dll();
+
+	release_bmp();
 
 	// 初始化IPC服务
 	if (IPC_Init("") != 0)
