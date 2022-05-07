@@ -2,7 +2,7 @@ MiraiCQ
 ==
 
 <div align=center>
-	<a href="https://imgtu.com/i/HC16MR"><img src="https://s4.ax1x.com/2022/01/30/HC16MR.png" alt="HC16MR.png" border="0" /></a>
+	<a href="https://imgtu.com/i/OM7U3D"><img src="https://s1.ax1x.com/2022/05/07/OM7U3D.png" alt="OM7U3D.png" border="0" /></a>
 </div>
 
 #### 软件说明：
