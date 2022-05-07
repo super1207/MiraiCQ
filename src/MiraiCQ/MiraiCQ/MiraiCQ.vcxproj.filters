@@ -207,6 +207,9 @@
     <ClCompile Include="plusprocess\cqpexport.cpp">
       <Filter>plusprocess</Filter>
     </ClCompile>
+    <ClCompile Include="mainprocess\dealapi.cpp">
+      <Filter>mainprocess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -279,6 +282,9 @@
       <Filter>tool</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="mainprocess\dealapi.h">
+      <Filter>mainprocess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
