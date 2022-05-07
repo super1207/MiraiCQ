@@ -419,7 +419,7 @@ static void plus_dlg()
 	// ͷ
 	Fl_Box luna_sama_box(50, 5, 100, 100); 
 	//char s[100] = { 0 };
-	Fl_BMP_Image tmp = Fl_BMP_Image((PathTool::get_exe_dir() + "\\config\\luna_sama.bmp").c_str());
+	Fl_BMP_Image tmp = Fl_BMP_Image((StrTool::to_utf8(PathTool::get_exe_dir()) + "\\config\\luna_sama.bmp").c_str());
 	//sprintf_s(s, 100, "%d", tmp.fail());
 	//MiraiLog::get_instance()->add_debug_log("IMAGELOAD", s);
 	Fl_Image* pImg = tmp.copy(100, 100);
