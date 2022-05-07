@@ -150,13 +150,13 @@ static bool login_dlg()
 
 
 
-// Derive a class from Fl_Table
+// 插件菜单
 class MyTable2 : public Fl_Table {
 	std::vector<std::string> data;
 	int ac = -1;
 	void DrawHeader(const char* s, int X, int Y, int W, int H) {
 		fl_push_clip(X, Y, W, H);
-		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
+		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, fl_rgb_color(255, 204, 229));
 		fl_color(FL_BLACK);
 		fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
 		fl_pop_clip();
@@ -168,7 +168,7 @@ class MyTable2 : public Fl_Table {
 		// Draw cell data
 		fl_color(FL_GRAY0); fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
 		// Draw box border
-		fl_color(color()); fl_rect(X, Y, W, H);
+		fl_color(fl_rgb_color(51, 0, 0)); fl_rect(X, Y, W, H);
 		fl_pop_clip();
 	}
 	void draw_cell(TableContext context, int ROW = 0, int COL = 0, int X = 0, int Y = 0, int W = 0, int H = 0) {
@@ -180,7 +180,7 @@ class MyTable2 : public Fl_Table {
 			fl_font(FL_HELVETICA, 16);              // set the font for our drawing operations
 			return;
 		case CONTEXT_COL_HEADER:                  // Draw column headers
-			sprintf_s(s, "%s", arr[COL]);                // "A", "B", "C", etc.
+			sprintf_s(s, "%s", arr[COL]);
 			DrawHeader(s, X, Y, W, H);
 			return;
 		case CONTEXT_CELL:                        // Draw data in cells
@@ -196,14 +196,15 @@ public:
 		int R = callback_row();
 		int C = callback_col();
 		TableContext context = callback_context();
-		int evt = Fl::event();//FL_PUSH
-		if (context == 0x10 && evt == FL_RELEASE)
+		int evt = Fl::event();
+		if (context == 0x10 && evt == FL_RELEASE) //点击事件
 		{
 			auto center = Center::get_instance();
-			if (R == data.size() - 1) {
+			if (R == data.size() - 1) //点击的是插件启停按键
+			{
 				if (MiraiPlus::get_instance()->is_enable(ac)) {
 					MiraiPlus::get_instance()->disable_plus(ac);
-					++gui_flush;
+					++gui_flush; //刷新界面
 				}
 				else {
 					std::string err;
@@ -211,23 +212,22 @@ public:
 						MiraiLog::get_instance()->add_fatal_log("MAINPROCESS", err);
 						exit(-1);
 					}
-					++gui_flush;
+					++gui_flush; //刷新界面
 				}
-				
 			}
-			else {
+			else { //点击的是插件菜单
 				center->call_menu_fun_by_ac(ac, R);
 			}
 			
 		}
 	}
-	static void event_callback(Fl_Widget*, void* v) {      // table's event callback (static)
+	static void event_callback(Fl_Widget*, void* v) {
 		((MyTable2*)v)->event_callback2();
 	}
 	static void callback_timer2(void* d) {
 		static int flushh = gui_flush;
 		MyTable2* instance = static_cast<MyTable2*>(d);
-		//MiraiLog::get_instance()->add_debug_log("TB", "TM");
+		// gui_flush 与上次不一样，插件菜单切换(重新渲染)
 		if (flushh != gui_flush)
 		{
 			instance->set_ac(instance->ac);
@@ -236,6 +236,11 @@ public:
 		Fl::repeat_timeout(1.0, callback_timer2, d);
 	}
 	MyTable2(int X, int Y, int W, int H, const char* L = 0) : Fl_Table(X, Y, W, H, L) {
+		this->color(fl_rgb_color(255, 255, 255));
+		this->vscrollbar->color(fl_rgb_color(255, 255, 255));
+		this->vscrollbar->selection_color(fl_rgb_color(0, 255, 255));
+		this->hscrollbar->color(fl_rgb_color(255, 255, 255));
+		this->hscrollbar->selection_color(fl_rgb_color(0, 255, 255));
 		rows(data.size());             // how many rows
 		row_height_all(20);         // default height of rows
 		row_resize(0);              // disable row resizing
@@ -275,13 +280,13 @@ public:
 	}
 	~MyTable2() { }
 };
-// Derive a class from Fl_Table
+// 插件列表
 class MyTable : public Fl_Table {
 
 	std::vector<std::pair<int, std::shared_ptr<Center::PlusInfo>>> data;
 	void DrawHeader(const char* s, int X, int Y, int W, int H) {
 		fl_push_clip(X, Y, W, H);
-		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
+		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, fl_rgb_color(255, 204, 229));
 		fl_color(FL_BLACK);
 		fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
 		fl_pop_clip();
@@ -293,7 +298,7 @@ class MyTable : public Fl_Table {
 		// Draw cell data
 		fl_color(FL_GRAY0); fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
 		// Draw box border
-		fl_color(color()); fl_rect(X, Y, W, H);
+		fl_color(fl_rgb_color(51, 0, 0)); fl_rect(X, Y, W, H);
 		fl_pop_clip();
 	}
 	void draw_cell(TableContext context, int ROW = 0, int COL = 0, int X = 0, int Y = 0, int W = 0, int H = 0) {
@@ -305,7 +310,7 @@ class MyTable : public Fl_Table {
 			fl_font(FL_HELVETICA, 16);              // set the font for our drawing operations
 			return;
 		case CONTEXT_COL_HEADER:                  // Draw column headers
-			sprintf_s(s, "%s", arr[COL]);                // "A", "B", "C", etc.
+			sprintf_s(s, "%s", arr[COL]); 
 			DrawHeader(s, X, Y, W, H);
 			return;
 		case CONTEXT_CELL:                        // Draw data in cells
@@ -332,7 +337,7 @@ public:
 		int R = callback_row();//获取行
 		TableContext context = callback_context();
 		int evt = Fl::event();//FL_PUSH
-		if (context == 0x10 && evt == FL_RELEASE)
+		if (context == 0x10 && evt == FL_RELEASE) //点击事件
 		{
 			box_name->copy_label(StrTool::to_utf8(data.at(R).second->name).c_str());
 			box_version->copy_label(StrTool::to_utf8(data.at(R).second->version).c_str());
@@ -346,14 +351,14 @@ public:
 		((MyTable*)v)->event_callback2();
 	}
 	static void callback_timer(void* d) {
-		//static int flush = gui_flush;
+		static int flushh = gui_flush;
 		MyTable* instance = static_cast<MyTable*>(d);
-		//MiraiLog::get_instance()->add_debug_log("TB", "TM");
-		//if (flush != gui_flush)
+		// gui_flush 与上次不一样，插件菜单切换(重新渲染)
+		if (flushh != gui_flush)
 		{
 			instance->rows(0);
 			instance->rows(instance->data.size());
-		//	flush = gui_flush;
+			flushh = gui_flush;
 		}
 		Fl::repeat_timeout(1.0, callback_timer, d);
 	}
@@ -363,7 +368,7 @@ public:
 		Fl_Box* box_version,
 		Fl_Multiline_Input* edit_des,
 		const char* L = 0) : Fl_Table(X, Y, W, H, L) {
-
+		this->color(fl_rgb_color(255, 255, 255));
 		auto center = Center::get_instance();
 		auto ac_vec = center->get_ac_vec();
 		for (auto ac : ac_vec)
@@ -376,7 +381,7 @@ public:
 			data.push_back({ ac,info });
 		}
 		rows(data.size());             // how many rows
-		row_height_all(20);         // default height of rows
+		row_height_all(25);         // default height of rows
 		cols(1);             // how many columns
 		col_header(1);              // enable column headers (along top)
 		col_width_all(175);          // default width of columns
@@ -388,6 +393,7 @@ public:
 		this->box_author = box_author;
 		this->box_version = box_version;
 		this->edit_des = edit_des;
+		//开启定时器，用于定时刷新界面
 		Fl::add_timeout(1.0, callback_timer, (void*)this);
 	}
 	~MyTable() { }
@@ -396,8 +402,10 @@ public:
 static void plus_dlg()
 {
 	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理");
-	Fl_Window win(500, 400, str1.c_str());
+	Fl_Window win(508, 400, str1.c_str());
+	win.color(fl_rgb_color(0, 255, 255));
 	win.size_range(500, 400, 500, 400);
+	// table2为插件菜单
 	MyTable2 table2(200, 280, 300, 110);
 	std::string str2 = StrTool::to_utf8("插件名：");
 	std::string str3 = StrTool::to_utf8("作者：");
@@ -406,6 +414,7 @@ static void plus_dlg()
 	Fl_Box box_author(200, 40, 300, 20, str3.c_str());
 	Fl_Box box_version(200, 70, 300, 20, str4.c_str());
 	Fl_Multiline_Input edit_des(200, 100, 300, 180);
+	// table为插件列表
 	MyTable table(10, 10, 180, 380, &table2, &box_name, &box_author, &box_version, &edit_des);
 	win.end();
 	win.show();

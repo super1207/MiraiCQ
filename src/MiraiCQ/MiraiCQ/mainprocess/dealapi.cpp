@@ -443,5 +443,5 @@ void do_api_call(const char* sender, const char* flag, const char* msg)
 	std::string sender_str = sender;
 	ThreadTool::get_instance()->submit([msg_str, flag_str, sender_str]() {
 		deal_api_thread(sender_str, flag_str, msg_str);
-		});
+	});
 }
