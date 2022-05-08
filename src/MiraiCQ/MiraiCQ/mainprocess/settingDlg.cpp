@@ -16,9 +16,10 @@
 
 SettingDlg::SettingDlg()
 {
-	const char* str1 = autoDel(new std::string(StrTool::to_utf8("ÏêÏ¸ÉèÖÃ")))->c_str();
+	const char* str1 = autoDel(new std::string(StrTool::to_utf8("ÏêÏ¸ÉèÖÃ(ESCÍË³ö)")))->c_str();
 	win = autoDel(new Fl_Window(800, 500, str1));
 	win->color(fl_rgb_color(0, 255, 255));
+	win->set_modal();
 }
 
 SettingDlg::~SettingDlg()
@@ -69,25 +70,38 @@ void SettingDlg::show()
 	
 }
 
+class AutoFlUnlock {
+public:
+	AutoFlUnlock() {
+		Fl::lock();
+	}
+	~AutoFlUnlock() {
+		Fl::unlock();
+	}
+};
+
+
 void SettingDlg::create_log_group(int group_x, int group_y, int group_w, int group_h)
 {
 	Fl_Text_Buffer* log_buffer = autoDel(new Fl_Text_Buffer);
 	Fl_Text_Display* edit_des = autoDel(new Fl_Text_Display(group_x, group_y, group_w, group_h));
 	edit_des->buffer(log_buffer);
 	std::string log_flag = StrTool::gen_uuid();
-	MiraiLog::get_instance()->add_front_sinks(log_flag, [edit_des, log_buffer](const MiraiLog::Level& lv, const std::string& category, const std::string& dat, void* user_ptr) -> std::pair<std::string, std::string> {
+	MiraiLog::get_instance()->add_front_sinks(log_flag, [this,edit_des, log_buffer](const MiraiLog::Level& lv, const std::string& category, const std::string& dat, void* user_ptr) -> std::pair<std::string, std::string> {
+		AutoFlUnlock fl_lock;
 		if (log_buffer->length() > 100000) {
 			char* text = log_buffer->text_range(0, 100000);
 			log_buffer->remove(0, log_buffer->length());
 			log_buffer->append(text);
 			free(text);
 		}
-		log_buffer->append((StrTool::to_utf8(fmt::format("[{}]:{}\n", category, dat))).c_str());
+		std::string logStr = StrTool::to_utf8(fmt::format("[{}]:{}\n", category, dat));
+		log_buffer->append(logStr.c_str());
 		return { category ,dat };
-		}, 0);
+	}, 0);
 	this->delete_list.push_front([log_flag]() {
 		MiraiLog::get_instance()->del_front_sinks(log_flag);
-		});
+	});
 	
 }
 
