@@ -549,7 +549,7 @@ static void do_login()
 			bool is_login = login_dlg();
 			if (is_login == false)
 			{
-				return;
+				exit(-1);
 			}
 			break;
 		}
@@ -565,7 +565,7 @@ static void do_login()
 			bool is_login = login_dlg();
 			if (is_login == false)
 			{
-				return;
+				exit(-1);
 			}
 			break;
 		}

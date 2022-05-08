@@ -82,7 +82,7 @@ void SettingDlg::create_log_group(int group_x, int group_y, int group_w, int gro
 			log_buffer->append(text);
 			free(text);
 		}
-		log_buffer->append((StrTool::to_utf8(fmt::format("[{}]:{}", category, dat))).c_str());
+		log_buffer->append((StrTool::to_utf8(fmt::format("[{}]:{}\n", category, dat))).c_str());
 		return { category ,dat };
 		}, 0);
 	this->delete_list.push_front([log_flag]() {

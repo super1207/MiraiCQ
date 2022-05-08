@@ -268,7 +268,7 @@ bool MiraiPlus::enable_plus(int ac, std::string & err_msg)
 	// 创建UUID,先设置uuid再启动进程，可以让插件始终能顺利调用API
 	std::string uuid = StrTool::gen_uuid();
 	plus->set_uuid(uuid);
-	assert(plus->uuid != "");
+	assert(uuid != "");
 
 	/* 创建插件进程 */
 	std::shared_ptr<MiraiPlus::PlusDef::Process> proc = std::make_shared<MiraiPlus::PlusDef::Process>(plus->dll_name,uuid);
