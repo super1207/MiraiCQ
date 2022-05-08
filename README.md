@@ -37,6 +37,7 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 2. clone本项目，使用VS2022打开 MiraiCQ.sln ，直接编译。
 
 #### 开源说明：
+
 本软件(不包括插件，插件是否免费取决于插件作者)永久免费使用，您可以通过任何合法方式使用本软件。
 
 本软件使用 GNU Affero General Public License v3.0 开源，若要用于其它用途，请仔细阅读开源协议。
@@ -49,10 +50,14 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 
 #### 常见问题解答：
 1. 插件的json文件需要使用 UTF-8 编码。
-2. 某些原酷Q插件会依赖一些酷Q的dll，可以自行将其放入指定目录，一般是bin目录（自行创建）或者MiraiCQ.exe目录（不清楚可以两个目录都放）。
+2. 某些原酷Q插件会依赖一些酷Q的dll，可以将其放入bin目录（自行创建）。
 3. 原酷Q中的[dll下载地址](https://super1207.lanzoui.com/iVNkJttuf2f)。
-4. MiraiCQ不会支持获取txqq的cookie，csrf token，也不会支持点赞，钱包相关内容。
-5. MiraiCQ"暂时"不支持语音收发。
+4. MiraiCQ不会支持获取txqq的cookie，csrf token等涉及账号安全的API，也不会支持钱包转账、红包收发等涉及金钱交易的API。
+5. MiraiCQ"暂时"不支持语音收发。注：您仍然可以使用[**onebot定义**的语音cq码](https://github.com/botuniverse/onebot-11/blob/master/message/segment.md#%E8%AF%AD%E9%9F%B3)来收发语音(需要安装ffmpeg，并且要确保onebot实现所在的电脑可以访问语音文件)。
+
+#### 插件开发：
+
+您可以寻找以前酷Q的SDK来开发MiraiCQ的插件。如[kyubotics/cqcppsdk](https://github.com/kyubotics/cqcppsdk)
 
 #### 相关项目：
 
