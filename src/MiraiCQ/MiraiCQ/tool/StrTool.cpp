@@ -5,6 +5,7 @@
 #include <vector>
 #include <pcre.h>
 #include <set>
+#include <cassert>
 
 #pragma comment(lib,"Ole32.lib")
 
@@ -162,6 +163,8 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 	for (size_t i = 0;i < cq_str.size();++i)
 	{
 		char cur_ch = cq_str[i];
+		int utf8_char_len = EmojiTool::utf8_next_len(cq_str, i);
+		assert(utf8_char_len > 0);
 		if (stat == 0) //text mode
 		{
 			if (cur_ch == '[') // to cqcode
@@ -211,7 +214,8 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 			}
 			else //normal ch
 			{
-				text += cq_str[i];
+				text += cq_str.substr(i, utf8_char_len);
+				i += (utf8_char_len - 1);
 			}
 		}
 		else if (stat == 1) // cqcode_type
@@ -246,7 +250,8 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 			}
 			else //normal ch
 			{
-				type += cq_str[i];
+				type += cq_str.substr(i, utf8_char_len);
+				i += (utf8_char_len - 1);
 			}
 		}
 		else if (stat == 2) // cqcode_key
@@ -281,7 +286,8 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 			}
 			else //normal ch
 			{
-				key += cq_str[i];
+				key += cq_str.substr(i, utf8_char_len);
+				i += (utf8_char_len - 1);
 			}
 		}
 		else if (stat == 3) // cqcode_val
@@ -336,7 +342,8 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 			}
 			else //normal ch
 			{
-				val += cq_str[i];
+				val += cq_str.substr(i, utf8_char_len);
+				i += (utf8_char_len - 1);
 			}
 		}
 	}

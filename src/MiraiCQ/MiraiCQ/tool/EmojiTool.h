@@ -17,6 +17,13 @@ public:
 	* 返回值：转换后的字符串
 	*/
 	static std::string unescape_cq_emoji(const std::string& str);
+	/*
+	* 描述：计算utf-8字符的长度
+	* 参数`str`：要计算的字符串
+	* 参数`offset`：字符所在的位置
+	* 返回值：utf-8字符的长度
+	*/
+	static int utf8_next_len(const std::string& str, int offset);
 
 private:
 	EmojiTool();

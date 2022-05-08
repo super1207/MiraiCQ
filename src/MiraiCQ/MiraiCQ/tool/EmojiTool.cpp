@@ -107,7 +107,7 @@ static int utf82u(const std::string& str)
     return t;
 }
 
-static int utf8_next_len(const std::string& str, int offset)
+int EmojiTool::utf8_next_len(const std::string& str, int offset)
 {
     if (str.size() <= (size_t)offset || str[offset] == 0)
         return 0;
