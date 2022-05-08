@@ -5,6 +5,7 @@
 #include <shared_mutex>
 #include <functional>
 #include <vector>
+#include <tuple>
 
 class MiraiLog
 {
@@ -56,10 +57,17 @@ public:
 
 	/*
 	* 描述：增加前端sinks
+	* 参数`flag`：前端sinks的标记
 	* 参数`front_sinks`：前端sinks函数
 	* 参数`user_dat`：用户数据指针
 	*/
-	void add_front_sinks(front_sinks_funtype front_sinks,void * user_dat);
+	void add_front_sinks(const std::string & flag, front_sinks_funtype front_sinks,void * user_dat);
+
+	/*
+	* 描述：删除前端sinks
+	* 参数`flag`：前端sinks的标记
+	*/
+	void del_front_sinks(const std::string& flag);
 
 	/*
 	* 描述：增加后端sinks
@@ -74,7 +82,7 @@ private:
 	void default_backend_sinks(const Level& lv, const std::string& category, const std::string& dat);
 
 private:
-	std::vector<std::pair<front_sinks_funtype,void *>> front_sinks_vec;
+	std::vector<std::tuple<std::string,front_sinks_funtype,void *>> front_sinks_vec;
 	std::vector<std::pair<backend_sinks_funtype, void*>> backend_sinks_vec;
 	std::shared_mutex add_log_mx;
 	

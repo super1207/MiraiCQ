@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <atomic>
+#include <algorithm>
 
 using namespace std;
 
@@ -36,10 +37,19 @@ void MiraiLog::add_fatal_log(const string& category, const string& dat)
     add_log(Level::FATAL, category, dat);
 }
 
-void MiraiLog::add_front_sinks(front_sinks_funtype front_sinks, void* user_dat)
+void MiraiLog::add_front_sinks(const std::string & flag,front_sinks_funtype front_sinks, void* user_dat)
 {
     unique_lock<shared_mutex> lock(add_log_mx);
-    front_sinks_vec.push_back({ front_sinks, user_dat });
+    front_sinks_vec.push_back({ flag,front_sinks, user_dat });
+}
+
+void MiraiLog::del_front_sinks(const std::string& flag)
+{
+    unique_lock<shared_mutex> lock(add_log_mx);
+    auto iter = std::remove_if(front_sinks_vec.begin(), front_sinks_vec.end(), [&](const std::tuple<std::string, front_sinks_funtype, void*> & it) {
+        return std::get<0>(it) == flag;
+    });
+    front_sinks_vec.erase(iter, front_sinks_vec.end());
 }
 
 void MiraiLog::add_backend_sinks(backend_sinks_funtype backend_sinks, void* user_dat)
@@ -89,8 +99,8 @@ void MiraiLog::add_log(const Level& lv, const string& category, const string& da
     pair<string, string> sinks_ret{ category ,dat };
     for (const auto& sinks : front_sinks_vec)
     {
-        const auto slint_fun = sinks.first;
-        const auto user_data = sinks.second;
+        const auto slint_fun = std::get<1>(sinks);
+        const auto user_data = std::get<2>(sinks);
         sinks_ret = slint_fun(lv, sinks_ret.first, sinks_ret.second, user_data);
     }
 
@@ -103,10 +113,10 @@ void MiraiLog::add_log(const Level& lv, const string& category, const string& da
     }
 
     /* 如果没有自定义的后端sinks,则调用默认sinks(打印到控制台上) */
-    if (backend_sinks_vec.size() == 0)
-    {
+    //if (backend_sinks_vec.size() == 0)
+    //{
         default_backend_sinks(lv, sinks_ret.first, sinks_ret.second);
-    }
+    //}
 
 }
 /* 默认的后端sinks */

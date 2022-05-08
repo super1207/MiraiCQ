@@ -107,6 +107,7 @@
     <ClCompile Include="log\MiraiLog.cpp" />
     <ClCompile Include="mainprocess\dealapi.cpp" />
     <ClCompile Include="mainprocess\mainprocess.cpp" />
+    <ClCompile Include="mainprocess\settingDlg.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpApiDeal.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpEventDeal.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpImpl.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="log\MiraiLog.h" />
     <ClInclude Include="mainprocess\dealapi.h" />
     <ClInclude Include="mainprocess\mainprocess.h" />
+    <ClInclude Include="mainprocess\settingDlg.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpApiDeal.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpEventDeal.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpImpl.h" />

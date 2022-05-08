@@ -24,10 +24,12 @@
 #include "../tool/ThreadTool.h"
 #include "../tool/IPCTool.h"
 #include "./dealapi.h"
+#include "./settingDlg.h"
 
 #include <StackWalker/BaseException.h>
 
 #include <assert.h>
+#include <memory>
 
 #include "../resource.h"
 
@@ -400,6 +402,13 @@ public:
 	~MyTable() { }
 };
 
+// 详细设置的回调函数
+static void ex_btn_cb(Fl_Widget* o, void* p)
+{
+	std::unique_ptr<SettingDlg> dlg = std::make_unique<SettingDlg>();
+	dlg->show();
+}
+
 static void plus_dlg()
 {
 	//fl_register_images();
@@ -418,14 +427,15 @@ static void plus_dlg()
 	Fl_Multiline_Input edit_des(200, 100, 300, 180);
 	// 头
 	Fl_Box luna_sama_box(50, 5, 100, 100); 
-	//char s[100] = { 0 };
 	Fl_BMP_Image tmp = Fl_BMP_Image((StrTool::to_utf8(PathTool::get_exe_dir()) + "\\config\\luna_sama.bmp").c_str());
-	//sprintf_s(s, 100, "%d", tmp.fail());
-	//MiraiLog::get_instance()->add_debug_log("IMAGELOAD", s);
 	Fl_Image* pImg = tmp.copy(100, 100);
 	luna_sama_box.image(pImg);
 	// table为插件列表
-	MyTable table(10, 115, 180, 275, &table2, &box_name, &box_author, &box_version, &edit_des);
+	MyTable table(10, 115, 180, 245, &table2, &box_name, &box_author, &box_version, &edit_des);
+	std::string ex_btn_str = StrTool::to_utf8("详细设置");
+	Fl_Button ex_btn(10, 365, 180, 25,ex_btn_str.c_str());
+	ex_btn.color(fl_rgb_color(255, 255, 255));
+	ex_btn.callback(ex_btn_cb, 0);
 	win.end();
 	win.show();
 	Fl::run();

@@ -210,6 +210,9 @@
     <ClCompile Include="mainprocess\dealapi.cpp">
       <Filter>mainprocess</Filter>
     </ClCompile>
+    <ClCompile Include="mainprocess\settingDlg.cpp">
+      <Filter>mainprocess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -283,6 +286,9 @@
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="mainprocess\dealapi.h">
+      <Filter>mainprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="mainprocess\settingDlg.h">
       <Filter>mainprocess</Filter>
     </ClInclude>
   </ItemGroup>
