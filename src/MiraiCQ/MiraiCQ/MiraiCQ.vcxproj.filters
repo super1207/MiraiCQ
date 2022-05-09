@@ -297,6 +297,7 @@
     <None Include="plusprocess\cqpexport.def">
       <Filter>plusprocess</Filter>
     </None>
+    <None Include="debug_tip.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />

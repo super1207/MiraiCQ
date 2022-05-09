@@ -508,16 +508,16 @@ static void release_dll()
 	CloseHandle(hFile);
 }
 
-static void release_bmp()
+static void release_config(int idr, const std::string & filename)
 {
 	std::string bmp_dir = PathTool::get_exe_dir() + "config\\";
-	std::string bmp_file = bmp_dir + "luna_sama.bmp";
+	std::string bmp_file = bmp_dir + filename;
 	if (PathTool::is_file_exist(bmp_file)) {
 		return;
 	}
-	HRSRC hRes = FindResourceA(NULL, MAKEINTRESOURCEA(IDR_DLL_BIN2), "DLL_BIN");
+	HRSRC hRes = FindResourceA(NULL, MAKEINTRESOURCEA(idr), "DLL_BIN");
 	if (hRes == NULL) {
-		MiraiLog::get_instance()->add_fatal_log("RELEASE_luna_sama.bmp", "FindResourceA err");
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_" + filename, "FindResourceA err");
 		exit(-1);
 	}
 	HGLOBAL hMem = LoadResource(NULL, hRes);
@@ -525,17 +525,18 @@ static void release_bmp()
 	PathTool::create_dir(bmp_dir);
 	HANDLE hFile = CreateFileA(bmp_file.c_str(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
-		MiraiLog::get_instance()->add_fatal_log("RELEASE_luna_sama.bmp", "CreateFileA err");
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_"+ filename, "CreateFileA err");
 		exit(-1);
 	}
 	DWORD dwWrite = 0;
 	BOOL bRet = WriteFile(hFile, hMem, dwSize, &dwWrite, NULL);
 	if (bRet == FALSE) {
-		MiraiLog::get_instance()->add_fatal_log("RELEASE_luna_sama.bmp", "WriteFile err");
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_" + filename, "WriteFile err");
 		exit(-1);
 	}
 	CloseHandle(hFile);
 }
+
 
 
 
@@ -593,7 +594,8 @@ void mainprocess()
 	// 释放CQP.dll
 	release_dll();
 
-	release_bmp();
+	release_config(IDR_DLL_BIN2,"luna_sama.bmp");
+	release_config(IDR_DLL_BIN3,"debug_tip.json");
 
 	// 初始化IPC服务
 	if (IPC_Init("") != 0)

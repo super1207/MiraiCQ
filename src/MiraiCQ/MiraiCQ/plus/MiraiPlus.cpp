@@ -26,25 +26,6 @@ MiraiPlus::~MiraiPlus()
 {
 }
 
-// 用于读取文件
-static std::string read_biniary_file(const std::string& file_path)
-{
-	using namespace std;
-	//ios::ate: move file point to end of file
-	ifstream in(file_path, ios::binary | ios::ate);
-	if (!in.is_open())
-		throw runtime_error("file " + file_path + " can't open");
-	//get the file's size
-	streampos file_size = in.tellg();
-	//pepare buf for read
-	string biniary_buf((size_t)file_size, '\0');
-	//move file point to start of file
-	in.seekg(0);
-	//read file
-	in.read(&biniary_buf[0], file_size);
-	//file will auto close
-	return biniary_buf;
-}
 
 bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) 
 {
@@ -84,7 +65,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 
 	std::string json_file;
 	try {
-		json_file = read_biniary_file(json_path);
+		json_file = PathTool::read_biniary_file(json_path);
 		if (StrTool::is_utf8(json_file)) {
 			json_file = StrTool::to_ansi(json_file);
 		}

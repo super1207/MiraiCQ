@@ -1,0 +1,14 @@
+[
+  {
+    "key": "取登录号信息",
+    "val": "{\n\t\"action\":\"get_login_info\",\n\t\"params\":{}\n}"
+  },
+  {
+    "key": "发送群消息",
+    "val": "{\n\t\"action\":\"send_group_msg\",\n\t\"params\": {\n\t\t\"group_id\":920220179,\n\t\t\"message\":\"你好，世界\"\n\t}\n}"
+  },
+  {
+    "key": "发送私聊消息",
+    "val": "{\n\t\"action\":\"send_private_msg\",\n\t\"params\": {\n\t\t\"user_id\":1875159423,\n\t\t\"message\":\"你好，世界\"\n\t}\n}"
+  }
+]

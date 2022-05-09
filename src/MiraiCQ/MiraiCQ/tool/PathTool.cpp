@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <windows.h>
+#include <fstream>
 
 using namespace std;
 namespace  fs = std::filesystem;
@@ -150,4 +151,25 @@ bool PathTool::rename(const std::string& old_name, const std::string& new_name)
 		return false;
 	}
 	return true;
+}
+
+// 用于读取文件
+
+std::string PathTool::read_biniary_file(const std::string& file_path)
+{
+	using namespace std;
+	//ios::ate: move file point to end of file
+	ifstream in(file_path, ios::binary | ios::ate);
+	if (!in.is_open())
+		throw runtime_error("file " + file_path + " can't open");
+	//get the file's size
+	streampos file_size = in.tellg();
+	//pepare buf for read
+	string biniary_buf((size_t)file_size, '\0');
+	//move file point to start of file
+	in.seekg(0);
+	//read file
+	in.read(&biniary_buf[0], file_size);
+	//file will auto close
+	return biniary_buf;
 }

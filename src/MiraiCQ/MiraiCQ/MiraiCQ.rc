@@ -51,7 +51,10 @@ END
 //
 
 IDR_DLL_BIN1            DLL_BIN                 "..\\CQP_BIN\\CQP.dll"
+
 IDR_DLL_BIN2            DLL_BIN                 "luna_sama.bmp"
+
+IDR_DLL_BIN3            DLL_BIN                 "debug_tip.json"
 
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////

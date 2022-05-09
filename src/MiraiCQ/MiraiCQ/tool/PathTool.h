@@ -68,6 +68,6 @@ public:
 	*/
 	static bool rename(const std::string& old_name, const std::string& new_name) ;
 
-
-
+	// 用于读取文件
+	static std::string read_biniary_file(const std::string& file_path);
 };

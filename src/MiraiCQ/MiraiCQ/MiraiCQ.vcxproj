@@ -186,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
+    <None Include="debug_tip.json" />
     <None Include="plusprocess\cqpexport.def" />
   </ItemGroup>
   <ItemGroup>
