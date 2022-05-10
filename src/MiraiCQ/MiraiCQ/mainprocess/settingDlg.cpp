@@ -18,6 +18,8 @@
 #include "../tool//PathTool.h"
 #include "../center/center.h"
 
+#include <lua.hpp>
+
 
 
 
@@ -152,6 +154,10 @@ void SettingDlg::com_tip_cb_t(Fl_Widget* o, void* p)
 void SettingDlg::send_btn_cb()
 {
 	std::string to_send_str = this->edit_send->value();
+	lua_State* L = luaL_newstate();
+	if (L) {
+		lua_close(L);
+	}
 	this->edit_debug->value(fmt::format("{}:\n{}\n", StrTool::to_utf8("µ÷ÊÔ·¢ËÍ"), to_send_str).c_str());
 	std::string ret;
 	try

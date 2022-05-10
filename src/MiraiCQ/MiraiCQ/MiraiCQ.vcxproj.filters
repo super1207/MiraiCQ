@@ -298,6 +298,7 @@
       <Filter>plusprocess</Filter>
     </None>
     <None Include="debug_tip.json" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />

@@ -187,6 +187,7 @@
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
     <None Include="debug_tip.json" />
+    <None Include="packages.config" />
     <None Include="plusprocess\cqpexport.def" />
   </ItemGroup>
   <ItemGroup>
@@ -197,5 +198,12 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\super1207.luajit.native.0.0.3\build\native\super1207.luajit.native.targets" Condition="Exists('..\packages\super1207.luajit.native.0.0.3\build\native\super1207.luajit.native.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\super1207.luajit.native.0.0.3\build\native\super1207.luajit.native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\super1207.luajit.native.0.0.3\build\native\super1207.luajit.native.targets'))" />
+  </Target>
 </Project>
