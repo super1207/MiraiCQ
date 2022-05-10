@@ -11,6 +11,7 @@
 #include "../tool/MsgIdTool.h"
 #include <websocketpp/base64/base64.hpp>
 #include "../tool/IPCTool.h"
+#include "../scriptrun/ScriptRun.h"
 
 
 using namespace std;
@@ -28,6 +29,11 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "post_type不存在");
 		/* 失败，不再继续处理 */
+		return;
+	}
+	bool is_pass = ScriptRun::get_instance()->onebot_event_filter(Json::FastWriter().write(*evt).c_str());
+	if (!is_pass) {
+		/* 被过滤，不再继续处理 */
 		return;
 	}
 	try
@@ -65,9 +71,13 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 
 static void IPC_SendEvent_T(const char * msg)
 {
+	if (!msg) {
+		return ;
+	}
 	auto plus = MiraiPlus::get_instance()->get_all_plus();
 	for (auto p : plus) {
-		if (p.second->is_enable()) {
+		if (p.second->is_enable()) 
+		{
 			IPC_SendEvent(p.second->get_uuid().c_str(), msg);
 		}
 	}

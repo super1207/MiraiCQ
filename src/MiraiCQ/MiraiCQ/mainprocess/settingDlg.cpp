@@ -10,6 +10,7 @@
 #include <Fl/Fl_Choice.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Multiline_Input.H>
+#include <FL/fl_ask.H>
 
 #include <spdlog/fmt/fmt.h>
 
@@ -17,8 +18,7 @@
 #include "../log/MiraiLog.h"
 #include "../tool//PathTool.h"
 #include "../center/center.h"
-
-#include <lua.hpp>
+#include "../scriptrun/ScriptRun.h"
 
 
 
@@ -90,6 +90,11 @@ void SettingDlg::show()
 	create_debug_group(group_x, group_y, group_w, group_h);
 	debug_group2->end();
 
+	const char* group3_str = autoDel(new std::string(StrTool::to_utf8("  过滤器  ")))->c_str();
+	Fl_Group* filter_group3 = autoDel(new Fl_Group(margin, tabs_y + tabs_hh, tabs_w, tabs_h - tabs_hh, group2_str));
+	create_filter_group(group_x, group_y, group_w, group_h);
+	filter_group3->end();
+
 
 	tabs->end();
 
@@ -154,15 +159,15 @@ void SettingDlg::com_tip_cb_t(Fl_Widget* o, void* p)
 void SettingDlg::send_btn_cb()
 {
 	std::string to_send_str = this->edit_send->value();
-	lua_State* L = luaL_newstate();
-	if (L) {
-		lua_close(L);
-	}
+	//lua_State* L = luaL_newstate();
+	//if (L) {
+	//	lua_close(L);
+	//}
 	this->edit_debug->value(fmt::format("{}:\n{}\n", StrTool::to_utf8("调试发送"), to_send_str).c_str());
 	std::string ret;
 	try
 	{
-		ret = Center::get_instance()->CQ_callApi(1, this->edit_send->value());
+		ret = Center::get_instance()->CQ_callApi(-1207, this->edit_send->value());
 	}
 	catch (const std::exception & e) {
 		ret = e.what();
@@ -204,4 +209,39 @@ void SettingDlg::create_debug_group(int group_x, int group_y, int group_w, int g
 	combox->callback(com_tip_cb_t, this);
 	Fl_Button * send_btn = autoDel(new Fl_Button(group_x + 10, group_y + group_h - 35, group_w - 20, 25, make_u8_str("发送")));
 	send_btn->callback(SettingDlg::send_btn_cb_t, this);
+}
+
+
+static void reload_filter_btn_cb(Fl_Widget* o, void* p)
+{
+	ScriptRun::get_instance()->init();
+}
+
+static void open_filter_btn_cb(Fl_Widget* o, void* p)
+{
+	std::string lua_file = PathTool::get_exe_dir() + "\\config\\filter_script.lua";
+	PathTool::create_dir(PathTool::get_exe_dir() + "\\config");
+	if (!PathTool::is_file_exist(lua_file)) {
+		FILE* fp = NULL;
+		fopen_s(&fp, lua_file.c_str(), "a+");
+		if (fp)
+		{
+			fprintf_s(fp,"%s", StrTool::to_utf8("-- 获得当前脚本目录,末尾没有'/''\nlocal function get_cur_dir()\n    local function sum(a, b)\n            return a + b\n    end\n    local info = debug.getinfo(sum)\n    local path = info.source\n    path = string.sub(path, 2, -1) -- 去掉开头的\"@\"\n    path = string.match(path, \"^(.*)\\\\\") -- 捕获最后一个 \"/\" 之前的部分 就是我们最终要的目录部分\n    return string.gsub(path,'\\\\','/')\nend\n\nlocal path = get_cur_dir()\nlocal json_path = path .. \"/JSON.lua\"\nlocal JSON = (loadfile (json_path))()\n\nfunction onebot_api_filter(filename,msg)\n\tlocal lua_value = JSON:decode(msg)\n\treturn true\nend\n\nfunction onebot_event_filter(msg)\n\tlocal lua_value = JSON:decode(msg)\n\tprint(lua_value[\"post_type\"])\n\treturn true\nend").c_str());
+			fclose(fp);
+			ShellExecuteA(NULL, "open", lua_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		}
+		else
+		{
+			fl_alert("can't create file:config\\filter_script.lua");
+		}
+	}
+	ShellExecuteA(NULL, "open", lua_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+
+void SettingDlg::create_filter_group(int group_x, int group_y, int group_w, int group_h)
+{
+	Fl_Button* reload_filter_btn = autoDel(new Fl_Button(group_x + 10, group_y + 10, 80, 25, make_u8_str("重载过滤器")));
+	reload_filter_btn->callback(reload_filter_btn_cb, this);
+	Fl_Button* open_filter_btn = autoDel(new Fl_Button(group_x + 10, group_y + 40, 80, 25, make_u8_str("编辑过滤器")));
+	open_filter_btn->callback(open_filter_btn_cb, this);
 }

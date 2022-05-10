@@ -118,6 +118,7 @@
     <ClCompile Include="plusprocess\cqpexport.cpp" />
     <ClCompile Include="plusprocess\plusprocess.cpp" />
     <ClCompile Include="plus\MiraiPlus.cpp" />
+    <ClCompile Include="scriptrun\ScriptRun.cpp" />
     <ClCompile Include="test_ipc.cpp" />
     <ClCompile Include="thirdpart\include\jsoncpp\json_reader.cpp" />
     <ClCompile Include="thirdpart\include\jsoncpp\json_value.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="plusprocess\plusprocess.h" />
     <ClInclude Include="plus\MiraiPlus.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="scriptrun\ScriptRun.h" />
     <ClInclude Include="tool\BinTool.h" />
     <ClInclude Include="tool\ImgTool.h" />
     <ClInclude Include="tool\InputTool.h" />
@@ -187,6 +189,7 @@
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
     <None Include="debug_tip.json" />
+    <None Include="JSON.lua" />
     <None Include="packages.config" />
     <None Include="plusprocess\cqpexport.def" />
   </ItemGroup>

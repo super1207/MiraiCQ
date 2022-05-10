@@ -7,6 +7,7 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
+#include "../scriptrun/ScriptRun.h"
 
 #include <websocketpp/base64/base64.hpp>
 #include <fstream>
@@ -50,7 +51,7 @@ static TER_TYPE normal_call(
 {
 	if (!can_not_enable)
 	{
-		auto plus = MiraiPlus::get_instance();
+		//auto plus = MiraiPlus::get_instance();
 		//assert(plus);
 		// 插件总是开启的
 		/*if (!plus->is_enable(auth_code))
@@ -66,6 +67,20 @@ static TER_TYPE normal_call(
 	/* 如果需要访问onebot实现端，则插件必须开启 */
 	MiraiNet::NetStruct json(new Json::Value);
 	fun1(json);
+
+
+	// 经过过滤器，-1207来自MiraiCQ的调试，不过滤
+	if(auth_code != -1207){
+		auto plus = MiraiPlus::get_instance()->get_plus(auth_code);
+		if (plus && json) {
+			const std::string &  filename = plus->get_filename();
+			bool is_pass = ScriptRun::get_instance()->onebot_api_filter(filename, Json::FastWriter().write(*json).c_str());
+			if (is_pass == false) {
+				return RETERR(TP10086<TER_TYPE>());
+			}
+		}
+	}
+
 	auto net = net_.lock();
 	if (!net)
 	{

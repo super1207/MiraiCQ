@@ -46,6 +46,9 @@
     <Filter Include="plusprocess">
       <UniqueIdentifier>{d468bd48-aa9f-46e8-b7e4-b80b17a28cf2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scriptrun">
+      <UniqueIdentifier>{4a1546ee-f0dd-43d8-8025-1fc94a91b27c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="log\MiraiLog.cpp">
@@ -213,6 +216,9 @@
     <ClCompile Include="mainprocess\settingDlg.cpp">
       <Filter>mainprocess</Filter>
     </ClCompile>
+    <ClCompile Include="scriptrun\ScriptRun.cpp">
+      <Filter>scriptrun</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -291,6 +297,9 @@
     <ClInclude Include="mainprocess\settingDlg.h">
       <Filter>mainprocess</Filter>
     </ClInclude>
+    <ClInclude Include="scriptrun\ScriptRun.h">
+      <Filter>scriptrun</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
@@ -299,6 +308,7 @@
     </None>
     <None Include="debug_tip.json" />
     <None Include="packages.config" />
+    <None Include="JSON.lua" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />

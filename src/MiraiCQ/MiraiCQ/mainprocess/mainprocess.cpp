@@ -25,6 +25,7 @@
 #include "../tool/IPCTool.h"
 #include "./dealapi.h"
 #include "./settingDlg.h"
+#include "../scriptrun/ScriptRun.h"
 
 #include <StackWalker/BaseException.h>
 
@@ -596,6 +597,9 @@ void mainprocess()
 
 	release_config(IDR_DLL_BIN2,"luna_sama.bmp");
 	release_config(IDR_DLL_BIN3,"debug_tip.json");
+	release_config(IDR_DLL_BIN4, "JSON.lua");
+
+	ScriptRun::get_instance()->init();
 
 	// 初始化IPC服务
 	if (IPC_Init("") != 0)
