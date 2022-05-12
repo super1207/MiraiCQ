@@ -112,6 +112,12 @@ void ScriptRun::init() {
 	
 }
 
+bool ScriptRun::is_init()
+{
+	std::shared_lock<std::shared_mutex> lk(mx_lua_sta);
+	return lua_sta;
+}
+
 bool ScriptRun::onebot_event_filter(const char* dat)
 {
 	std::unique_lock<std::shared_mutex> lk(mx_lua_sta);
