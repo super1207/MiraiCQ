@@ -6,6 +6,10 @@
 #include <pcre.h>
 #include <set>
 #include <cassert>
+#include <algorithm> 
+#include <functional> 
+#include <cctype>
+#include <locale>
 
 #pragma comment(lib,"Ole32.lib")
 
@@ -564,6 +568,27 @@ bool StrTool::is_utf8(const std::string& text)
 {
 	// 此算法来自:https://www.jianshu.com/p/a83d398e3606
 	return isUtf8(text);
+}
+
+
+// trim from end of string (right)
+static std::string& rtrim(std::string& s, const char* t)
+{
+	s.erase(s.find_last_not_of(t) + 1);
+	return s;
+}
+
+// trim from beginning of string (left)
+static std::string& ltrim(std::string& s, const char* t)
+{
+	s.erase(0, s.find_first_not_of(t));
+	return s;
+}
+
+void StrTool::trim(std::string & text)
+{
+	const static char* ws = " \t\n\r\f\v";
+	ltrim(rtrim(text, ws), ws);
 }
 
 StrTool::StrTool()

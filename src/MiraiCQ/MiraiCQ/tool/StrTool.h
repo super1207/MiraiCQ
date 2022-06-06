@@ -151,6 +151,14 @@ public:
 	*/
 	static bool is_utf8(const std::string& text);
 
+	/*
+	* 描述：去除两端空白字符
+	* 参数`text`：略
+	*/
+	static void trim(std::string& text);
+
+
+
 private:
 	StrTool();
 };

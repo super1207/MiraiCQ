@@ -1010,27 +1010,38 @@ std::string Center::CQ_getCookies(int auth_code)
 
 std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 {
-	std::weak_ptr<MiraiNet> net;
-	{
-		std::shared_lock<std::shared_mutex> lk;
-		net = this->net;
+
+	std::string domainStr = domain;
+	size_t cmdEndPos = domainStr.find_first_of(",");
+	if (cmdEndPos == std::string::npos) {
+		return "";
 	}
-	return normal_call<std::string>(auth_code, net, false,
-		[&](MiraiNet::NetStruct json)
-		{
-			(*json)["action"] = "get_cookies";
-			if (std::string(domain ? domain : "") != "")
-			{
-				(*json)["params"]["domain"] = StrTool::to_utf8(domain ? domain : "");
-			}
 
-		}, [&](const Json::Value& data_json)
-		{
-			std::string cookies = StrTool::get_str_from_json(data_json, "cookies", "");
-			return cookies;
-		},
-			JSON_TYPE::JSON_OBJECT);
-
+	std::string cmdStr = domainStr.substr(0,cmdEndPos);
+	StrTool::trim(cmdStr);
+	std::string cmdData = domainStr.substr(cmdEndPos + 1);
+	MiraiLog::get_instance()->add_debug_log("ExCmd", cmdStr);
+	MiraiLog::get_instance()->add_debug_log("ExData", cmdData);
+	if (cmdStr == "onebot") {
+		return CQ_callApi(auth_code, cmdData.c_str());
+	}
+	else if (cmdStr == "towebid") {
+		Json::Value webid = MsgIdTool::getInstance()->to_webid(std::stoi(cmdData));
+		if (webid.isInt64()) {
+			return std::to_string(webid.asInt64());
+		}
+		else if (webid.isString()) {
+			return webid.asString();
+		}
+		else {
+			MiraiLog::get_instance()->add_warning_log("towebid", "webid not str or int");
+			return "";
+		}
+	}
+	else {
+		return "";
+	}
+	
 }
 
 int Center::CQ_getCsrfToken(int auth_code)
