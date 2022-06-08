@@ -1013,13 +1013,17 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 
 	std::string domainStr = domain;
 	size_t cmdEndPos = domainStr.find_first_of(",");
+	std::string cmdStr;
+	std::string cmdData;
 	if (cmdEndPos == std::string::npos) {
-		return "";
+		cmdStr = domainStr;
 	}
-
-	std::string cmdStr = domainStr.substr(0,cmdEndPos);
+	else {
+		cmdStr = domainStr.substr(0, cmdEndPos);
+		cmdData = domainStr.substr(cmdEndPos + 1);
+	}
 	StrTool::trim(cmdStr);
-	std::string cmdData = domainStr.substr(cmdEndPos + 1);
+	cmdStr = StrTool::tolower(cmdStr);
 	MiraiLog::get_instance()->add_debug_log("ExCmd", cmdStr);
 	MiraiLog::get_instance()->add_debug_log("ExData", cmdData);
 	if (cmdStr == "onebot") {
@@ -1037,6 +1041,10 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 			MiraiLog::get_instance()->add_warning_log("towebid", "webid not str or int");
 			return "";
 		}
+	}
+	else if (cmdStr == "rundir") {
+		std::string exeDir = PathTool::get_exe_dir();
+		return exeDir.substr(0, exeDir.size() - 1);
 	}
 	else {
 		return "";
