@@ -1,0 +1,31 @@
+背景：
+	因某些原因，MiraiCQ无法支持原酷Q中的CQ_getCookiesV2接口。
+	某些酷Q的老插件，希望能直接收发原始的onebot数据或在已有的酷Qapi基础上拓展新功能。
+
+目的：
+	对CQ_getCookiesV2进行改装，以拓展新的功能，供铃心自定义等插件使用。
+
+详细说明：
+	CQ_getCookiesV2这个函数，传入一个字符串做参数，返回一个字符串。
+	在铃心自定义中的使用方式为：【机器人Cookiexxxxxx】
+	其中，xxxxxx就是参数。
+	下面，以在铃心自定义中的使用方式，做具体示例说明。
+
+示例说明（紧接着"【机器人Cookie"之后的空白字符可以省略，紧接着第一个","之前的空白字符也可以省略）：
+	直接调用onebot api:
+		【机器人Cookie onebot,{"action":"get_login_info","params":{}}】
+		这样，可以获得登录号信息。但是要注意，传入的参数必须为utf8,返回的数据也是utf8。
+	获取onebot原始MsgId:
+		【机器人Cookie towebid,cqid】
+		cqid为酷Q兼容的msgid，要直接发送onebot数据，可能需要原始的onebot的msgid。
+	获取MiraiCQ.exe所在目录：
+		【机器人Cookie rundir】
+		因为MiraiCQ是多进程框架，插件要获取MiraiCQ所在目录可能会遇到困难，所以有了这个api
+		此api获取的目录末尾没有\，并且始终为ansi编码，又因为MiraiCQ要求中文环境，所以ansi编码实际就是gbk编码。
+	utf8与gbk转化：
+		【机器人Cookie U8-GB,【机器人Cookie GB-U8,你好[CQ:emoji,id=129488]】】
+		这个api不止能实现utf8与gbk转化，还能实现emoji的CQ码与utf8字符之间的转化。
+		也就是说，不会丢失emoji CQ码。
+	
+		
+		
