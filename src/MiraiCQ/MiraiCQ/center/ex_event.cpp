@@ -45,23 +45,6 @@ static void send_group_msg(int64_t group_id,int64_t user_id, const std::string& 
 	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
 
-static void do_poke_msg(Json::Value& evt) {
-	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
-	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
-	std::string toSend;
-	if (group_id == 0) {
-		//好友戳一戳
-		toSend = websocketpp::base64_encode(Json::FastWriter().write(evt));
-		send_private_msg(user_id, toSend);
-	}
-	else {
-		// 群内戳一戳
-		toSend = websocketpp::base64_encode(Json::FastWriter().write(evt));
-		send_group_msg(group_id, user_id, toSend);
-	}
-	
-}
-
 void Center::deal_ex_event(Json::Value& evt)
 {
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
