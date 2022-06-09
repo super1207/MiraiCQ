@@ -1046,7 +1046,16 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 		std::string exeDir = PathTool::get_exe_dir();
 		return exeDir.substr(0, exeDir.size() - 1);
 	}
-	else {
+	else if (cmdStr == "u8-gb") {
+		std::string ret = StrTool::to_ansi(cmdData);
+		return ret;
+
+	}
+	else if (cmdStr == "gb-u8") {
+		std::string ret = StrTool::to_utf8(cmdData);
+		return ret;
+	}
+	else{
 		return "";
 	}
 	
