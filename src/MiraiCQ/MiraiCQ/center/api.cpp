@@ -209,6 +209,11 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 			int cqid = stoi(node["data"]["id"].asString());
 			node["data"]["id"] = MsgIdTool::getInstance()->to_webid(cqid);
 		}
+		else if (node["type"].asString() == "mcqevt")/* 错误的cq码，不准发送 */
+		{
+			json_arr.clear();
+			return json_arr;
+		}
 	}
 	/* auto s = json_arr.toStyledString(); */
 	return json_arr;

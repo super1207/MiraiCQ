@@ -48,6 +48,7 @@ public:
 		// std::set<int> auth_vec;
 		std::shared_ptr<Process> process = nullptr; /* 插件的进程 */
 		std::shared_mutex mx_plus_def;
+		bool recive_ex_event = false;
 
 		~PlusDef();
 		/*
@@ -95,6 +96,8 @@ public:
 		*  描述：返回插件进程是否存在，注意，若插件没有启用，则插件进程一定不存在
 		*/
 		bool is_process_exist();
+
+		bool is_recive_ex_event();
 	private:
 		std::string uuid;
 	};

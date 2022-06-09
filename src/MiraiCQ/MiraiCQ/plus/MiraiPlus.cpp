@@ -113,6 +113,32 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		}
 	}
 
+	// 是否接收额外的event
+	{
+		auto recive_ex_event_json = root.get("recive_ex_event", def_str);
+		if (recive_ex_event_json.isBool())
+		{
+			if (recive_ex_event_json.asBool()) {
+				plus_def->recive_ex_event = true;
+			}
+			else {
+				plus_def->recive_ex_event = false;
+			}
+		}
+		else if (recive_ex_event_json.isInt()) {
+			if (recive_ex_event_json.asInt() != 0) {
+				plus_def->recive_ex_event = true;
+			}
+			else {
+				plus_def->recive_ex_event = false;
+			}
+		}
+		else
+		{
+			plus_def->recive_ex_event = false;
+		}
+	}
+
 	{
 		auto author_json = root.get("author", def_str);
 		if (author_json.isString() && author_json.asString() != "")
@@ -410,6 +436,8 @@ bool MiraiPlus::PlusDef::is_enable()
 	return (process != nullptr);
 }
 
+
+
 bool MiraiPlus::PlusDef::is_process_exist()
 {
 	shared_lock<shared_mutex> lock(mx_plus_def);
@@ -417,6 +445,12 @@ bool MiraiPlus::PlusDef::is_process_exist()
 		return true;
 	}
 	return false;
+}
+
+bool MiraiPlus::PlusDef::is_recive_ex_event()
+{
+	shared_lock<shared_mutex> lock(mx_plus_def);
+	return this->recive_ex_event;
 }
 
 MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::string & uuid)

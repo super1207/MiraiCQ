@@ -106,6 +106,7 @@ private:
 	void deal_type_message_private(Json::Value& evt);
 	void deal_type_message_group(Json::Value& evt);
 	void deal_1207_event(Json::Value& evt);
+	void deal_ex_event(Json::Value& evt);
 
 };
 

@@ -41,6 +41,8 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 		/* 1207号事件暂时单独处理 */
 		deal_1207_event(*evt);
 
+		deal_ex_event(*evt);
+
 		if (post_type == "message")
 		{
 			deal_type_message(*evt);
@@ -620,3 +622,4 @@ void Center::deal_1207_event(Json::Value& evt)
 	to_send["data"]["msg"] = Json::FastWriter().write(evt);
 	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
 }
+

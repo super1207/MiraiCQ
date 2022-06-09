@@ -103,6 +103,7 @@
     <ClCompile Include="center\api.cpp" />
     <ClCompile Include="center\center.cpp" />
     <ClCompile Include="center\event.cpp" />
+    <ClCompile Include="center\ex_event.cpp" />
     <ClCompile Include="config\config.cpp" />
     <ClCompile Include="log\MiraiLog.cpp" />
     <ClCompile Include="mainprocess\dealapi.cpp" />

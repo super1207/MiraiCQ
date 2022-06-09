@@ -219,6 +219,9 @@
     <ClCompile Include="scriptrun\ScriptRun.cpp">
       <Filter>scriptrun</Filter>
     </ClCompile>
+    <ClCompile Include="center\ex_event.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
