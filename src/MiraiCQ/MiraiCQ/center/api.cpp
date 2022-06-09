@@ -1055,6 +1055,9 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 		std::string ret = StrTool::to_utf8(cmdData);
 		return ret;
 	}
+	else if (cmdStr == "toobmsg") {
+		return Json::FastWriter().write(deal_cq_str(cmdData));
+	}
 	else{
 		return "";
 	}

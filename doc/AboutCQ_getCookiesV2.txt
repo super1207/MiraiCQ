@@ -11,7 +11,7 @@
 	其中，xxxxxx就是参数。
 	下面，以在铃心自定义中的使用方式，做具体示例说明。
 
-示例说明（紧接着"【机器人Cookie"之后的空白字符可以省略，紧接着第一个","之前的空白字符也可以省略）：
+示例说明（紧接着"【机器人Cookie"之后的空白字符可以省略，紧接着第一个","之前的空白字符也可以省略，命令是大小写不敏感的）：
 	直接调用onebot api:
 		【机器人Cookie onebot,{"action":"get_login_info","params":{}}】
 		这样，可以获得登录号信息。但是要注意，传入的参数必须为utf8,返回的数据也是utf8。
@@ -26,6 +26,10 @@
 		【机器人Cookie U8-GB,【机器人Cookie GB-U8,你好[CQ:emoji,id=129488]】】
 		这个api不止能实现utf8与gbk转化，还能实现emoji的CQ码与utf8字符之间的转化。
 		也就是说，不会丢失emoji CQ码。
+	CQ格式的消息转onebot格式的json:
+		【机器人Cookie ToOBMsg,测试balabala】
+		能把cq格式的消息转化成符合onebot格式的json，供onebot api发送。
+		参数为gbk编码，转化后的json为utf8编码。
 	
 		
 		
