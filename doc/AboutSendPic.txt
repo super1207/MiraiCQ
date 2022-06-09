@@ -1,0 +1,13 @@
+支持onebot格式的图片路径(同时也支持CQ格式的路径)： 
+    绝对路径
+    网络路径
+    base64路径
+如：
+[CQ:image,file=D:\doc\luna_sama.jpg]
+[CQ:image,file=file:///D:\doc\luna_sama.jpg]
+[CQ:image,file=luna_sama.jpg]
+[CQ:image,file=file:///luna_sama.jpg]
+[CQ:image,file=https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png]
+[CQ:image,file=base64://iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAIAAADJt1n/AAAAKElEQVQ4EWPk5+RmIBcwkasRpG9UM4mhNxpgowFGMARGEwnBIEJVAAAdBgBNAZf+QAAAAABJRU5ErkJggg==]
+但无论如何，涉及的中文路径，请使用ansi编码。
+相对路径，以data/image作参考。
