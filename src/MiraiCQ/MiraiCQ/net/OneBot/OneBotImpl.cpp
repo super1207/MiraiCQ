@@ -5,6 +5,7 @@
 #include "OneBotApiDeal.h"
 #include "../../tool/StrTool.h"
 #include "../../tool/TimeTool.h"
+#include "../../tool/AutoDoSth.h"
 
 using namespace std;
 
@@ -121,14 +122,13 @@ bool OneBotNetImpl::connect_()
 					return;
 				}
 				std::string echo = echo_json.asString();
-				lock_guard<mutex> lock(mx_call_map);
-				auto iter = call_map.find(echo);
-				if (iter != call_map.end())
-				{
-					iter->second.recv_json = recv;
-					iter->second.isdeal = true;
+				try {
+					auto bqueue = call_map.get(echo);
+					bqueue->push(recv);
 				}
-				
+				catch (...) {
+
+				}	
 			}
 		}
 		catch (const std::exception& e)
@@ -231,19 +231,16 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout,bool 
 	(*api_json)["echo"] = echo;
 	auto start_time = TimeTool::get_tick_count();
 
-	{
-		lock_guard<mutex> lock(mx_call_map);
-		call_map[echo] = call_struct;
-		/* MiraiLog::get_instance()->add_debug_log("map size", std::to_string(call_map.size())); */
-	}
+	std::shared_ptr<BlockQueue<NetStruct>> bqueue = std::make_shared<BlockQueue<NetStruct>>();
+	call_map.put(echo, bqueue);
+	AutoDoSth doSth([this, echo]() {
+		this->call_map.remove(echo);
+	});
 
 	try
 	{
 		if (!is_run)
 		{
-			//err_msg = "net error";
-			lock_guard<mutex> lock(mx_call_map);
-			call_map.erase(echo);
 			return MiraiNet::NetStruct();
 		}
 		auto send_json = Json::FastWriter().write(*api_json);
@@ -262,8 +259,6 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout,bool 
 				throw std::runtime_error("can't connect new net");
 			}
 			auto ret_json = new_net->call_fun(senddat, timeout, true);
-			lock_guard<mutex> lock(mx_call_map);
-			call_map.erase(echo);
 			return ret_json;
 		}
 		else
@@ -277,43 +272,20 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout,bool 
 
 		MiraiLog::get_instance()->add_warning_log("发送消息失败", e.what());
 		//err_msg = "net error";
-		lock_guard<mutex> lock(mx_call_map);
-		call_map.erase(echo);
 		return MiraiNet::NetStruct();
 	}
 
 	/* 说明用户并不想获得api调用结果，所以，直接返回，不等待结果 */
 	if (timeout <= 0)
 	{
-		lock_guard<mutex> lock(mx_call_map);
-		call_map.erase(echo);
 		//err_msg = "timeout error";
 		return MiraiNet::NetStruct();
 	}
-	MiraiNet::NetStruct ret_json;
-	while (true)
-	{
-		TimeTool::sleep(0);
-		lock_guard<mutex> lock(mx_call_map);
-		auto& it = call_map.at(echo);
-		if (it.isdeal)
-		{
-			ret_json = it.recv_json;
-			call_map.erase(echo);
-			break;
-		}
-		if (TimeTool::get_tick_count() - start_time > timeout)
-		{
-			call_map.erase(echo);
-			break;
-		}
+	try {
+		return bqueue->pop(timeout);
 	}
-	/* 在timeout时间内没有得到结果，说明超时了 */
-	if (!ret_json)
-	{
-		//err_msg = "timeout error";
+	catch(...) {
 		return MiraiNet::NetStruct();
 	}
-	return ret_json;
 }
 

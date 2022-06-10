@@ -147,6 +147,7 @@
     <ClCompile Include="thirdpart\include\libpcre\pcre_xclass.c" />
     <ClCompile Include="thirdpart\include\StackWalker\BaseException.cpp" />
     <ClCompile Include="thirdpart\include\StackWalker\StackWalker.cpp" />
+    <ClCompile Include="tool\AutoDoSth.cpp" />
     <ClCompile Include="tool\BinTool.cpp" />
     <ClCompile Include="tool\ImgTool.cpp" />
     <ClCompile Include="tool\InputTool.cpp" />
@@ -176,7 +177,9 @@
     <ClInclude Include="plus\MiraiPlus.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="scriptrun\ScriptRun.h" />
+    <ClInclude Include="tool\AutoDoSth.h" />
     <ClInclude Include="tool\BinTool.h" />
+    <ClInclude Include="tool\BlockQueue.h" />
     <ClInclude Include="tool\ImgTool.h" />
     <ClInclude Include="tool\InputTool.h" />
     <ClInclude Include="tool\IPCTool.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="tool\PathTool.h" />
     <ClInclude Include="tool\StrTool.h" />
     <ClInclude Include="tool\EmojiTool.h" />
+    <ClInclude Include="tool\ThreadSafeMap.h" />
     <ClInclude Include="tool\ThreadTool.h" />
     <ClInclude Include="tool\TimeTool.h" />
   </ItemGroup>

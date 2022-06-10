@@ -1,6 +1,8 @@
 #pragma once 
 
 #include "../MiraiNet.h"
+#include "../../tool/ThreadSafeMap.h"
+#include "../../tool/BlockQueue.h"
 
 
 #define ASIO_STANDALONE
@@ -36,8 +38,7 @@ private:
 	websocketpp::connection_hdl  hdl;
 	std::atomic_bool is_run = false;
 
-	std::map<std::string,CallStuct> call_map;
-	std::mutex mx_call_map;
+	ThreadSafeMap<std::shared_ptr<BlockQueue<NetStruct>>> call_map;
 
 	std::mutex mx_send;
 

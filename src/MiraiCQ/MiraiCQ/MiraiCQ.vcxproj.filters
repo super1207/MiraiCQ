@@ -222,6 +222,9 @@
     <ClCompile Include="center\ex_event.cpp">
       <Filter>center</Filter>
     </ClCompile>
+    <ClCompile Include="tool\AutoDoSth.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -302,6 +305,15 @@
     </ClInclude>
     <ClInclude Include="scriptrun\ScriptRun.h">
       <Filter>scriptrun</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\BlockQueue.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\ThreadSafeMap.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\AutoDoSth.h">
+      <Filter>tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
