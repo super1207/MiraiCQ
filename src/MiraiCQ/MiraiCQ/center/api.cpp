@@ -74,7 +74,8 @@ static TER_TYPE normal_call(
 		auto plus = MiraiPlus::get_instance()->get_plus(auth_code);
 		if (plus && json) {
 			const std::string &  filename = plus->get_filename();
-			bool is_pass = ScriptRun::get_instance()->onebot_api_filter(filename, Json::FastWriter().write(*json).c_str());
+			//当json中含有图片的base64时，lua中的json解析器解析json的速度太慢,所以暂时关闭解析，下版本修复
+			bool is_pass = ScriptRun::get_instance()->onebot_api_filter(filename, "{}");
 			if (is_pass == false) {
 				return RETERR(TP10086<TER_TYPE>());
 			}
@@ -173,6 +174,7 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				/* 说明是相对路径 */
 				file = PathTool::get_exe_dir() + "data\\image\\" + StrTool::to_ansi(file);
 			}
+			MiraiLog::get_instance()->add_warning_log("iiiiiiiiiiiiii", file);
 			/* 如果文件不存在，但是文件在cqimg里面存在，则以url方式发送 */
 			if ((!PathTool::is_file_exist(file)) && (PathTool::is_file_exist((file + ".cqimg"))))
 			{
@@ -201,6 +203,7 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				MiraiLog::get_instance()->add_debug_log("ApiCall", "读取图片文件失败");
 				continue;
 			}
+			MiraiLog::get_instance()->add_warning_log("iiiiiiiiiiiiiibuffer.size():", std::to_string(buffer.size()));
 			node["data"]["file"] = "base64://" + websocketpp::base64_encode((const unsigned char*)(&(buffer[0])), buffer.size());
 
 		}
@@ -215,7 +218,7 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 			return json_arr;
 		}
 	}
-	/* auto s = json_arr.toStyledString(); */
+	auto s = json_arr.toStyledString(); 
 	return json_arr;
 	
 }
@@ -248,6 +251,7 @@ int Center::CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg)
 
 int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg) 
 {
+	MiraiLog::get_instance()->add_warning_log("------", "CQ_sendGroupMsg" + std::string(msg));
 	if (!msg)
 	{
 		return -1;
@@ -263,6 +267,7 @@ int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg)
 		(*json)["action"] = "send_group_msg";
 		(*json)["params"]["group_id"] = group_id;
 		(*json)["params"]["message"] = deal_cq_str(msg);
+		//MiraiLog::get_instance()->add_warning_log("------", (*json)["params"]["message"].asString());
 
 	}, [&](const Json::Value& data_json)
 	{
