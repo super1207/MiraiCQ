@@ -87,7 +87,7 @@ static TER_TYPE normal_call(
 	{
 		return RETERR(TP10086<TER_TYPE>());
 	}
-	MiraiNet::NetStruct ret_json = net->call_fun(json, 10000);
+	MiraiNet::NetStruct ret_json = net->call_fun(json, 15000);
 	net = nullptr; /* º∞ ± Õ∑≈net */
 	if (!ret_json)
 	{

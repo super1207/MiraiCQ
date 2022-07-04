@@ -157,39 +157,46 @@ void SettingDlg::com_tip_cb_t(Fl_Widget* o, void* p)
 	((SettingDlg*)p)->com_tip_cb(o);
 }
 
-void SettingDlg::send_btn_cb()
+void SettingDlg::send_btn_cb(Fl_Widget* o)
 {
-	std::string to_send_str = this->edit_send->value();
-	//lua_State* L = luaL_newstate();
-	//if (L) {
-	//	lua_close(L);
-	//}
-	this->edit_debug->value(fmt::format("{}:\n{}\n", StrTool::to_utf8("调试发送"), to_send_str).c_str());
-	std::string ret;
-	try
-	{
-		ret = Center::get_instance()->CQ_callApi(-1207, this->edit_send->value());
-	}
-	catch (const std::exception & e) {
-		ret = e.what();
-		this->edit_debug->value(fmt::format("{}{}:\n{}\n", this->edit_debug->value(), StrTool::to_utf8("调试发送失败"), ret).c_str());
+	static bool  isEnable = true;
+	if (!isEnable) {
+		fl_alert("please wait the last send");
 		return;
 	}
-	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(ret, root))
-	{
-		ret = StrTool::to_utf8("Json解析失败:") + ret;
-	}
-	else {
-		ret = root.toStyledString();
-	}
-	this->edit_debug->value(fmt::format("{}{}:\n{}\n", this->edit_debug->value(), StrTool::to_utf8("调试接收"), ret).c_str());
+	std::string to_send_str = this->edit_send->value();
+	this->edit_debug->value(fmt::format("{}:\n{}\n", StrTool::to_utf8("调试发送"), to_send_str).c_str());
+	isEnable = false;
+	std::thread([this, to_send_str]() {
+		std::string ret;
+		try {
+			ret = Center::get_instance()->CQ_callApi(-1207, to_send_str.c_str());
+		}
+		catch (const std::exception& e) {
+			ret = e.what();
+			AutoFlUnlock lock;
+			this->edit_debug->value(fmt::format("{}{}:\n{}\n", this->edit_debug->value(), StrTool::to_utf8("调试发送失败"), ret).c_str());
+			isEnable = true;
+			return;
+		}
+		AutoFlUnlock lock;
+		Json::Value root;
+		Json::Reader reader;
+		if (!reader.parse(ret, root))
+		{
+			ret = StrTool::to_utf8("Json解析失败:") + ret;
+		}
+		else {
+			ret = root.toStyledString();
+		}
+		this->edit_debug->value(fmt::format("{}{}:\n{}\n", this->edit_debug->value(), StrTool::to_utf8("调试接收"), ret).c_str());
+		isEnable = true;
+	}).detach();
 }
 
 void SettingDlg::send_btn_cb_t(Fl_Widget* o, void* p)
 {
-	((SettingDlg*)p)->send_btn_cb();
+	((SettingDlg*)p)->send_btn_cb(o);
 }
 
 void SettingDlg::create_debug_group(int group_x, int group_y, int group_w, int group_h)

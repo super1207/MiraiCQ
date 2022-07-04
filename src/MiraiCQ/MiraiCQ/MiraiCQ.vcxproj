@@ -113,6 +113,9 @@
     <ClCompile Include="net\MiraiHttp\MiraiHttpEventDeal.cpp" />
     <ClCompile Include="net\MiraiHttp\MiraiHttpImpl.cpp" />
     <ClCompile Include="net\MiraiNet.cpp" />
+    <ClCompile Include="net\OneBot12\OneBot12ApiDeal.cpp" />
+    <ClCompile Include="net\OneBot12\OneBot12EventDeal.cpp" />
+    <ClCompile Include="net\OneBot12\OneBot12Impl.cpp" />
     <ClCompile Include="net\OneBot\OneBotApiDeal.cpp" />
     <ClCompile Include="net\OneBot\OneBotEventDeal.cpp" />
     <ClCompile Include="net\OneBot\OneBotImpl.cpp" />
@@ -170,6 +173,9 @@
     <ClInclude Include="net\MiraiHttp\MiraiHttpEventDeal.h" />
     <ClInclude Include="net\MiraiHttp\MiraiHttpImpl.h" />
     <ClInclude Include="net\MiraiNet.h" />
+    <ClInclude Include="net\OneBot12\OneBot12ApiDeal.h" />
+    <ClInclude Include="net\OneBot12\OneBot12EventDeal.h" />
+    <ClInclude Include="net\OneBot12\OneBot12Impl.h" />
     <ClInclude Include="net\OneBot\OneBotApiDeal.h" />
     <ClInclude Include="net\OneBot\OneBotEventDeal.h" />
     <ClInclude Include="net\OneBot\OneBotImpl.h" />

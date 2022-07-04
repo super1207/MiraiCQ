@@ -49,6 +49,9 @@
     <Filter Include="scriptrun">
       <UniqueIdentifier>{4a1546ee-f0dd-43d8-8025-1fc94a91b27c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net\OneBot12">
+      <UniqueIdentifier>{6ca01032-6fe1-405a-82d0-73290d33afc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="log\MiraiLog.cpp">
@@ -225,6 +228,15 @@
     <ClCompile Include="tool\AutoDoSth.cpp">
       <Filter>tool</Filter>
     </ClCompile>
+    <ClCompile Include="net\OneBot12\OneBot12ApiDeal.cpp">
+      <Filter>net\OneBot12</Filter>
+    </ClCompile>
+    <ClCompile Include="net\OneBot12\OneBot12EventDeal.cpp">
+      <Filter>net\OneBot12</Filter>
+    </ClCompile>
+    <ClCompile Include="net\OneBot12\OneBot12Impl.cpp">
+      <Filter>net\OneBot12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -314,6 +326,15 @@
     </ClInclude>
     <ClInclude Include="tool\AutoDoSth.h">
       <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OneBot12\OneBot12ApiDeal.h">
+      <Filter>net\OneBot12</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OneBot12\OneBot12EventDeal.h">
+      <Filter>net\OneBot12</Filter>
+    </ClInclude>
+    <ClInclude Include="net\OneBot12\OneBot12Impl.h">
+      <Filter>net\OneBot12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

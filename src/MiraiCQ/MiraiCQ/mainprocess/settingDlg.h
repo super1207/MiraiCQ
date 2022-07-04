@@ -15,7 +15,7 @@ public:
 	void show();
 
 private:
-	void send_btn_cb();
+	void send_btn_cb(Fl_Widget* o);
 	void com_tip_cb(Fl_Widget* o);
 	static void send_btn_cb_t(Fl_Widget* o, void* p);
 	static void com_tip_cb_t(Fl_Widget* o, void* p);
