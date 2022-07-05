@@ -211,8 +211,13 @@ MiraiNet::NetStruct OneBot12NetImpl::call_fun(NetStruct senddat, int timeout,boo
 	MiraiNet::NetStruct api_json;
 	try
 	{
-		api_json = OneBot12ApiDeal::deal_api(*senddat);
+		Json::Value retJson;
+		api_json = OneBot12ApiDeal::deal_api(*senddat, retJson);
 		MiraiLog::get_instance()->add_debug_log("·¢ËÍµÄJson", "");
+		if (!retJson.isNull()) {
+			return MiraiNet::NetStruct(new Json::Value(retJson));
+		}
+		
 
 	}
 	catch (std::exception& e)
