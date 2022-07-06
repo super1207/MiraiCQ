@@ -30,7 +30,9 @@ private:
 		NetStruct recv_json;
 		bool isdeal = false;
 	};
-	virtual bool connect_();
+	NetStruct call_fun_native(NetStruct senddat, int timeout, bool in_new_net = false);
+	void deal_send_message(Json::Value& msg_json);
+	bool connect_();
 	using MessagePtr = websocketpp::config::asio_client::message_type::ptr;
 	using Client = websocketpp::client<websocketpp::config::asio_client>;
 	Client client;

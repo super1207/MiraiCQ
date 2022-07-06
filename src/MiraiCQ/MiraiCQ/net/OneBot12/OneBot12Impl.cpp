@@ -110,12 +110,7 @@ bool OneBot12NetImpl::connect_()
 			}
 			else /* 收到API返回 */
 			{
-				MiraiNet::NetStruct recv = OneBot12ApiDeal::deal_recv(root);
-				if (!recv)
-				{
-					MiraiLog::get_instance()->add_debug_log("API返回解析失败", event_str);
-					return;
-				}
+				MiraiNet::NetStruct recv = MiraiNet::NetStruct(new Json::Value(root));
 				Json::Value echo_json = recv->get("echo","");
 				if (!echo_json.isString() || echo_json.asString() == "")
 				{
@@ -201,34 +196,14 @@ bool OneBot12NetImpl::is_connect()
 	return is_run;
 }
 
-MiraiNet::NetStruct OneBot12NetImpl::call_fun(NetStruct senddat, int timeout,bool in_new_net)
+MiraiNet::NetStruct OneBot12NetImpl::call_fun_native(NetStruct senddat, int timeout, bool in_new_net)
 {
 	if (!senddat)
 	{
 		//err_msg = "param error";
 		return MiraiNet::NetStruct();
 	}
-	MiraiNet::NetStruct api_json;
-	try
-	{
-		Json::Value retJson;
-		api_json = OneBot12ApiDeal::deal_api(*senddat, retJson);
-		MiraiLog::get_instance()->add_debug_log("发送的Json", "");
-		if (!retJson.isNull()) {
-			return MiraiNet::NetStruct(new Json::Value(retJson));
-		}
-		
-
-	}
-	catch (std::exception& e)
-	{
-		MiraiLog::get_instance()->add_debug_log("jsonapi处理失败", e.what());
-	}
-	if (!api_json)
-	{
-		//err_msg = "param error";
-		return MiraiNet::NetStruct();
-	}
+	MiraiNet::NetStruct api_json = senddat;
 	CallStuct call_struct;
 	std::string echo = StrTool::gen_uuid();
 	if (echo == "")
@@ -243,7 +218,7 @@ MiraiNet::NetStruct OneBot12NetImpl::call_fun(NetStruct senddat, int timeout,boo
 	call_map.put(echo, bqueue);
 	AutoDoSth doSth([this, echo]() {
 		this->call_map.remove(echo);
-	});
+		});
 
 	try
 	{
@@ -266,14 +241,14 @@ MiraiNet::NetStruct OneBot12NetImpl::call_fun(NetStruct senddat, int timeout,boo
 			{
 				throw std::runtime_error("can't connect new net");
 			}
-			auto ret_json = new_net->call_fun(senddat, timeout, true);
+			auto ret_json = std::dynamic_pointer_cast<OneBot12NetImpl>(new_net)->call_fun_native(senddat, timeout, true);
 			return ret_json;
 		}
 		else
 		{
 			lock_guard<mutex> lock(mx_send);
 			client.send(hdl, send_json, websocketpp::frame::opcode::text);
-		}	
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -292,8 +267,280 @@ MiraiNet::NetStruct OneBot12NetImpl::call_fun(NetStruct senddat, int timeout,boo
 	try {
 		return bqueue->pop(timeout);
 	}
-	catch(...) {
+	catch (...) {
 		return MiraiNet::NetStruct();
 	}
+}
+
+// 这个函数将onebot11的message数组转化成onebot12的message数组
+void OneBot12NetImpl::deal_send_message(Json::Value& msg_json)
+{
+	for (auto& it : msg_json)
+	{
+		std::string msg_type = it["type"].asString();
+		if (msg_type == "image") {
+			//11有两种发送图片的方法，base64和url
+			std::string file = StrTool::get_str_from_json(it["data"], "file", "");
+			if (file.rfind("http://", 0) == 0 || file.rfind("https://", 0) == 0)
+			{
+				auto ret_json = std::make_shared<Json::Value>();
+				(*ret_json)["action"] = "upload_file";
+				(*ret_json)["params"]["type"] = "url";
+				(*ret_json)["params"]["name"] = StrTool::gen_uuid();
+				(*ret_json)["params"]["url"] = file;
+				auto r = call_fun_native(ret_json, 15000);
+				if (r && (*r)["retcode"].asInt() == 0)
+				{
+					std::string file_id = (*r)["data"]["file_id"].asString();
+					it["data"]["file_id"] = file_id;
+				}
+			}
+			else if (file.rfind("base64://", 0) == 0) {
+				auto ret_json = std::make_shared<Json::Value>();
+				(*ret_json)["action"] = "upload_file";
+				(*ret_json)["params"]["type"] = "data";
+				(*ret_json)["params"]["name"] = StrTool::gen_uuid();
+				(*ret_json)["params"]["data"] = file.substr(9);
+				auto r = call_fun_native(ret_json, 15000);
+				if (r && (*r)["retcode"].asInt() == 0)
+				{
+					std::string file_id = (*r)["data"]["file_id"].asString();
+					it["data"]["file_id"] = file_id;
+				}
+			}
+		}
+
+	}
+}
+
+MiraiNet::NetStruct OneBot12NetImpl::call_fun(NetStruct senddat, int timeout,bool in_new_net)
+{
+	if (!senddat)
+	{
+		//err_msg = "param error";
+		return MiraiNet::NetStruct();
+	}
+	auto ret_json = senddat;
+	std::string action = (*ret_json)["action"].asString();
+	if (action == "send_group_msg") {
+		(*ret_json)["action"] = "send_message";
+		(*ret_json)["params"]["detail_type"] = "group";
+		(*ret_json)["params"]["group_id"] = std::to_string((*senddat)["params"]["group_id"].asInt64());
+		if ((*ret_json)["params"]["message"].isString()) {
+			(*ret_json)["params"]["message"] = StrTool::cq_str_to_jsonarr((*ret_json)["params"]["message"].asString());
+		}
+		deal_send_message((*ret_json)["params"]["message"]);
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "send_private_msg") {
+		(*ret_json)["action"] = "send_message";
+		(*ret_json)["params"]["detail_type"] = "private";
+		(*ret_json)["params"]["user_id"] = std::to_string((*senddat)["params"]["user_id"].asInt64());
+		if ((*ret_json)["params"]["message"].isString()) {
+			(*ret_json)["params"]["message"] = StrTool::cq_str_to_jsonarr((*ret_json)["params"]["message"].asString());
+		}
+		deal_send_message((*ret_json)["params"]["message"]);
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "send_msg") {
+		(*ret_json)["action"] = "send_message";
+		(*ret_json)["params"]["detail_type"] = (*senddat)["params"]["message_type"].asString();
+		int64_t user_id = StrTool::get_int64_from_json((*senddat)["params"], "user_id", 0);
+		int64_t group_id = StrTool::get_int64_from_json((*senddat)["params"], "group_id", 0);
+		if (user_id != 0) {
+			(*ret_json)["params"]["user_id"] = std::to_string(user_id);
+		}
+		if (group_id != 0) {
+			(*ret_json)["params"]["group_id"] = std::to_string(group_id);
+		}
+		if ((*ret_json)["params"]["message"].isString()) {
+			(*ret_json)["params"]["message"] = StrTool::cq_str_to_jsonarr((*ret_json)["params"]["message"].asString());
+		}
+		deal_send_message((*ret_json)["params"]["message"]);
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "delete_msg") {
+		(*ret_json)["action"] = "delete_message";
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "get_msg") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "get_forward_msg") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "send_like") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_kick") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_ban") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_anonymous_ban") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_whole_ban") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_admin") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_anonymous") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_card") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_name") {
+		(*ret_json)["params"]["group_id"] = std::to_string((*senddat)["params"]["group_id"].asInt64());
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "set_group_leave") {
+		(*ret_json)["action"] = "leave_group";
+		(*ret_json)["params"]["group_id"] = std::to_string((*senddat)["params"]["group_id"].asInt64());
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "set_group_special_title") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_friend_add_request") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "set_group_add_request") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "get_login_info") {
+		(*ret_json)["action"] = "get_self_info";
+		auto r = call_fun_native(ret_json, timeout);
+		std::string user_id = StrTool::get_str_from_json((*r)["data"], "user_id", "");
+		if (user_id != "") {
+			(*r)["data"]["user_id"] = std::stoll(user_id);
+		}
+		return r;
+	}
+	else if (action == "get_stranger_info") {
+		(*ret_json)["action"] = "get_user_info";
+		(*ret_json)["params"]["user_id"] = std::to_string((*senddat)["params"]["user_id"].asInt64());
+		auto r = call_fun_native(ret_json, timeout);
+		std::string user_id = StrTool::get_str_from_json((*r)["data"], "user_id", "");
+		if (user_id != "") {
+			(*r)["data"]["user_id"] = std::stoll(user_id);
+		}
+		return r;
+	}
+	else if (action == "get_group_list") {
+		auto r = call_fun_native(ret_json, timeout);
+		for (auto& it : (*r)["data"]) {
+			std::string group_id = StrTool::get_str_from_json(it, "group_id", "");
+			if (group_id != "") {
+				it["group_id"] = std::stoll(group_id);
+			}
+		}
+		return r;
+	}
+	else if (action == "get_friend_list") {
+		auto r = call_fun_native(ret_json, timeout);
+		for (auto& it : (*r)["data"]) {
+			std::string user_id = StrTool::get_str_from_json(it, "user_id", "");
+			if (user_id != "") {
+				it["user_id"] = std::stoll(user_id);
+			}
+		}
+		return r;
+	}
+	else if (action == "get_group_member_info") {
+		(*ret_json)["params"]["user_id"] = std::to_string((*senddat)["params"]["user_id"].asInt64());
+		(*ret_json)["params"]["group_id"] = std::to_string((*senddat)["params"]["group_id"].asInt64());
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "get_group_member_list") {
+		(*ret_json)["params"]["group_id"] = std::to_string((*senddat)["params"]["group_id"].asInt64());
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "get_group_honor_info") {
+		// onebot12没有对应的api
+	}
+	else if (action == "get_cookies") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "get_csrf_token") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "get_credentials") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "get_record") {
+		// no need todo
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "get_image") {
+		// no need todo
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "can_send_image") {
+		auto r = std::make_shared<Json::Value>();
+		(*r)["status"] = "ok";
+		(*r)["retcode"] = 0;
+		(*r)["message"] = "";
+		(*r)["data"]["yes"] = true;
+		return r;
+	}
+	else if (action == "can_send_record") {
+		auto r = std::make_shared<Json::Value>();
+		(*r)["status"] = "ok";
+		(*r)["retcode"] = 0;
+		(*r)["message"] = "";
+		(*r)["data"]["yes"] = true;
+		return r;
+	}
+	else if (action == "get_status") {
+		auto r = call_fun_native(ret_json, timeout);
+		return r;
+	}
+	else if (action == "get_version_info") {
+
+		auto r = std::make_shared<Json::Value>();
+		(*r)["status"] = "ok";
+		(*r)["retcode"] = 0;
+		(*r)["message"] = "";
+		(*r)["data"]["app_name"] = "MiraiCQ";
+		(*r)["data"]["app_version"] = "2.3.9";
+		(*r)["data"]["protocol_version"] = "v11";
+	}
+	else if (action == "set_restart") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	else if (action == "clean_cache") {
+		// onebot12没有对应的api
+		return MiraiNet::NetStruct();
+	}
+	return MiraiNet::NetStruct();
 }
 

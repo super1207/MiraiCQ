@@ -202,7 +202,6 @@ static Json::Value deal_cq_str(const std::string & cq_str)
 				MiraiLog::get_instance()->add_debug_log("ApiCall", "¶ÁÈ¡Í¼Æ¬ÎÄ¼þÊ§°Ü");
 				continue;
 			}
-			MiraiLog::get_instance()->add_warning_log("iiiiiiiiiiiiiibuffer.size():", std::to_string(buffer.size()));
 			node["data"]["file"] = "base64://" + websocketpp::base64_encode((const unsigned char*)(&(buffer[0])), buffer.size());
 
 		}
