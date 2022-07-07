@@ -319,6 +319,10 @@ void OneBot12NetImpl::deal_send_message(Json::Value& msg_json)
 				it["data"]["user_id"] = qq;
 			}
 		}
+		else if (msg_type == "face") {
+			std::string id = it["data"]["id"].asString();
+			it["data"]["id"] = std::stoll(id);
+		}
 
 	}
 }

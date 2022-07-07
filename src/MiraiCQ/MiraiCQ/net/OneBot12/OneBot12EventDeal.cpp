@@ -28,6 +28,9 @@ static void deal_message_arr(Json::Value& msgarr)
 			obj["type"] = "at";
 			obj["data"]["qq"] = "all";
 		}
+		else if (msg_type == "face") {
+			obj["data"]["id"] = std::to_string(obj["data"]["id"].asInt64());
+		}
 	}
 }
 
