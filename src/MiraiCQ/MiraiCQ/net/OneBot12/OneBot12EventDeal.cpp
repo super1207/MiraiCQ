@@ -20,6 +20,13 @@ static void deal_message_arr(Json::Value& msgarr)
 		std::string msg_type = obj["type"].asString();
 		if (msg_type == "image") {
 			obj["data"]["file"] = obj["data"]["file_id"].asString();
+		}else if (msg_type == "mention") {
+			obj["type"] = "at";
+			obj["data"]["qq"] = obj["data"]["user_id"].asString();
+		}
+		else if (msg_type == "mention_all") {
+			obj["type"] = "at";
+			obj["data"]["qq"] = "all";
 		}
 	}
 }

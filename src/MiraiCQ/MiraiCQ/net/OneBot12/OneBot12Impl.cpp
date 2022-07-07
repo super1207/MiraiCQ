@@ -309,6 +309,16 @@ void OneBot12NetImpl::deal_send_message(Json::Value& msg_json)
 				}
 			}
 		}
+		else if (msg_type == "at") {
+			std::string qq = it["data"]["qq"].asString();
+			if (qq == "all") {
+				it["type"] = "mention_all";
+			}
+			else {
+				it["type"] = "mention";
+				it["data"]["user_id"] = qq;
+			}
+		}
 
 	}
 }
