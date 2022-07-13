@@ -66,7 +66,7 @@ public:
 	* 描述：获得事件，并清空事件数组
 	* 返回值：事件数组
 	*/
-	std::vector<NetStruct> get_event();
+	std::vector<NetStruct> get_event(int timeout = 5000);
 
 	static std::shared_ptr<MiraiNet> get_instance(const std::string & type) ;
 	
@@ -82,6 +82,7 @@ private:
 	std::shared_mutex mx_config_map;
 	std::map<std::string, std::string> config_map;
 	std::mutex mx_event_vec;
+	std::condition_variable cv_event_vec;
 	std::vector<NetStruct> event_vec;
 	/* 记录event_vec的最大大小，若超过，则较旧的数据会被丢弃 */
 	std::atomic_size_t buf_size = 128;

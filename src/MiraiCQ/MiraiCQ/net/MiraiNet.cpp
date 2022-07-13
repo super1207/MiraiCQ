@@ -21,9 +21,12 @@ std::map<std::string, std::string> MiraiNet::get_all_config()
 	return config_map;
 }
 
-std::vector<MiraiNet::NetStruct> MiraiNet::get_event()
+std::vector<MiraiNet::NetStruct> MiraiNet::get_event(int timeout)
 {
-	lock_guard<mutex> lock(mx_event_vec);
+	unique_lock<mutex> lock(mx_event_vec);
+	// 等待事件数组 > 0
+	cv_event_vec.wait_for(lock, std::chrono::milliseconds(timeout), [&] {return event_vec.size() > 0; });
+	// 无论是否等待成功，都正常返回
 	auto ret_vec = event_vec;
 	event_vec.clear();
 	return ret_vec;
@@ -36,6 +39,7 @@ void MiraiNet::add_event(NetStruct event)
 	{
 		event_vec.erase(event_vec.begin());
 	}
+	cv_event_vec.notify_one();
 }
 
 MiraiNet::~MiraiNet()
