@@ -90,7 +90,7 @@ bool OneBotNetImpl::connect_()
 				return;
 			}
 			std::string event_str = msg->get_payload();
-			MiraiLog::get_instance()->add_debug_log("OnMessage", event_str);
+			/* MiraiLog::get_instance()->add_debug_log("OnMessage", event_str); */
 			Json::Value root;
 			Json::Reader reader;
 			if (!reader.parse(event_str, root))
