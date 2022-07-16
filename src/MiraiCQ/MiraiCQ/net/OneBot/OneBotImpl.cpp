@@ -85,8 +85,12 @@ bool OneBotNetImpl::connect_()
 	{
 		try
 		{
+			if (msg->get_opcode() != websocketpp::frame::opcode::text) {
+				MiraiLog::get_instance()->add_warning_log("收到非text类型的ws消息", "");
+				return;
+			}
 			std::string event_str = msg->get_payload();
-			/* MiraiLog::get_instance()->add_debug_log("OnMessage", event_str); */
+			MiraiLog::get_instance()->add_debug_log("OnMessage", event_str);
 			Json::Value root;
 			Json::Reader reader;
 			if (!reader.parse(event_str, root))

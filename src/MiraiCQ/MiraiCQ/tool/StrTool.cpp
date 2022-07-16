@@ -168,7 +168,9 @@ Json::Value StrTool::cq_str_to_jsonarr(const std::string& cq_str,int mode)
 	{
 		char cur_ch = cq_str[i];
 		int utf8_char_len = EmojiTool::utf8_next_len(cq_str, i);
-		assert(utf8_char_len > 0);
+		if (utf8_char_len == 0) {
+			continue;
+		}
 		if (stat == 0) //text mode
 		{
 			if (cur_ch == '[') // to cqcode
