@@ -58,6 +58,16 @@ IDR_DLL_BIN3            DLL_BIN                 "debug_tip.json"
 
 IDR_DLL_BIN4            DLL_BIN                 "JSON.lua"
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "MiraiCQ.ico"
+
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 

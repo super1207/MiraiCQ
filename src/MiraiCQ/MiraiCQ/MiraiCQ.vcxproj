@@ -209,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="luna_sama.bmp" />
+    <Image Include="MiraiCQ.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

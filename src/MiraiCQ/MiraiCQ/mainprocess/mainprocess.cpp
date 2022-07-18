@@ -147,6 +147,7 @@ static bool login_dlg()
 	login_info._token_input = &token_input;
 	login_info._win = &win;
 	button.callback(login_dlg_cb, &login_info);
+	win.icon((char*)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1)));
 	win.show();
 	Fl::run();
 	return login_info.is_login;
@@ -438,6 +439,7 @@ static void plus_dlg()
 	ex_btn.color(fl_rgb_color(255, 255, 255));
 	ex_btn.callback(ex_btn_cb, 0);
 	win.end();
+	win.icon((char*)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1)));
 	win.show();
 	Fl::run();
 }
@@ -573,6 +575,8 @@ static void do_login()
 		}
 	}
 }
+
+static HINSTANCE m_hInstance;
 
 void mainprocess()
 {

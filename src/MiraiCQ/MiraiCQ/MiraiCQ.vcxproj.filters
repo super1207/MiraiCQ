@@ -351,5 +351,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="luna_sama.bmp" />
+    <Image Include="MiraiCQ.ico" />
   </ItemGroup>
 </Project>
