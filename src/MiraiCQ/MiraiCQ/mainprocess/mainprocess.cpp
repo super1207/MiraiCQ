@@ -13,6 +13,7 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Multiline_Input.H>
 #include <FL/Fl_BMP_Image.H>
+#include <FL/Fl_JPEG_Image.H>
 
 
 #include "../log/MiraiLog.h"
@@ -23,6 +24,7 @@
 #include "../tool/TimeTool.h"
 #include "../tool/ThreadTool.h"
 #include "../tool/IPCTool.h"
+#include "../tool/ImgTool.h"
 #include "./dealapi.h"
 #include "./settingDlg.h"
 #include "../scriptrun/ScriptRun.h"
@@ -404,6 +406,41 @@ public:
 	~MyTable() { }
 };
 
+
+class MyImageBox :public Fl_Box
+{
+public:
+	int handle(int event) {
+		int ret = Fl_Box::handle(event);
+		if (event == FL_RELEASE) {
+			int64_t qq = Center::get_instance()->CQ_getLoginQQ(-1207);
+			if (qq == -1) {
+				MiraiLog::get_instance()->add_warning_log("mainprocess", "获取头像失败,无法得到user_id");
+				return ret;
+			}
+			std::string img_path = PathTool::get_exe_dir() + "config\\tou.jpg";
+			bool is_download = ImgTool::download_img("http://q1.qlogo.cn/g?b=qq&nk=" + std::to_string(qq) + "&s=640", img_path);
+			if (!is_download) {
+				MiraiLog::get_instance()->add_warning_log("mainprocess", "获取头像失败,无法下载头像");
+				return ret;
+			}
+			auto img = this->image();
+			if (img) {
+				free(img);
+			}
+			Fl_JPEG_Image tmp = Fl_JPEG_Image(StrTool::to_utf8(img_path).c_str());
+			Fl_Image* pImg = tmp.copy(100, 100);
+			this->image(pImg);
+			this->draw();
+		}
+		return ret;
+	}
+	MyImageBox(int X, int Y, int W, int H, const char* l = 0) : Fl_Box(X, Y, W, H, l) {
+		
+	}
+
+};
+
 // 详细设置的回调函数
 static void ex_btn_cb(Fl_Widget* o, void* p)
 {
@@ -428,10 +465,18 @@ static void plus_dlg()
 	Fl_Box box_version(200, 70, 300, 20, str4.c_str());
 	Fl_Multiline_Input edit_des(200, 100, 300, 180);
 	// 头
-	Fl_Box luna_sama_box(50, 5, 100, 100); 
-	Fl_BMP_Image tmp = Fl_BMP_Image((StrTool::to_utf8(PathTool::get_exe_dir()) + "\\config\\luna_sama.bmp").c_str());
-	Fl_Image* pImg = tmp.copy(100, 100);
-	luna_sama_box.image(pImg);
+	MyImageBox luna_sama_box(50, 5, 100, 100);
+	std::string tou_image = PathTool::get_exe_dir() + "config\\tou.jpg";
+	if (PathTool::is_file_exist(tou_image)) {
+		Fl_JPEG_Image tmp = Fl_JPEG_Image(StrTool::to_utf8(tou_image).c_str());
+		Fl_Image* pImg = tmp.copy(100, 100);
+		luna_sama_box.image(pImg);
+	}
+	else {
+		Fl_BMP_Image tmp = Fl_BMP_Image((StrTool::to_utf8(PathTool::get_exe_dir()) + "\\config\\luna_sama.bmp").c_str());
+		Fl_Image* pImg = tmp.copy(100, 100);
+		luna_sama_box.image(pImg);
+	}
 	// table为插件列表
 	MyTable table(10, 115, 180, 245, &table2, &box_name, &box_author, &box_version, &edit_des);
 	std::string ex_btn_str = StrTool::to_utf8("详细设置");

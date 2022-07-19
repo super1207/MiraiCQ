@@ -528,5 +528,6 @@
     <ClCompile Include="..\..\src\screen_xywh.cxx" />
     <ClCompile Include="..\..\src\vsnprintf.c" />
     <ClCompile Include="..\..\src\Fl_BMP_Image.cxx" />
+    <ClCompile Include="..\..\src\Fl_JPEG_Image.cxx" />
   </ItemGroup>
 </Project>
