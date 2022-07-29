@@ -1,10 +1,11 @@
-#include "plusprocess.h"
+#include "ipcprocess.h"
 
 
 #include<thread>
 #include <jsoncpp/json.h>
 #include <Windows.h>
 #include <assert.h>
+#include <map>
 #include <FL/Fl.H>
 
 #include "../tool/IPCTool.h"
@@ -13,10 +14,14 @@
 #include "../tool/StrTool.h"
 #include "../tool/PathTool.h"
 #include "../tool/ThreadTool.h"
+#include "../center/center.h"
 
 #include <tlhelp32.h>
 
+#include "../resource.h"
 
+
+extern std::string g_plus_name;
 extern std::string g_main_flag;
 static std::string g_dll_path;
 
@@ -35,7 +40,7 @@ static void* get_fun_ptr(const std::string& dll_path, const std::string& fun_nam
 	return GetProcAddress(hand, fun_name.c_str());
 }
 
-/* 用于向主进程查询函数名字,返回`""`代表没有查询到 */
+/* 用于查询函数名字,返回`""`代表没有查询到 */
 static std::string get_fun_name(int funtype)
 {
 	static std::map<int, std::string> mmap;
@@ -53,17 +58,52 @@ static std::string get_fun_name(int funtype)
 		}
 	}
 	Json::Value to_send;
-	to_send["action"] = "get_fun_name";
-	to_send["params"] = funtype;
-	const char* ret = IPC_ApiSend(g_main_flag.c_str(), Json::FastWriter().write(to_send).c_str(), 3000);
-	if (strcmp(ret, "") != 0) {
+	std::string json_path = PathTool::get_exe_dir() + "app\\" + g_plus_name + ".json";
+	if (!PathTool::is_file_exist(json_path))
+	{
 		std::lock_guard<std::mutex>lk(mx);
-		mmap[funtype] = ret;
-	}
-	if (strcmp(ret, "?") == 0) {
+		mmap[funtype] = "";
 		return "";
 	}
-	return ret;
+	std::string json_file;
+	try {
+		json_file = PathTool::read_biniary_file(json_path);
+		if (StrTool::is_utf8(json_file)) {
+			json_file = StrTool::to_ansi(json_file);
+		}
+	}
+	catch (...) {
+		std::lock_guard<std::mutex>lk(mx);
+		mmap[funtype] = "";
+		return "";
+	}
+	Json::Value root;
+	Json::Reader reader;
+	if (!reader.parse(json_file, root))
+	{
+		std::lock_guard<std::mutex>lk(mx);
+		mmap[funtype] = "";
+		return "";
+	}
+	try {
+		Json::Value event_json_arr = root.get("event", "");
+		for (auto& it : event_json_arr) {
+			if (it["type"].asInt64() == funtype) {
+				std::string fun_name = it["function"].asString();
+				std::lock_guard<std::mutex>lk(mx);
+				mmap[funtype] = fun_name;
+				return fun_name;
+			}
+		}
+	}
+	catch (...) {
+		std::lock_guard<std::mutex>lk(mx);
+		mmap[funtype] = "";
+		return "";
+	}
+	std::lock_guard<std::mutex>lk(mx);
+	mmap[funtype] = "";
+	return "";
 }
 
 /* 用于加载插件dll,并且设置静态全局变量`g_dll_path` */
@@ -169,7 +209,7 @@ static void fun(const char* sender, const char* flag, const char* msg)
 }
 
 /* 用于处理主进程传来的事件 */
-static void do_event(Json::Value& root) {
+static void do_event(const std::string & tp,const Json::Value & root) {
 	std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
 	// MiraiLog::get_instance()->add_debug_log("PLUS","收到主进程的事件类型："+ event_type);
 	if (event_type == "cq_event_group_message")
@@ -346,46 +386,45 @@ static void do_event(Json::Value& root) {
 		}
 	}
 	else {
-		MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到未知的事件类型:" + root.toStyledString());
+		// MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到未知的事件类型:" + root.toStyledString());
 	}
 }
 
-static bool is_parent_exist() {
-	DWORD dwID, dwParentID;
-	HANDLE hParent = NULL;
-	HANDLE  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	dwID = GetCurrentProcessId();
-	if (hSnapshot != INVALID_HANDLE_VALUE)
-	{
-		PROCESSENTRY32 pe32 = { sizeof(PROCESSENTRY32) };
-		BOOL bRet = Process32First(hSnapshot, &pe32);
-		if (pe32.th32ProcessID == dwID)
-		{
-			dwParentID = pe32.th32ParentProcessID;
-			hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
-		}
-		else
-		{
-			while (Process32Next(hSnapshot, &pe32))
-			{
-				if (pe32.th32ProcessID == dwID)
-				{
-					dwParentID = pe32.th32ParentProcessID;
-					hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
-					break;
-				}
-			}
-		}
-		CloseHandle(hSnapshot);
+static void release_dll()
+{
+	std::string cqp1_dir = PathTool::get_exe_dir();
+	std::string cqp1_file = cqp1_dir + "CQP.dll";
+	std::string cqp2_dir = PathTool::get_exe_dir() + "bin\\";
+	std::string cqp2_file = cqp2_dir + "CQP.dll";
+	if (PathTool::is_file_exist(cqp1_file)) {
+		PathTool::del_file(cqp1_file);
 	}
-	if (hParent != NULL) {
-		CloseHandle(hParent);
-		return true;
+	if (PathTool::is_file_exist(cqp2_file)) {
+		PathTool::del_file(cqp2_file);
 	}
-	return false;
+	HRSRC hRes = FindResourceA(NULL, MAKEINTRESOURCEA(IDR_DLL_BIN1), "DLL_BIN");
+	if (hRes == NULL) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_CQP.dll", "FindResourceA err");
+		exit(-1);
+	}
+	HGLOBAL hMem = LoadResource(NULL, hRes);
+	DWORD dwSize = SizeofResource(NULL, hRes);
+	PathTool::create_dir(cqp2_dir);
+	HANDLE hFile = CreateFileA(cqp2_file.c_str(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_CQP.dll", "CreateFileA err");
+		exit(-1);
+	}
+	DWORD dwWrite = 0;
+	BOOL bRet = WriteFile(hFile, hMem, dwSize, &dwWrite, NULL);
+	if (bRet == FALSE) {
+		MiraiLog::get_instance()->add_fatal_log("RELEASE_CQP.dll", "WriteFile err");
+		exit(-1);
+	}
+	CloseHandle(hFile);
 }
 
-void plusprocess(const std::string& main_flag, const std::string& plus_flag, const std::string& plus_name)
+void ipcprocess(const std::string& main_flag, const std::string& plus_flag, const std::string& plus_name)
 {
 	try
 	{
@@ -394,12 +433,16 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 		PathTool::create_dir(path_str);
 		SetDllDirectoryA(path_str.c_str());
 
+
 		/* 初始化IPC */
 		if (IPC_Init(plus_flag.c_str()) != 0)
 		{
 			MiraiLog::get_instance()->add_fatal_log("TESTPLUS", "IPC_Init 执行失败");
 			exit(-1);
 		}
+
+		//释放CQP.dll
+		release_dll();
 
 		/* 加载插件，加载失败会强制退出进程 */
 		load_plus(plus_name);
@@ -417,33 +460,21 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 			call_start(fptr);
 		}
 
-		std::thread([]() {
-			while (true)
-			{
-				if (!is_parent_exist()) {
-					MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
-					exit(-1);
-				}
-				TimeTool::sleep(5000);
-			}
-		}).detach();
-
 
 		/* 用于处理主进程下发的事件 */
 		std::thread([plus_flag]() {
 			while (true)
 			{
 				const char* evt = IPC_GetEvent(plus_flag.c_str());
-
+				assert(evt);
 				Json::Value root;
 				Json::Reader reader;
 				if (!reader.parse(evt, root))
 				{
-					/* Json解析失败 */
-					MiraiLog::get_instance()->add_warning_log("EVENTRECV", "收到不规范的Json" + std::string(evt));
+					MiraiLog::get_instance()->add_debug_log("IPC_PROCESS_EVENT", "收到不规范的Json" + std::string(evt));
 					continue;
 				}
-
+				
 				//检测是否是插件退出事件
 				try {
 					std::string event_type = StrTool::get_str_from_json(root, "event_type", "");
@@ -470,11 +501,40 @@ void plusprocess(const std::string& main_flag, const std::string& plus_flag, con
 					MiraiLog::get_instance()->add_fatal_log("EVENTRECV", std::string("插件退出时发生异常：") + e.what());
 					exit(-1);
 				}
+
+				try {
+					if (StrTool::get_str_from_json(root, "post_type", "") == "message")
+					{
+						auto msg_json = root.get("message", Json::Value());
+						/* 在此将message变为数组格式 */
+						if (msg_json.isString())
+						{
+							root["message"] = StrTool::cq_str_to_jsonarr(msg_json.asString());
+						}
+					}
+				}
+				catch (const std::exception& e) {
+					MiraiLog::get_instance()->add_debug_log("EVENTRECV", "将消息格式转为数组失败:" + std::string(e.what()));
+					continue;
+				}
+				
+				std::map<std::string,Json::Value> to_send;
+				try {
+					to_send = Center::get_instance()->deal_event(MiraiNet::NetStruct(new Json::Value(root)));
+				}
+				catch (const std::exception& e) {
+					MiraiLog::get_instance()->add_debug_log("EVENTRECV", "预处理Json消息失败:" + std::string(e.what()));
+					continue;
+				}
+
 				// 将其放入线程池
-				ThreadTool::get_instance()->submit([=]() {
+				ThreadTool::get_instance()->submit([to_send]() {
 					try {
-						Json::Value root_ = root;
-						do_event(root_);
+						for (auto& it : to_send) {
+							if (!it.second.isNull()) {
+								do_event(it.first,it.second);
+							}
+						}	
 					}
 					catch (const std::exception& e) {
 						MiraiLog::get_instance()->add_fatal_log("EVENTRECV", std::string("do_event发生异常：") + e.what());

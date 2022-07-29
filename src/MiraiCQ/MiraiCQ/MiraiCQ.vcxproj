@@ -105,6 +105,7 @@
     <ClCompile Include="center\event.cpp" />
     <ClCompile Include="center\ex_event.cpp" />
     <ClCompile Include="config\config.cpp" />
+    <ClCompile Include="ipcprocess\ipcprocess.cpp" />
     <ClCompile Include="log\MiraiLog.cpp" />
     <ClCompile Include="mainprocess\dealapi.cpp" />
     <ClCompile Include="mainprocess\mainprocess.cpp" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="center\center.h" />
     <ClInclude Include="config\config.h" />
+    <ClInclude Include="ipcprocess\ipcprocess.h" />
     <ClInclude Include="log\MiraiLog.h" />
     <ClInclude Include="mainprocess\dealapi.h" />
     <ClInclude Include="mainprocess\mainprocess.h" />

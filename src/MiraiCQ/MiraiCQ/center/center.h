@@ -4,6 +4,7 @@
 #include <string>
 #include <atomic>
 #include <functional>
+#include <map>
 
 #include "../plus/MiraiPlus.h"
 #include "../net/MiraiNet.h"
@@ -82,31 +83,34 @@ public:
 	std::string CQ_callApi(int auth_code, const char* msg);
 	int CQ_setDiscussLeave(int auth_code, int64_t discuss_id);
 
+	/* 此函数用于转换onebot事件为CQ消息(注意消息格式必须为数组格式) */
+	std::map<std::string,Json::Value>  deal_event(MiraiNet::NetStruct evt);
+
 private:
 	std::weak_ptr<MiraiNet> net;
 	std::shared_mutex mx_net; /* 用于对智能指针本身进行加锁 */
 
 	std::atomic_bool is_run = false;
 	std::atomic_bool can_run = false;
+	
 private:
 	Center();
-	void deal_event(MiraiNet::NetStruct evt) ;
-	void deal_type_message(Json::Value& evt);
-	void deal_type_notice(Json::Value& evt);
-	void deal_type_notice_group_upload(Json::Value& evt);
-	void deal_type_notice_group_admin(Json::Value& evt);
-	void deal_type_notice_group_decrease(Json::Value& evt);
-	void deal_type_notice_group_increase(Json::Value& evt);
-	void deal_type_notice_group_ban(Json::Value& evt);
-	void deal_type_notice_friend_add(Json::Value& evt);
-	void deal_type_request_friend(Json::Value& evt);
-	void deal_type_request_group(Json::Value& evt);
-	void deal_type_request(Json::Value& evt);
-	void deal_type_meta_event(Json::Value& evt);
-	void deal_type_message_private(Json::Value& evt);
-	void deal_type_message_group(Json::Value& evt);
-	void deal_1207_event(Json::Value& evt);
-	void deal_ex_event(Json::Value& evt);
+	Json::Value deal_type_message(Json::Value& evt);
+	Json::Value deal_type_notice(Json::Value& evt);
+	Json::Value deal_type_notice_group_upload(Json::Value& evt);
+	Json::Value deal_type_notice_group_admin(Json::Value& evt);
+	Json::Value deal_type_notice_group_decrease(Json::Value& evt);
+	Json::Value deal_type_notice_group_increase(Json::Value& evt);
+	Json::Value deal_type_notice_group_ban(Json::Value& evt);
+	Json::Value deal_type_notice_friend_add(Json::Value& evt);
+	Json::Value deal_type_request_friend(Json::Value& evt);
+	Json::Value deal_type_request_group(Json::Value& evt);
+	Json::Value deal_type_request(Json::Value& evt);
+	Json::Value deal_type_meta_event(Json::Value& evt);
+	Json::Value deal_type_message_private(Json::Value& evt);
+	Json::Value deal_type_message_group(Json::Value& evt);
+	Json::Value deal_1207_event(Json::Value& evt);
+	Json::Value deal_ex_event(Json::Value& evt);
 
 };
 

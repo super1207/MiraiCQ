@@ -52,6 +52,9 @@
     <Filter Include="net\OneBot12">
       <UniqueIdentifier>{6ca01032-6fe1-405a-82d0-73290d33afc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ipcprocess">
+      <UniqueIdentifier>{a7eae0a1-0531-402b-8523-87e2fdd55a46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="log\MiraiLog.cpp">
@@ -237,6 +240,9 @@
     <ClCompile Include="net\OneBot12\OneBot12Impl.cpp">
       <Filter>net\OneBot12</Filter>
     </ClCompile>
+    <ClCompile Include="ipcprocess\ipcprocess.cpp">
+      <Filter>ipcprocess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -335,6 +341,9 @@
     </ClInclude>
     <ClInclude Include="net\OneBot12\OneBot12Impl.h">
       <Filter>net\OneBot12</Filter>
+    </ClInclude>
+    <ClInclude Include="ipcprocess\ipcprocess.h">
+      <Filter>ipcprocess</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,54 +10,57 @@
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
 #include <websocketpp/base64/base64.hpp>
-#include "../tool/IPCTool.h"
 #include "../scriptrun/ScriptRun.h"
 
 
 using namespace std;
 
-void Center::deal_event(MiraiNet::NetStruct evt) 
+std::map<std::string,Json::Value> Center::deal_event(MiraiNet::NetStruct evt)
 {
 	assert(evt);
+	std::map<std::string, Json::Value> ret;
+	ret["cq_event"] = Json::Value();
+	ret["1207_event"] = Json::Value();
+	ret["ex_event"] = Json::Value();
 	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:"+ StrTool::to_ansi(Json::FastWriter().write(*evt)));
 	if (!(*evt).isObject())
 	{
-		return;
+		return ret;
 	}
 	auto post_type = StrTool::get_str_from_json((*evt), "post_type", "");
 	if (post_type == "")
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "post_type不存在");
 		/* 失败，不再继续处理 */
-		return;
+		return ret;
 	}
 	bool is_pass = ScriptRun::get_instance()->onebot_event_filter(Json::FastWriter().write(*evt).c_str());
 	if (!is_pass) {
 		/* 被过滤，不再继续处理 */
-		return;
+		return ret;
 	}
 	try
 	{
 		/* 1207号事件暂时单独处理 */
-		deal_1207_event(*evt);
+		ret["1207_event"] = deal_1207_event(*evt);
 
-		deal_ex_event(*evt);
+		ret["ex_event"] = deal_ex_event(*evt);
 
 		if (post_type == "message")
 		{
-			deal_type_message(*evt);
+			ret["cq_event"] = deal_type_message(*evt);
 		}
 		else if (post_type == "notice")
 		{
-			deal_type_notice(*evt);
+			ret["cq_event"] = deal_type_notice(*evt);
 		}
 		else if (post_type == "request")
 		{
-			deal_type_request(*evt);
+			ret["cq_event"] = deal_type_request(*evt);
 		}
 		else if (post_type == "meta_event")
 		{
-			deal_type_meta_event(*evt);
+			ret["cq_event"] = deal_type_meta_event(*evt);
 		}
 		else
 		{
@@ -66,26 +69,12 @@ void Center::deal_event(MiraiNet::NetStruct evt)
 	}
 	catch (const std::exception& e)
 	{
-		MiraiLog::get_instance()->add_warning_log("Center", string("处理事件时发送错误：") + e.what());
+		MiraiLog::get_instance()->add_warning_log("Center", string("处理事件时发生错误：") + e.what());
 	}
-
+	return ret;
 }
 
-static void IPC_SendEvent_T(const char * msg)
-{
-	if (!msg) {
-		return ;
-	}
-	auto plus = MiraiPlus::get_instance()->get_all_plus();
-	for (auto p : plus) {
-		if (p.second->is_enable()) 
-		{
-			IPC_SendEvent(p.second->get_uuid().c_str(), msg);
-		}
-	}
-}
-
-void Center::deal_type_message(Json::Value& evt)
+Json::Value Center::deal_type_message(Json::Value& evt)
 {
 	// 处理message事件中的message_id
 	Json::Value webid = evt.get("message_id", Json::Value());
@@ -94,52 +83,54 @@ void Center::deal_type_message(Json::Value& evt)
 	auto message_type = StrTool::get_str_from_json(evt, "message_type", "");
 	if (message_type == "private")
 	{
-		deal_type_message_private(evt);
+		return deal_type_message_private(evt);
 	}
 	else if (message_type == "group")
 	{
-		deal_type_message_group(evt);
+		return deal_type_message_group(evt);
 	}
 	else
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "未知的message_type:"+ message_type);
+		return Json::Value();
 	}
 }
 
-void Center::deal_type_notice(Json::Value& evt)
+Json::Value Center::deal_type_notice(Json::Value& evt)
 {
 	auto notice_type = StrTool::get_str_from_json(evt, "notice_type", "");
 	if (notice_type == "group_upload")
 	{
-		deal_type_notice_group_upload(evt);
+		return deal_type_notice_group_upload(evt);
 	}
 	else if (notice_type == "group_admin")
 	{
-		deal_type_notice_group_admin(evt);
+		return deal_type_notice_group_admin(evt);
 	}
 	else if (notice_type == "group_decrease")
 	{
-		deal_type_notice_group_decrease(evt);
+		return deal_type_notice_group_decrease(evt);
 	}
 	else if (notice_type == "group_increase")
 	{
-		deal_type_notice_group_increase(evt);
+		return deal_type_notice_group_increase(evt);
 	}
 	else if (notice_type == "group_ban")
 	{
-		deal_type_notice_group_ban(evt);
+		return deal_type_notice_group_ban(evt);
 	}
 	else if (notice_type == "friend_add")
 	{
-		deal_type_notice_friend_add(evt);
+		return deal_type_notice_friend_add(evt);
 	}
 	else
 	{
+		return Json::Value();
 		//MiraiLog::get_instance()->add_debug_log("Center", "未知的notice_type:"+ notice_type);
 	}
 }
 
-void Center::deal_type_notice_group_upload(Json::Value& evt)
+Json::Value Center::deal_type_notice_group_upload(Json::Value& evt)
 {
 	std::string file_base64;
 
@@ -147,7 +138,7 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 	if (!file.isObject())
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "错误的deal_type_notice_group_upload 事件");
-		return;
+		return Json::Value();
 	}
 	std::string id = StrTool::to_ansi(StrTool::get_str_from_json(file, "id", ""));
 	std::string name = StrTool::to_ansi(StrTool::get_str_from_json(file, "name", ""));
@@ -170,10 +161,10 @@ void Center::deal_type_notice_group_upload(Json::Value& evt)
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["file_base64"] = file_base64;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_notice_group_admin(Json::Value& evt)
+Json::Value Center::deal_type_notice_group_admin(Json::Value& evt)
 {
 	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
@@ -195,10 +186,10 @@ void Center::deal_type_notice_group_admin(Json::Value& evt)
 	to_send["data"]["send_time"] = time_;
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["being_operate_qq"] = user_id;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_notice_group_decrease(Json::Value& evt)
+Json::Value Center::deal_type_notice_group_decrease(Json::Value& evt)
 {
 	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
@@ -226,10 +217,10 @@ void Center::deal_type_notice_group_decrease(Json::Value& evt)
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["from_qq"] = operator_id;
 	to_send["data"]["being_operate_qq"] = user_id;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_notice_group_increase(Json::Value& evt)
+Json::Value Center::deal_type_notice_group_increase(Json::Value& evt)
 {
 	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
@@ -253,10 +244,10 @@ void Center::deal_type_notice_group_increase(Json::Value& evt)
 	to_send["data"]["from_group"] = group_id;
 	to_send["data"]["from_qq"] = operator_id;
 	to_send["data"]["being_operate_qq"] = user_id;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_notice_group_ban(Json::Value& evt)
+Json::Value Center::deal_type_notice_group_ban(Json::Value& evt)
 {
 	std::string subtype = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
 	__int32 sub_type;
@@ -282,10 +273,10 @@ void Center::deal_type_notice_group_ban(Json::Value& evt)
 	to_send["data"]["from_qq"] = operator_id;
 	to_send["data"]["being_operate_qq"] = user_id;
 	to_send["data"]["duration"] = duration;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_notice_friend_add(Json::Value& evt)
+Json::Value Center::deal_type_notice_friend_add(Json::Value& evt)
 {
 	int time_ = StrTool::get_int_from_json(evt, "time", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
@@ -295,10 +286,10 @@ void Center::deal_type_notice_friend_add(Json::Value& evt)
 	to_send["data"]["sub_type"] = 1;
 	to_send["data"]["send_time"] = time_;
 	to_send["data"]["from_qq"] = user_id;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_request_friend(Json::Value& evt)
+Json::Value Center::deal_type_request_friend(Json::Value& evt)
 {
 	std::string comment = StrTool::to_ansi(StrTool::get_str_from_json(evt, "comment", ""));
 	std::string response_flag = StrTool::to_ansi(StrTool::get_str_from_json(evt, "flag", ""));
@@ -312,10 +303,10 @@ void Center::deal_type_request_friend(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = comment;
 	to_send["data"]["response_flag"] = response_flag;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_request_group(Json::Value& evt)
+Json::Value Center::deal_type_request_group(Json::Value& evt)
 {
 	std::string comment = StrTool::to_ansi(StrTool::get_str_from_json(evt, "comment", ""));
 	std::string response_flag = StrTool::to_ansi(StrTool::get_str_from_json(evt, "flag", ""));
@@ -341,28 +332,30 @@ void Center::deal_type_request_group(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = comment;
 	to_send["data"]["response_flag"] = response_flag;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
-void Center::deal_type_request(Json::Value& evt)
+Json::Value Center::deal_type_request(Json::Value& evt)
 {
 	std::string request_type = StrTool::to_ansi(StrTool::get_str_from_json(evt, "request_type", ""));
 	if (request_type == "friend")
 	{
-		deal_type_request_friend(evt);
+		return deal_type_request_friend(evt);
 	}
 	else if (request_type == "group")
 	{
-		deal_type_request_group(evt);
+		return deal_type_request_group(evt);
 	}
 	else
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "未知的request_type:" + request_type);
+		return Json::Value();
 	}
 }
 
-void Center::deal_type_meta_event(Json::Value& evt)
+Json::Value Center::deal_type_meta_event(Json::Value& evt)
 {
+	return Json::Value();
 }
 
 static std::string get_md5_from_imgurl(const std::string & url)
@@ -515,20 +508,20 @@ static bool deal_json_array(Json::Value & json_arr)
 	return true;
 }
 
-void Center::deal_type_message_private(Json::Value& evt)
+Json::Value Center::deal_type_message_private(Json::Value& evt)
 {
 	Json::Value jsonarr = evt.get("message", Json::Value());
 	/* 处理json array,比如要生成cqimg文件，或者要将多余的字段去掉 */
 	if (!deal_json_array(jsonarr))
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "jsonarr预处理失败");
-		return;
+		return Json::Value();
 	}
 	auto s = Json::FastWriter().write(jsonarr);
 	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr,0));
 	if (cq_str == "")
 	{
-		return;
+		return Json::Value();
 	}
 	//MiraiLog::get_instance()->add_debug_log("Center", "传入PrivateEvent的Msg:\n"+ cq_str);
 	std::string sub_type_str = StrTool::to_ansi(StrTool::get_str_from_json(evt, "sub_type", ""));
@@ -544,12 +537,12 @@ void Center::deal_type_message_private(Json::Value& evt)
 	else if (sub_type_str == "other")
 	{
 		subtype_int = 1; //coolq中表示来自在线状态
-		return;
+		return Json::Value();
 	}
 	else
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "未知的私聊消息来源:"+ sub_type_str +"，不进行处理");
-		return;
+		return Json::Value();
 	}
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
 	int font = StrTool::get_int_from_json(evt, "font", 0);
@@ -562,12 +555,12 @@ void Center::deal_type_message_private(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = cq_str;
 	to_send["data"]["font"] = font;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
 
 
-void Center::deal_type_message_group(Json::Value& evt)
+Json::Value Center::deal_type_message_group(Json::Value& evt)
 {
 	std::string from_anonymous_base64;
 	Json::Value anonymous = evt.get("anonymous", Json::Value());
@@ -587,13 +580,13 @@ void Center::deal_type_message_group(Json::Value& evt)
 	if (!deal_json_array(jsonarr))
 	{
 		MiraiLog::get_instance()->add_warning_log("Center", "jsonarr预处理失败");
-		return;
+		return Json::Value();
 	}
 	auto s = Json::FastWriter().write(jsonarr);
 	std::string cq_str = StrTool::to_ansi(StrTool::jsonarr_to_cq_str(jsonarr, 0));
 	if (cq_str == "")
 	{
-		return;
+		return Json::Value();
 	}
 	//MiraiLog::get_instance()->add_debug_log("Center", "传入GroupEvent的Msg:\n" + cq_str);
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
@@ -611,15 +604,15 @@ void Center::deal_type_message_group(Json::Value& evt)
 	to_send["data"]["anonymous"] = from_anonymous_base64;
 	to_send["data"]["msg"] = cq_str;
 	to_send["data"]["font"] = font;
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 
 
-void Center::deal_1207_event(Json::Value& evt)
+Json::Value Center::deal_1207_event(Json::Value& evt)
 {
 	Json::Value to_send;
 	to_send["event_type"] = "cq_1207_event";
 	to_send["data"]["msg"] = Json::FastWriter().write(evt);
-	IPC_SendEvent_T(Json::FastWriter().write(to_send).c_str());
+	return to_send;
 }
 

@@ -7,10 +7,15 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
+#include "../tool/IPCTool.h"
 #include "../scriptrun/ScriptRun.h"
 
 #include <websocketpp/base64/base64.hpp>
 #include <fstream>
+
+extern bool g_is_alone;
+extern std::string g_main_flag;
+extern std::string g_plus_name;
 
 
 enum class JSON_TYPE
@@ -82,13 +87,37 @@ static TER_TYPE normal_call(
 		}
 	}
 
-	auto net = net_.lock();
-	if (!net)
+	MiraiNet::NetStruct ret_json = nullptr;
+	if (g_is_alone) 
 	{
-		return RETERR(TP10086<TER_TYPE>());
+		// IPC模式
+		// MiraiLog::get_instance()->add_debug_log("Send", Json::FastWriter().write(*json).c_str());
+		std::string ret = IPC_ApiSend(g_main_flag.c_str(), Json::FastWriter().write(*json).c_str(), 15000);
+		// MiraiLog::get_instance()->add_debug_log("Recv", ret);
+		if (ret == "") {
+			return RETERR(TP10086<TER_TYPE>());
+		}
+		Json::Value root;
+		Json::Reader reader;
+		if (!reader.parse(ret, root))
+		{
+			MiraiLog::get_instance()->add_warning_log("API_RECV", "收到不规范的Json" + ret);
+			return RETERR(TP10086<TER_TYPE>());
+		}
+		ret_json = MiraiNet::NetStruct(new Json::Value(root));
+
 	}
-	MiraiNet::NetStruct ret_json = net->call_fun(json, 15000);
-	net = nullptr; /* 及时释放net */
+	else 
+	{
+		// 正常模式
+		auto net = net_.lock();
+		if (!net)
+		{
+			return RETERR(TP10086<TER_TYPE>());
+		}
+		ret_json = net->call_fun(json, 15000);
+	}
+	
 	if (!ret_json)
 	{
 		return RETERR(TP10086<TER_TYPE>());
@@ -1016,8 +1045,13 @@ std::string Center::CQ_getCookies(int auth_code)
 
 std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 {
-
-	std::string domainStr = domain;
+	std::string domainStr;
+	if (domain == NULL) {
+		domainStr = "";
+	}
+	else {
+		domainStr = domain;
+	}
 	size_t cmdEndPos = domainStr.find_first_of(",");
 	std::string cmdStr;
 	std::string cmdData;
@@ -1103,23 +1137,37 @@ std::string Center::CQ_getAppDirectory(int auth_code)
 
 	}, [&](const Json::Value& data_json) -> std::string
 	{
-		auto plus = MiraiPlus::get_instance();
-		auto plus_def = plus->get_plus(auth_code);
-		if (!plus_def)
-		{
-			return "";
+		if (g_is_alone) {
+			std::string ret_path = PathTool::get_exe_dir() + "app\\" + g_plus_name + "\\";
+			if (!PathTool::is_dir_exist(ret_path))
+			{
+				if (!PathTool::create_dir(ret_path))
+				{
+					return "";
+				}
+			}
+			return ret_path;
 		}
-		std::string filename = plus_def->get_filename();
-		plus_def = nullptr; /* 尽快释放plus_def */
-		std::string ret_path = PathTool::get_exe_dir() +"app\\"+ filename + "\\";
-		if (!PathTool::is_dir_exist(ret_path))
-		{
-			if (!PathTool::create_dir(ret_path))
+		else {
+			auto plus = MiraiPlus::get_instance();
+			auto plus_def = plus->get_plus(auth_code);
+			if (!plus_def)
 			{
 				return "";
 			}
+			std::string filename = plus_def->get_filename();
+			plus_def = nullptr; /* 尽快释放plus_def */
+			std::string ret_path = PathTool::get_exe_dir() + "app\\" + filename + "\\";
+			if (!PathTool::is_dir_exist(ret_path))
+			{
+				if (!PathTool::create_dir(ret_path))
+				{
+					return "";
+				}
+			}
+			return ret_path;
 		}
-		return ret_path;
+		
 	},
 		JSON_TYPE::JSON_NULL);
 }

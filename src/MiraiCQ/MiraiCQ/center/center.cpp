@@ -134,12 +134,7 @@ bool Center::run()
 				}
 			}
 			
-			auto event_vec = net->get_event();
-			/* 如果没获取到事件，则睡眠一下,缓解cpu压力 */
-			if (event_vec.size() == 0)
-			{
-				TimeTool::sleep(10);
-			}
+			auto event_vec = net->get_event(5000);
 			for (auto evt : event_vec)
 			{
 				if (!evt)
@@ -150,7 +145,36 @@ bool Center::run()
 				pool->submit([this,evt]() {
 					try
 					{
-						this->deal_event(evt);
+						std::map<std::string, Json::Value> cqEvtMap = this->deal_event(evt);
+						if (cqEvtMap.at("1207_event").isNull() == false) {
+							auto plus = MiraiPlus::get_instance()->get_all_plus();
+							for (auto p : plus) {
+								if (p.second->is_enable())
+								{
+									IPC_SendEvent(p.second->get_uuid().c_str(), Json::FastWriter().write(cqEvtMap.at("1207_event")).c_str());
+								}
+							}
+						}
+
+						if (cqEvtMap.at("ex_event").isNull() == false) {
+							auto plus = MiraiPlus::get_instance()->get_all_plus();
+							for (auto p : plus) {
+								if (p.second->is_enable() && p.second->is_recive_ex_event())
+								{
+									IPC_SendEvent(p.second->get_uuid().c_str(), Json::FastWriter().write(cqEvtMap.at("ex_event")).c_str());
+								}
+							}
+						}
+
+						if (cqEvtMap.at("cq_event").isNull() == false) {
+							auto plus = MiraiPlus::get_instance()->get_all_plus();
+							for (auto p : plus) {
+								if (p.second->is_enable())
+								{
+									IPC_SendEvent(p.second->get_uuid().c_str(), Json::FastWriter().write(cqEvtMap.at("cq_event")).c_str());
+								}
+							}
+						}
 					}
 					catch (const std::exception& e)
 					{
