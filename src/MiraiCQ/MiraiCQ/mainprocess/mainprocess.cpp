@@ -134,7 +134,7 @@ static void login_dlg_cb(Fl_Widget* o, void* p) {
 static bool login_dlg()
 {
 	LOGIN_INFO login_info;
-	Fl_Window win(300, 180, "MiraiCQ V2.3.9");
+	Fl_Window win(300, 180, "MiraiCQ V2.4.0");
 	win.begin();
 	login_info.ws_url = Config::get_instance()->get_ws_url();
 	login_info.access_token = Config::get_instance()->get_access_token();
@@ -638,7 +638,7 @@ void mainprocess()
 		hide_all_window();
 	}
 
-	MiraiLog::get_instance()->add_info_log("VERSION", "V2.3.9");
+	MiraiLog::get_instance()->add_info_log("VERSION", "V2.4.0");
 	MiraiLog::get_instance()->add_info_log("CORE", "开源地址：https://github.com/super1207/MiraiCQ");
 
 	// 释放CQP.dll
