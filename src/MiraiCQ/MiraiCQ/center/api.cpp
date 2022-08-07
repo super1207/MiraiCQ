@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include "center.h"
+#include "InputStream.h"
 #include "../log/MiraiLog.h"
 #include "../tool/PathTool.h"
 #include "../tool/StrTool.h"
@@ -8,6 +9,7 @@
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
 #include "../tool/IPCTool.h"
+#include "../tool/AutoDoSth.h"
 #include "../scriptrun/ScriptRun.h"
 
 #include <websocketpp/base64/base64.hpp>
@@ -1097,6 +1099,63 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 	}
 	else if (cmdStr == "toobmsg") {
 		return Json::FastWriter().write(deal_cq_str(cmdData));
+	}
+	else if (cmdStr == "inputstream") {
+		Json::Value root;
+		Json::Reader reader;
+		if (!reader.parse(cmdData, root))
+		{
+			MiraiLog::get_instance()->add_warning_log("API_CQ_getCookiesV2", "收到不规范的Json:" + cmdData);
+			return "";
+		}
+		int64_t group_id = StrTool::get_int64_from_json(root, "group_id", 0);
+		int64_t user_id = StrTool::get_int64_from_json(root, "user_id", 0);
+
+		std::string type;
+		if (group_id == 0 && user_id != 0)
+		{
+			type = "private";
+		}
+		else if (group_id != 0 && user_id == 0) {
+			type = "group";
+		}
+		else if (group_id != 0 && user_id != 0) {
+			type = "group_member";
+		}
+		else {
+			throw std::runtime_error("unkonw inputstream type");
+		}
+
+		int timeout = StrTool::get_int_from_json(root, "timeout", 30000);
+
+		std::string key;
+		if (type == "group_member"){
+			key = std::to_string(user_id) + "," + std::to_string(group_id);
+		}else if(type == "group"){
+			key = std::to_string(group_id);
+		}else if (type == "private") {
+			key = std::to_string(user_id);
+		}
+		else {
+			throw std::runtime_error(std::string("unkonw inputstream type:") + type);
+		}
+		auto dat_q = std::make_shared<BlockQueue<std::tuple<std::string, int64_t, int64_t>>>();
+		InputStream::get_instance()->put_key(key, dat_q);
+		AutoDoSth doSth([key]() {
+			InputStream::get_instance()->remove_key(key);
+		});
+		std::tuple<std::string, int64_t, int64_t> dat_ret = dat_q->pop(timeout);
+		std::string ret;
+		if (type == "group_member") {
+			ret = std::get<0>(dat_ret);
+		}
+		else if (type == "group") {
+			ret = std::to_string(std::get<1>(dat_ret)) + "," + std::get<0>(dat_ret);
+		}
+		else if (type == "private") {
+			ret = std::get<0>(dat_ret);
+		}
+		return ret;
 	}
 	else{
 		return "";

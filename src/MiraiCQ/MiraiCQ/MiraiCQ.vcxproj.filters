@@ -243,6 +243,9 @@
     <ClCompile Include="ipcprocess\ipcprocess.cpp">
       <Filter>ipcprocess</Filter>
     </ClCompile>
+    <ClCompile Include="center\InputStream.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -344,6 +347,9 @@
     </ClInclude>
     <ClInclude Include="ipcprocess\ipcprocess.h">
       <Filter>ipcprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="center\InputStream.h">
+      <Filter>center</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,16 @@
 		【机器人Cookie ToOBMsg,测试balabala】
 		能把cq格式的消息转化成符合onebot格式的json，供onebot api发送。
 		参数为gbk编码，转化后的json为utf8编码。
-	
+	输入流(试验功能，未来可能会变动):
+		【机器人Cookie inputstream,{"user_id":【发送者QQ】,"group_id":【当前群号】}】
+		【机器人Cookie inputstream,{"group_id":【当前群号】}】
+		【机器人Cookie inputstream,{"user_id":【发送者QQ】}】
+		以上三个api，分别为：群成员输入流，群输入流，私聊输入流。
+		对于群成员输入流/私聊输入流，api返回下一条对应群成员/好友的消息。
+		对于群输入流，api返回下一条对应群成员的QQ号和消息，中间用","分割。
+		api默认的超时时间为30000毫秒，超时返回空。也可以自定义超时时间，如：
+			【机器人Cookie inputstream,{"user_id":【发送者QQ】,"group_id":【当前群号】,"timeout":20000}】
+			这样，超时时间就变为了20000毫秒，
+		
 		
 		

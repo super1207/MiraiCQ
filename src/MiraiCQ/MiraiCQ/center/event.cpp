@@ -1,4 +1,5 @@
 #include "center.h"
+#include "InputStream.h"
 
 #include <cassert>
 #include <Windows.h>
@@ -548,6 +549,8 @@ Json::Value Center::deal_type_message_private(Json::Value& evt)
 	int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 
+	InputStream::get_instance()->deal_private_msg(cq_str, user_id);
+
 	Json::Value to_send;
 	to_send["event_type"] = "cq_event_private_message";
 	to_send["data"]["sub_type"] = subtype_int;
@@ -593,6 +596,10 @@ Json::Value Center::deal_type_message_group(Json::Value& evt)
 	int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
+
+
+	InputStream::get_instance()->deal_group_msg(cq_str, user_id, group_id);
+	InputStream::get_instance()->deal_group_member_msg(cq_str, user_id, group_id);
 
 
 	Json::Value to_send;
