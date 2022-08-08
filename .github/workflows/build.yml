@@ -28,6 +28,7 @@ jobs:
         del Release/*.exp
         del Release/*.pdb
         del Release/MiraiCQ.lib
+        del Release/libjpeg.lib
     - name: upload file
       uses: actions/upload-artifact@v2
       with:
