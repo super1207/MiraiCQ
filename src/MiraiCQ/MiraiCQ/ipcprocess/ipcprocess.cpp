@@ -424,6 +424,42 @@ static void release_dll()
 	CloseHandle(hFile);
 }
 
+
+static bool is_parent_exist() {
+	DWORD dwID, dwParentID;
+	HANDLE hParent = NULL;
+	HANDLE  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	dwID = GetCurrentProcessId();
+	if (hSnapshot != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe32 = { sizeof(PROCESSENTRY32) };
+		BOOL bRet = Process32First(hSnapshot, &pe32);
+		if (pe32.th32ProcessID == dwID)
+		{
+			dwParentID = pe32.th32ParentProcessID;
+			hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
+		}
+		else
+		{
+			while (Process32Next(hSnapshot, &pe32))
+			{
+				if (pe32.th32ProcessID == dwID)
+				{
+					dwParentID = pe32.th32ParentProcessID;
+					hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
+					break;
+				}
+			}
+		}
+		CloseHandle(hSnapshot);
+	}
+	if (hParent != NULL) {
+		CloseHandle(hParent);
+		return true;
+	}
+	return false;
+}
+
 void ipcprocess(const std::string& main_flag, const std::string& plus_flag, const std::string& plus_name)
 {
 	try
@@ -432,6 +468,18 @@ void ipcprocess(const std::string& main_flag, const std::string& plus_flag, cons
 		std::string path_str = PathTool::get_exe_dir() + "bin\\";
 		PathTool::create_dir(path_str);
 		SetDllDirectoryA(path_str.c_str());
+
+
+		std::thread([]() {
+			while (true)
+			{
+				if (!is_parent_exist()) {
+					MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
+					exit(-1);
+				}
+				TimeTool::sleep(5000);
+			}
+		}).detach();
 
 
 		/* 初始化IPC */
