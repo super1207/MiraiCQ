@@ -49,39 +49,26 @@ template <typename TER_TYPE>
 static TER_TYPE normal_call(
 	int auth_code,
 	std::weak_ptr<MiraiNet> net_,
-	bool can_not_enable,
 	std::function<void(MiraiNet::NetStruct json)> fun1,
 	std::function<TER_TYPE(const Json::Value& data_json)> fun2,
 	JSON_TYPE json_type,
 	bool is_call_api = false
 	)
 {
-	if (!can_not_enable)
 	{
-		//auto plus = MiraiPlus::get_instance();
-		//assert(plus);
-		// 插件总是开启的
-		/*if (!plus->is_enable(auth_code))
-		{
-			return RETERR(TP10086<TER_TYPE>());
-		}*/
+		// 以前用于检查插件是否开启的位置，现在已经不需要了，插件进程只要存在，默认就是开启的
+		// 关掉插件会杀死插件进程，所以也不会产生API调用了，检查已经没有意义。
 	}
-	else
-	{
-		auto ret = fun2(Json::Value());
-		return ret;
-	}
-	/* 如果需要访问onebot实现端，则插件必须开启 */
-	MiraiNet::NetStruct json(new Json::Value);
-	fun1(json);
 
+	MiraiNet::NetStruct json(new Json::Value);
+	fun1(json); // 用于构造要发给net的json
 
 	// 经过过滤器，-1207来自MiraiCQ的调试，不过滤
 	if(auth_code != -1207){
 		auto plus = MiraiPlus::get_instance()->get_plus(auth_code);
 		if (plus && json) {
 			const std::string &  filename = plus->get_filename();
-			//当json中含有图片的base64时，lua中的json解析器解析json的速度太慢,所以暂时关闭解析，下版本修复
+			//当json中含有图片的base64时，lua中的json解析器解析json的速度太慢,所以暂时关闭解析，以后修复
 			bool is_pass = ScriptRun::get_instance()->onebot_api_filter(filename, "{}");
 			if (is_pass == false) {
 				return RETERR(TP10086<TER_TYPE>());
@@ -92,10 +79,8 @@ static TER_TYPE normal_call(
 	MiraiNet::NetStruct ret_json = nullptr;
 	if (g_is_alone) 
 	{
-		// IPC模式
-		// MiraiLog::get_instance()->add_debug_log("Send", Json::FastWriter().write(*json).c_str());
+		// IPC模式,将数据发送给主进程
 		std::string ret = IPC_ApiSend(g_main_flag.c_str(), Json::FastWriter().write(*json).c_str(), 15000);
-		// MiraiLog::get_instance()->add_debug_log("Recv", ret);
 		if (ret == "") {
 			return RETERR(TP10086<TER_TYPE>());
 		}
@@ -111,7 +96,7 @@ static TER_TYPE normal_call(
 	}
 	else 
 	{
-		// 正常模式
+		// 正常模式将数据发送给onebot实现
 		auto net = net_.lock();
 		if (!net)
 		{
@@ -263,7 +248,7 @@ int Center::CQ_sendPrivateMsg(int auth_code, int64_t qq, const char* msg)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code,net,false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json) 
 	{
 		(*json)["action"] = "send_private_msg";
@@ -289,7 +274,7 @@ int Center::CQ_sendGroupMsg(int auth_code, int64_t group_id, const char* msg)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "send_group_msg";
@@ -316,7 +301,7 @@ int Center::CQ_deleteMsg(int auth_code, int64_t msg_id)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "delete_msg";
@@ -337,7 +322,7 @@ int Center::CQ_sendLike(int auth_code, int64_t qq)
 		net = this->net;
 	}
 	int times = 1;
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "send_like";
@@ -358,7 +343,7 @@ int Center::CQ_sendLikeV2(int auth_code, int64_t qq, int times)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 		{
 			(*json)["action"] = "send_like";
@@ -379,7 +364,7 @@ int Center::CQ_setGroupKick(int auth_code, int64_t group_id, int64_t qq, int rej
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_kick";
@@ -401,7 +386,7 @@ int Center::CQ_setGroupBan(int auth_code, int64_t group_id, int64_t qq, int64_t 
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_ban";
@@ -424,7 +409,7 @@ int Center::CQ_setGroupAnonymousBan(int auth_code, int64_t group_id, const char*
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_anonymous_ban";
@@ -451,7 +436,7 @@ int Center::CQ_setGroupWholeBan(int auth_code, int64_t group_id, int enable)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_whole_ban";
@@ -472,7 +457,7 @@ int Center::CQ_setGroupAdmin(int auth_code, __int64 group_id, __int64 qq, int se
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_admin";
@@ -494,7 +479,7 @@ int Center::CQ_setGroupAnonymous(int auth_code, __int64 group_id, int enable)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_anonymous";
@@ -515,7 +500,7 @@ int Center::CQ_setGroupCard(int auth_code, __int64 group_id, __int64 qq, const c
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_card";
@@ -537,7 +522,7 @@ int Center::CQ_setGroupLeave(int auth_code, __int64 group_id, int is_dismiss)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_leave";
@@ -558,7 +543,7 @@ int Center::CQ_setGroupSpecialTitle(int auth_code, __int64 group_id, __int64 qq,
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_special_title";
@@ -581,7 +566,7 @@ int Center::CQ_setFriendAddRequest(__int32 auth_code, const char* response_flag,
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_friend_add_request";
@@ -611,7 +596,7 @@ int Center::CQ_setGroupAddRequest(__int32 auth_code, const char* response_flag, 
 		net = this->net;
 	}
 	const char* reason = "";
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "set_group_add_request";
@@ -648,7 +633,7 @@ int Center::CQ_setGroupAddRequestV2(__int32 auth_code, const char* response_flag
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 		{
 			(*json)["action"] = "set_group_add_request";
@@ -685,7 +670,7 @@ int64_t Center::CQ_getLoginQQ(int auth_code)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int64_t>(auth_code, net, false,
+	return normal_call<int64_t>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_login_info";
@@ -704,7 +689,7 @@ std::string Center::CQ_getLoginNick(int auth_code)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_login_info";
@@ -724,7 +709,7 @@ std::string Center::CQ_getStrangerInfo(int auth_code, __int64 qq, int no_cache)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_stranger_info";
@@ -770,7 +755,7 @@ std::string Center::CQ_getFriendList(int auth_code, int reserved)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_friend_list";
@@ -804,7 +789,7 @@ std::string Center::CQ_getGroupList(int auth_code)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_group_list";
@@ -835,7 +820,7 @@ std::string Center::CQ_getGroupInfo(int auth_code, int64_t group_id, int no_cach
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_group_info";
@@ -862,7 +847,7 @@ std::string Center::CQ_getGroupMemberList(int auth_code, int64_t group_id)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_group_member_list";
@@ -943,7 +928,7 @@ std::string Center::CQ_getGroupMemberInfoV2(int auth_code, int64_t group_id, int
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_group_member_info";
@@ -1027,7 +1012,7 @@ std::string Center::CQ_getCookies(int auth_code)
 		net = this->net;
 	}
 	const char* domain = "";
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_cookies";
@@ -1170,7 +1155,7 @@ int Center::CQ_getCsrfToken(int auth_code)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "get_csrf_token";
@@ -1185,50 +1170,33 @@ int Center::CQ_getCsrfToken(int auth_code)
 
 std::string Center::CQ_getAppDirectory(int auth_code)
 {
-	std::weak_ptr<MiraiNet> net;
-	{
-		std::shared_lock<std::shared_mutex> lk;
-		net = this->net;
+	std::string ret_path;
+	if (g_is_alone) {
+		ret_path = PathTool::get_exe_dir() + "app\\" + g_plus_name + "\\";
 	}
-	return normal_call<std::string>(auth_code, net, true,
-		[&](MiraiNet::NetStruct json)
-	{
-
-	}, [&](const Json::Value& data_json) -> std::string
-	{
-		if (g_is_alone) {
-			std::string ret_path = PathTool::get_exe_dir() + "app\\" + g_plus_name + "\\";
-			if (!PathTool::is_dir_exist(ret_path))
-			{
-				if (!PathTool::create_dir(ret_path))
-				{
-					return "";
-				}
-			}
-			return ret_path;
+	else {
+		auto plus = MiraiPlus::get_instance();
+		auto plus_def = plus->get_plus(auth_code);
+		if (!plus_def)
+		{
+			return "";
 		}
-		else {
-			auto plus = MiraiPlus::get_instance();
-			auto plus_def = plus->get_plus(auth_code);
-			if (!plus_def)
-			{
-				return "";
-			}
-			std::string filename = plus_def->get_filename();
-			plus_def = nullptr; /* 尽快释放plus_def */
-			std::string ret_path = PathTool::get_exe_dir() + "app\\" + filename + "\\";
-			if (!PathTool::is_dir_exist(ret_path))
-			{
-				if (!PathTool::create_dir(ret_path))
-				{
-					return "";
-				}
-			}
-			return ret_path;
+		std::string filename = plus_def->get_filename();
+		plus_def = nullptr;
+		ret_path = PathTool::get_exe_dir() + "app\\" + filename + "\\";
+	}
+	if (ret_path == "") {
+		MiraiLog::get_instance()->add_warning_log("mainprocess", "获得插件目录失败");
+		return "";
+	}
+	if (!PathTool::is_dir_exist(ret_path))
+	{
+		if (!PathTool::create_dir(ret_path))
+		{
+			return "";
 		}
-		
-	},
-		JSON_TYPE::JSON_NULL);
+	}
+	return ret_path;
 }
 
 std::string Center::CQ_getRecord(int auth_code, const char* file, const char* out_format)
@@ -1250,7 +1218,7 @@ std::string Center::CQ_getImage(int auth_code, const char* file)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, true,
+	return normal_call<std::string>(auth_code, net,
 		[&](MiraiNet::NetStruct json)
 	{
 
@@ -1359,7 +1327,7 @@ int Center::CQ_canSendImage(int auth_code)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "can_send_image";
@@ -1379,7 +1347,7 @@ int Center::CQ_canSendRecord(int auth_code)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<int>(auth_code, net, false,
+	return normal_call<int>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 	{
 		(*json)["action"] = "can_send_record";
@@ -1396,57 +1364,35 @@ int Center::CQ_canSendRecord(int auth_code)
 
 int Center::CQ_addLog(int auth_code, int log_level, const char* category, const char* log_msg)
 {
-	std::weak_ptr<MiraiNet> net;
-	{
-		std::shared_lock<std::shared_mutex> lk;
-		net = this->net;
-	}
-	return normal_call<int>(auth_code, net, true,
-		[&](MiraiNet::NetStruct json)
-	{
-
-	}, [&](const Json::Value& data_json)
-	{
-		/*auto plus = MiraiPlus::get_instance();
-		auto plus_def = plus->get_plus(auth_code);
-		if (!plus_def)
-		{
-			return -1;
-		}
-		std::string name = plus_def->get_name();*/
-		//plus_def = nullptr; /* 尽快释放plus_def */
-		std::string name = "IPCPLUS";
-		MiraiLog::get_instance()->add_info_log(std::string("[") + name + std::string("] ") + (category ? category : ""), (log_msg ? log_msg : ""));
-		return 0;
-	},
-		JSON_TYPE::JSON_NULL);
-}
-
-int Center::CQ_setFatal(__int32 auth_code, const char* error_info)
-{
-	std::weak_ptr<MiraiNet> net;
-	{
-		std::shared_lock<std::shared_mutex> lk;
-		net = this->net;
-	}
-	return normal_call<int>(auth_code, net, true,
-		[&](MiraiNet::NetStruct json)
-	{
-
-	}, [&](const Json::Value& data_json)
-	{
+	std::string name;
+	if (!g_is_alone) {
 		auto plus = MiraiPlus::get_instance();
 		auto plus_def = plus->get_plus(auth_code);
 		if (!plus_def)
 		{
 			return -1;
 		}
-		std::string name = plus_def->get_name();
-		plus_def = nullptr; /* 尽快释放plus_def */
-		MiraiLog::get_instance()->add_fatal_log(std::string("[") + name + std::string("] CQ_setFatal: "), (error_info ? error_info : ""));
-		return 0;
-	},
-		JSON_TYPE::JSON_NULL);
+		name = plus_def->get_name();
+	}
+	MiraiLog::get_instance()->add_info_log(std::string("[") + name + std::string("] ") + (category ? category : ""), (log_msg ? log_msg : ""));
+	return 0;
+}
+
+int Center::CQ_setFatal(__int32 auth_code, const char* error_info)
+{
+	std::string name;
+	if (!g_is_alone) {
+		auto plus = MiraiPlus::get_instance();
+		auto plus_def = plus->get_plus(auth_code);
+		if (!plus_def)
+		{
+			return -1;
+		}
+		name = plus_def->get_name();
+	}
+	
+	MiraiLog::get_instance()->add_fatal_log(std::string("[") + name + std::string("] CQ_setFatal: "), (error_info ? error_info : ""));
+	return 0;
 }
 
 int Center::CQ_setRestart(int auth_code)
@@ -1472,7 +1418,7 @@ std::string Center::CQ_callApi(int auth_code, const char* msg)
 		std::shared_lock<std::shared_mutex> lk;
 		net = this->net;
 	}
-	return normal_call<std::string>(auth_code, net, false,
+	return normal_call<std::string>(auth_code,net,
 		[&](MiraiNet::NetStruct json)
 		{
 			(*json) = root;
