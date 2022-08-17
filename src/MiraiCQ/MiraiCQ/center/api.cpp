@@ -1374,7 +1374,20 @@ int Center::CQ_addLog(int auth_code, int log_level, const char* category, const 
 		}
 		name = plus_def->get_name();
 	}
-	MiraiLog::get_instance()->add_info_log(std::string("[") + name + std::string("] ") + (category ? category : ""), (log_msg ? log_msg : ""));
+	std::string cg = std::string("[") + name + std::string("] ") + (category ? category : "");
+	std::string msg = (log_msg ? log_msg : "");
+	if (log_level < 10) {
+		MiraiLog::get_instance()->add_debug_log(cg, msg);
+	}
+	else if(log_level < 20) {
+		MiraiLog::get_instance()->add_info_log(cg, msg);
+	}
+	else if (log_level < 30) {
+		MiraiLog::get_instance()->add_warning_log(cg, msg);
+	}
+	else {
+		MiraiLog::get_instance()->add_fatal_log(cg, msg);
+	}
 	return 0;
 }
 
