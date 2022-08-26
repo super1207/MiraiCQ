@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <map>
 #include <FL/Fl.H>
+#include <winternl.h>
 
 #include "../tool/IPCTool.h"
 #include "../log/MiraiLog.h"
@@ -425,61 +426,60 @@ static void release_dll()
 }
 
 
-static bool is_parent_exist() {
-	DWORD dwID, dwParentID;
-	HANDLE hParent = NULL;
-	HANDLE  hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	dwID = GetCurrentProcessId();
-	if (hSnapshot != INVALID_HANDLE_VALUE)
+
+static unsigned long GetParentPid()
+{
+	ULONG_PTR ppid = 0;
+	DWORD pid = GetCurrentProcessId();
+	HANDLE hcurrent = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+
+	typedef LONG(__stdcall* FPTR_NtQueryInformationProcess) (HANDLE, ULONG, PVOID, ULONG, PULONG);
+
+	if (hcurrent)
 	{
-		PROCESSENTRY32 pe32 = { sizeof(PROCESSENTRY32) };
-		BOOL bRet = Process32First(hSnapshot, &pe32);
-		if (pe32.th32ProcessID == dwID)
-		{
-			dwParentID = pe32.th32ParentProcessID;
-			hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
+		auto module_ptr = GetModuleHandle("ntdll.dll");
+		if (!module_ptr) {
+			return ppid;
 		}
-		else
+		FPTR_NtQueryInformationProcess NtQueryInformationProcess = (FPTR_NtQueryInformationProcess)GetProcAddress(module_ptr,
+			"NtQueryInformationProcess");
+
+		if (NtQueryInformationProcess != NULL)
 		{
-			while (Process32Next(hSnapshot, &pe32))
+			PROCESS_BASIC_INFORMATION  pbi;
+			if (NtQueryInformationProcess(hcurrent, 0, (void*)&pbi, sizeof(pbi), NULL) == 0)
 			{
-				if (pe32.th32ProcessID == dwID)
-				{
-					dwParentID = pe32.th32ParentProcessID;
-					hParent = OpenProcess(PROCESS_ALL_ACCESS, TRUE, dwParentID);
-					break;
-				}
+				ppid = (ULONG_PTR)pbi.Reserved3;
 			}
 		}
-		CloseHandle(hSnapshot);
+		CloseHandle(hcurrent);
 	}
-	if (hParent != NULL) {
-		CloseHandle(hParent);
-		return true;
-	}
-	return false;
+
+	return ppid;
 }
 
 void ipcprocess(const std::string& main_flag, const std::string& plus_flag, const std::string& plus_name)
 {
 	try
 	{
+		 
+		std::thread([]() {
+			ULONG_PTR pPid = GetParentPid();
+			if (pPid == 0) {
+				MiraiLog::get_instance()->add_fatal_log("TESTPLUS", "GetParentPid id is 0");
+				exit(-1);
+			}
+			HANDLE pHandle = OpenProcess(PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, pPid);
+			if (WaitForSingleObject(pHandle, INFINITE) == WAIT_OBJECT_0)
+			{
+				exit(-1);
+			}
+		}).detach();
+
 		// 设置dll搜索目录
 		std::string path_str = PathTool::get_exe_dir() + "bin\\";
 		PathTool::create_dir(path_str);
 		SetDllDirectoryA(path_str.c_str());
-
-
-		std::thread([]() {
-			while (true)
-			{
-				if (!is_parent_exist()) {
-					MiraiLog::get_instance()->add_fatal_log("do_heartbeat", "检测到主进程无响应，所以插件进程强制退出");
-					exit(-1);
-				}
-				TimeTool::sleep(5000);
-			}
-		}).detach();
 
 
 		/* 初始化IPC */
