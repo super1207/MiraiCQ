@@ -87,7 +87,7 @@ MiraiLog::MiraiLog()
         if (!g_is_plus)
         {
             auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/main_daily.txt", 2, 30);
-            logger->set_level(spdlog::level::debug);
+            logger->set_level(spdlog::level::info);
             logger->flush_on(spdlog::level::info);
         }
         else {
