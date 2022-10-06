@@ -135,10 +135,12 @@ static void load_plus(const std::string& plus_name)
 	fun_ptr_type_1 fun_ptr1 = (fun_ptr_type_1)GetProcAddress(hand, "Initialize");
 	if (!fun_ptr1)
 	{
-		MiraiLog::get_instance()->add_fatal_log("LOADPLUS", plus_dll_path + ":函数Initialize获取失败");
-		exit(-1);
+		MiraiLog::get_instance()->add_warning_log("LOADPLUS", plus_dll_path + ":函数Initialize获取失败");
+		// exit(-1);
+	}else
+	{
+		fun_ptr1(1); //这里ac直接传1
 	}
-	fun_ptr1(1); //这里ac直接传1
 }
 
 /* 用于调用插件的start和enable函数 */
