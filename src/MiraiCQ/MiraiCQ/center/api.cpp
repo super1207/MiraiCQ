@@ -1129,7 +1129,14 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 		AutoDoSth doSth([key]() {
 			InputStream::get_instance()->remove_key(key);
 		});
-		std::tuple<std::string, int64_t, int64_t> dat_ret = dat_q->pop(timeout);
+		std::tuple<std::string, int64_t, int64_t> dat_ret;
+		try {
+			dat_ret = dat_q->pop(timeout);
+		}
+		catch (const std::exception& e) {
+			MiraiLog::get_instance()->add_warning_log("Center", e.what());
+			return "";
+		}
 		std::string ret;
 		if (type == "group_member") {
 			ret = std::get<0>(dat_ret);
