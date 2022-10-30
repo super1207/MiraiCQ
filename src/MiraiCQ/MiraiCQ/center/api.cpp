@@ -1220,110 +1220,97 @@ std::string Center::CQ_getRecordV2(int auth_code, const char* file, const char* 
 
 std::string Center::CQ_getImage(int auth_code, const char* file)
 {
-	std::weak_ptr<MiraiNet> net;
+
+	/* 参数错误 */
+	if (std::string(file ? file : "") == "")
 	{
-		std::shared_lock<std::shared_mutex> lk;
-		net = this->net;
+		return "";
 	}
-	return normal_call<std::string>(auth_code, net,
-		[&](MiraiNet::NetStruct json)
+	auto img_dir = PathTool::get_exe_dir() + "data\\image\\";
+	auto cqimg_path = img_dir + file + ".cqimg";
+	if (!PathTool::is_file_exist(cqimg_path))
 	{
-
-	}, [&](const Json::Value& data_json) -> std::string
+		//无cqimg文件，无法获取图片
+		return "";
+	}
+	auto url = StrTool::get_str_from_ini(cqimg_path, "image", "url", "");
+	if (url == "")
 	{
-		/* 参数错误 */
-		if (std::string(file ? file : "") == "")
-		{
-			return "";
-		}
-		auto img_dir = PathTool::get_exe_dir() + "data\\image\\";
-		auto cqimg_path = img_dir + file + ".cqimg";
-		if (!PathTool::is_file_exist(cqimg_path))
-		{
-			//无cqimg文件，无法获取图片
-			return "";
-		}
-		auto url = StrTool::get_str_from_ini(cqimg_path, "image", "url", "");
-		if (url == "")
-		{
-			//没有读取到url
-			return "";
-		}
+		//没有读取到url
+		return "";
+	}
+	/* 保存正在下载的文件 */
+	static std::mutex mx;
+	static std::set<std::string> downing_set;
+	bool is_downloading = false;
 
-		/* 保存正在下载的文件 */
-		static std::mutex mx;
-		static std::set<std::string> downing_set;
-		bool is_downloading = false;
-
-		/* 检查是否正在其他插件中被下载 */
+	/* 检查是否正在其他插件中被下载 */
+	{
+		std::lock_guard<std::mutex> lock(mx);
+		/* 没有正在下载 */
+		if (downing_set.find(file) == downing_set.end())
 		{
-			std::lock_guard<std::mutex> lock(mx);
-			/* 没有正在下载 */
-			if (downing_set.find(file) == downing_set.end())
-			{
-				/* 添加正在下载标记 */
-				downing_set.insert(file);
-				is_downloading = false;
-			}
-			else
-			{
-				is_downloading = true;
-			}
+			/* 添加正在下载标记 */
+			downing_set.insert(file);
+			is_downloading = false;
 		}
-
-		/* 没有正在下载，说明该自己下载 */
-		if (!is_downloading)
+		else
 		{
-			/* 如果图片已经存在，就不用真正下载了 */
-			if (!PathTool::is_file_exist(img_dir + file))
+			is_downloading = true;
+		}
+	}
+
+	/* 没有正在下载，说明该自己下载 */
+	if (!is_downloading)
+	{
+		/* 如果图片已经存在，就不用真正下载了 */
+		if (!PathTool::is_file_exist(img_dir + file))
+		{
+			try
 			{
-				try
+				/* 下载图片 */
+				if (ImgTool::download_img(url, img_dir + file + ".tmp"))
 				{
-					/* 下载图片 */
-					if (ImgTool::download_img(url, img_dir + file + ".tmp"))
-					{
-						PathTool::rename(img_dir + file + ".tmp", img_dir + file);
-					}
-					else
-					{
-						MiraiLog::get_instance()->add_debug_log("Center", "图片下载失败");
-					}
+					PathTool::rename(img_dir + file + ".tmp", img_dir + file);
 				}
-				catch (const std::exception&)
+				else
 				{
 					MiraiLog::get_instance()->add_debug_log("Center", "图片下载失败");
 				}
-				
 			}
-			/* 图片下载完成(包括失败)，删除正在下载的标记 */
-			std::lock_guard<std::mutex> lock(mx);
-			downing_set.erase(file);
-		}
-
-		/* 等待正在下载的标记消失 */
-		while (true)
-		{
+			catch (const std::exception&)
 			{
-				std::lock_guard<std::mutex> lock(mx);
-				if (downing_set.find(file) == downing_set.end())
-				{
-					break;
-				}
+				MiraiLog::get_instance()->add_debug_log("Center", "图片下载失败");
 			}
-			/* 睡眠一段时间 */
-			TimeTool::sleep(0);
+				
 		}
+		/* 图片下载完成(包括失败)，删除正在下载的标记 */
+		std::lock_guard<std::mutex> lock(mx);
+		downing_set.erase(file);
+	}
 
-		/* 检查是否下载成功 */
-		if (!PathTool::is_file_exist(img_dir + file))
+	/* 等待正在下载的标记消失 */
+	while (true)
+	{
 		{
-			//没有下载成功
-			return "";
+			std::lock_guard<std::mutex> lock(mx);
+			if (downing_set.find(file) == downing_set.end())
+			{
+				break;
+			}
 		}
-		/* 下载成功，返回路径 */
-		return img_dir + file;
-	},
-		JSON_TYPE::JSON_NULL);
+		/* 睡眠一段时间 */
+		TimeTool::sleep(0);
+	}
+
+	/* 检查是否下载成功 */
+	if (!PathTool::is_file_exist(img_dir + file))
+	{
+		//没有下载成功
+		return "";
+	}
+	/* 下载成功，返回路径 */
+	return img_dir + file;
 }
 
 
