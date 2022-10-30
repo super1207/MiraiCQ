@@ -546,7 +546,7 @@ Json::Value Center::deal_type_message_private(Json::Value& evt)
 		return Json::Value();
 	}
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
-	int font = StrTool::get_int_from_json(evt, "font", 0);
+	// int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 
 	InputStream::get_instance()->deal_private_msg(cq_str, user_id);
@@ -557,7 +557,7 @@ Json::Value Center::deal_type_message_private(Json::Value& evt)
 	to_send["data"]["msg_id"] = message_id;
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = cq_str;
-	to_send["data"]["font"] = font;
+	to_send["data"]["font"] = 11;
 	return to_send;
 }
 
@@ -593,7 +593,7 @@ Json::Value Center::deal_type_message_group(Json::Value& evt)
 	}
 	//MiraiLog::get_instance()->add_debug_log("Center", "´«ÈëGroupEventµÄMsg:\n" + cq_str);
 	int message_id = StrTool::get_int_from_json(evt, "message_id", 0);
-	int font = StrTool::get_int_from_json(evt, "font", 0);
+	// int font = StrTool::get_int_from_json(evt, "font", 0);
 	int64_t user_id = StrTool::get_int64_from_json(evt, "user_id", 0);
 	int64_t group_id = StrTool::get_int64_from_json(evt, "group_id", 0);
 
@@ -610,7 +610,7 @@ Json::Value Center::deal_type_message_group(Json::Value& evt)
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["anonymous"] = from_anonymous_base64;
 	to_send["data"]["msg"] = cq_str;
-	to_send["data"]["font"] = font;
+	to_send["data"]["font"] = 11;
 	return to_send;
 }
 
