@@ -222,9 +222,6 @@
     <ClCompile Include="mainprocess\settingDlg.cpp">
       <Filter>mainprocess</Filter>
     </ClCompile>
-    <ClCompile Include="scriptrun\ScriptRun.cpp">
-      <Filter>scriptrun</Filter>
-    </ClCompile>
     <ClCompile Include="center\ex_event.cpp">
       <Filter>center</Filter>
     </ClCompile>
@@ -324,9 +321,6 @@
     <ClInclude Include="mainprocess\settingDlg.h">
       <Filter>mainprocess</Filter>
     </ClInclude>
-    <ClInclude Include="scriptrun\ScriptRun.h">
-      <Filter>scriptrun</Filter>
-    </ClInclude>
     <ClInclude Include="tool\BlockQueue.h">
       <Filter>tool</Filter>
     </ClInclude>
@@ -358,7 +352,6 @@
       <Filter>plusprocess</Filter>
     </None>
     <None Include="debug_tip.json" />
-    <None Include="packages.config" />
     <None Include="JSON.lua" />
   </ItemGroup>
   <ItemGroup>

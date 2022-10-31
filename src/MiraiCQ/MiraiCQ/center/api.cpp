@@ -10,7 +10,6 @@
 #include "../tool/MsgIdTool.h"
 #include "../tool/IPCTool.h"
 #include "../tool/AutoDoSth.h"
-#include "../scriptrun/ScriptRun.h"
 
 #include <websocketpp/base64/base64.hpp>
 #include <fstream>
@@ -62,19 +61,6 @@ static TER_TYPE normal_call(
 
 	MiraiNet::NetStruct json(new Json::Value);
 	fun1(json); // 用于构造要发给net的json
-
-	// 经过过滤器，-1207来自MiraiCQ的调试，不过滤
-	if(auth_code != -1207){
-		auto plus = MiraiPlus::get_instance()->get_plus(auth_code);
-		if (plus && json) {
-			const std::string &  filename = plus->get_filename();
-			//当json中含有图片的base64时，lua中的json解析器解析json的速度太慢,所以暂时关闭解析，以后修复
-			bool is_pass = ScriptRun::get_instance()->onebot_api_filter(filename, "{}");
-			if (is_pass == false) {
-				return RETERR(TP10086<TER_TYPE>());
-			}
-		}
-	}
 
 	MiraiNet::NetStruct ret_json = nullptr;
 	if (g_is_alone) 

@@ -19,9 +19,6 @@
 #include "../log/MiraiLog.h"
 #include "../tool//PathTool.h"
 #include "../center/center.h"
-#include "../scriptrun/ScriptRun.h"
-
-
 
 
 SettingDlg::SettingDlg()
@@ -90,12 +87,6 @@ void SettingDlg::show()
 	Fl_Group* debug_group2 = autoDel(new Fl_Group(margin, tabs_y + tabs_hh, tabs_w, tabs_h - tabs_hh, group2_str));
 	create_debug_group(group_x, group_y, group_w, group_h);
 	debug_group2->end();
-
-	const char* group3_str = autoDel(new std::string(StrTool::to_utf8("  过滤器  ")))->c_str();
-	Fl_Group* filter_group3 = autoDel(new Fl_Group(margin, tabs_y + tabs_hh, tabs_w, tabs_h - tabs_hh, group3_str));
-	create_filter_group(group_x, group_y, group_w, group_h);
-	filter_group3->end();
-
 
 	tabs->end();
 
@@ -217,61 +208,4 @@ void SettingDlg::create_debug_group(int group_x, int group_y, int group_w, int g
 	combox->callback(com_tip_cb_t, this);
 	Fl_Button * send_btn = autoDel(new Fl_Button(group_x + 10, group_y + group_h - 35, group_w - 20, 25, make_u8_str("发送")));
 	send_btn->callback(SettingDlg::send_btn_cb_t, this);
-}
-
-
-static void reload_filter_btn_cb(Fl_Widget* o, void* p)
-{
-	char * buffer_text = ((Fl_Text_Buffer*)p)->text();
-	std::string buffer_str = buffer_text;
-	free(buffer_text);
-	std::string lua_file = PathTool::get_exe_dir() + "\\config\\filter_script.lua";
-	PathTool::create_dir(PathTool::get_exe_dir() + "\\config");
-	ScriptRun::get_instance()->init();
-	FILE* fp = NULL;
-	fopen_s(&fp, lua_file.c_str(), "w+");
-	if (fp) {
-		fprintf_s(fp, "%s", buffer_str.c_str());
-		fclose(fp);
-	}
-	else {
-		MiraiLog::get_instance()->add_fatal_log("SettingDlg", "can't create file:config\\filter_script.lua");
-		fl_alert("can't create file:config\\filter_script.lua");
-		exit(-1);
-	}
-	ScriptRun::get_instance()->init();
-	if (!ScriptRun::get_instance()->is_init()) {
-		fl_alert("config\\filter_script.lua reload err,see the log");
-	}
-}
-
-
-void SettingDlg::create_filter_group(int group_x, int group_y, int group_w, int group_h)
-{
-	Fl_Text_Buffer* lua_buffer = autoDel(new Fl_Text_Buffer);
-	Fl_Text_Editor * edit_lua = autoDel(new Fl_Text_Editor(group_x + 10, group_y + 10, group_w - 20, group_h - 45));
-	std::string lua_file = PathTool::get_exe_dir() + "\\config\\filter_script.lua";
-	edit_lua->buffer(lua_buffer);
-	PathTool::create_dir(PathTool::get_exe_dir() + "\\config");
-	if (!PathTool::is_file_exist(lua_file)) {
-		FILE* fp = NULL;
-		fopen_s(&fp, lua_file.c_str(), "w+");
-		if (fp)
-		{
-			fprintf_s(fp, "%s", StrTool::to_utf8("-- 获得当前脚本目录,末尾没有'/''\nlocal function get_cur_dir()\n    local function sum(a, b)\n            return a + b\n    end\n    local info = debug.getinfo(sum)\n    local path = info.source\n    path = string.sub(path, 2, -1) -- 去掉开头的\"@\"\n    path = string.match(path, \"^(.*)\\\\\") -- 捕获最后一个 \"/\" 之前的部分 就是我们最终要的目录部分\n    return string.gsub(path,'\\\\','/')\nend\n\nlocal path = get_cur_dir()\nlocal json_path = path .. \"/JSON.lua\"\nlocal JSON = (loadfile (json_path))()\n\nfunction onebot_api_filter(filename,msg)\n\tlocal lua_value = JSON:decode(msg)\n\treturn true\nend\n\nfunction onebot_event_filter(msg)\n\tlocal lua_value = JSON:decode(msg)\n\tprint(lua_value[\"post_type\"])\n\treturn true\nend").c_str());
-			fclose(fp);
-			ScriptRun::get_instance()->init();
-		}
-		else
-		{
-			MiraiLog::get_instance()->add_fatal_log("SettingDlg", "can't create file:config\\filter_script.lua");
-			fl_alert("can't create file:config\\filter_script.lua");
-			exit(-1);
-		}
-	}
-	std::string file_dat = PathTool::read_biniary_file(lua_file);
-	lua_buffer->remove(0, lua_buffer->length());
-	lua_buffer->append(file_dat.c_str());
-	Fl_Button* reload_filter_btn = autoDel(new Fl_Button(group_x + 10, group_y + group_h - 35, group_w - 20, 25, make_u8_str("保存并重载过滤器")));
-	reload_filter_btn->callback(reload_filter_btn_cb, lua_buffer);
 }

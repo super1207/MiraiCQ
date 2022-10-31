@@ -32,7 +32,6 @@ private:
 	const char* make_u8_str(const std::string& str);
 	void create_log_group(int group_x,int group_y,int group_w,int group_h);
 	void create_debug_group(int group_x, int group_y, int group_w, int group_h);
-	void create_filter_group(int group_x, int group_y, int group_w, int group_h);
 	Fl_Window * win = 0;
 	Fl_Multiline_Input* edit_send = nullptr; 
 	Fl_Multiline_Input* edit_debug = nullptr;
