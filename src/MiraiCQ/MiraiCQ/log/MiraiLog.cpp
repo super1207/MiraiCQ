@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <atomic>
 #include <algorithm>
+#include <filesystem>
 
 #include "../tool/IPCTool.h"
 
@@ -84,15 +85,26 @@ MiraiLog::MiraiLog()
     spdlog::flush_every(std::chrono::seconds(3));
     if (!g_is_alone)
     {
+        std::string exe_dir = get_exe_dir();
         if (!g_is_plus)
         {
-            auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/main_daily.txt", 2, 30);
-            logger->set_level(spdlog::level::info);
+            auto logger = spdlog::daily_logger_mt("MiraiLog", exe_dir + "log/main_daily.txt", 2, 30);
+            if (filesystem::exists(exe_dir + "/debug.txt")) {
+                logger->set_level(spdlog::level::debug);
+            }
+            else {
+                logger->set_level(spdlog::level::info);
+            }
             logger->flush_on(spdlog::level::info);
         }
         else {
-            auto logger = spdlog::daily_logger_mt("MiraiLog", get_exe_dir() + "log/" + g_plus_name + "_plus_daily.txt", 2, 30);
-            logger->set_level(spdlog::level::debug);
+            auto logger = spdlog::daily_logger_mt("MiraiLog", exe_dir + "log/" + g_plus_name + "_plus_daily.txt", 2, 30);
+            if (filesystem::exists(exe_dir + "/debug.txt")) {
+                logger->set_level(spdlog::level::debug);
+            }
+            else {
+                logger->set_level(spdlog::level::info);
+            }
             logger->flush_on(spdlog::level::info);
         }
     }

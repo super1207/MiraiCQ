@@ -1,0 +1,1 @@
+为了节省硬盘，MiraiCQ默认不在log文件中输出Debug等级的日志。可以在MiraiCQ.exe所在目录下创建一个名为debug.txt的文件来开启Debug等级的日志文件输出。
