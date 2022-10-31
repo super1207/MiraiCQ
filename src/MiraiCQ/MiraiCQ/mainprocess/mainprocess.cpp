@@ -134,7 +134,7 @@ static void login_dlg_cb(Fl_Widget* o, void* p) {
 static bool login_dlg()
 {
 	LOGIN_INFO login_info;
-	Fl_Window win(300, 180, "MiraiCQ V2.4.0");
+	Fl_Window win(300, 180, "MiraiCQ V2.4.1");
 	win.begin();
 	login_info.ws_url = Config::get_instance()->get_ws_url();
 	login_info.access_token = Config::get_instance()->get_access_token();
@@ -451,7 +451,7 @@ static void ex_btn_cb(Fl_Widget* o, void* p)
 static void plus_dlg()
 {
 	//fl_register_images();
-	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理");
+	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理V2.4.1");
 	Fl_Double_Window win(508, 400, str1.c_str());
 	win.color(fl_rgb_color(0, 255, 255));
 	win.size_range(500, 400, 500, 400);
@@ -638,7 +638,7 @@ void mainprocess()
 		hide_all_window();
 	}
 
-	MiraiLog::get_instance()->add_info_log("VERSION", "V2.4.0");
+	MiraiLog::get_instance()->add_info_log("VERSION", "V2.4.1");
 	MiraiLog::get_instance()->add_info_log("CORE", "开源地址：https://github.com/super1207/MiraiCQ");
 
 	// 释放CQP.dll
