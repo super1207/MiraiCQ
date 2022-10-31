@@ -202,7 +202,6 @@
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
     <None Include="debug_tip.json" />
-    <None Include="JSON.lua" />
     <None Include="plusprocess\cqpexport.def" />
   </ItemGroup>
   <ItemGroup>

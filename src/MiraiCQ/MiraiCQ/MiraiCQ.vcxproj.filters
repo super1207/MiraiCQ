@@ -352,7 +352,6 @@
       <Filter>plusprocess</Filter>
     </None>
     <None Include="debug_tip.json" />
-    <None Include="JSON.lua" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />

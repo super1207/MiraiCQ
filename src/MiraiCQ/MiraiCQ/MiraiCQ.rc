@@ -56,8 +56,6 @@ IDR_DLL_BIN2            DLL_BIN                 "luna_sama.bmp"
 
 IDR_DLL_BIN3            DLL_BIN                 "debug_tip.json"
 
-IDR_DLL_BIN4            DLL_BIN                 "JSON.lua"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
