@@ -14,6 +14,7 @@ public:
 	std::string get_adapter();
 	std::string get_access_token() ;
 	bool set_access_token(const std::string& access_token);
+	std::string get_name();
 private:
 	Config();
 	~Config();
@@ -22,5 +23,6 @@ private:
 	std::string verifyKey = "";
 	std::string http_url = "http://localhost:8080";
 	std::string adapter = "onebotv11";
+	std::string name = "";
 };
 

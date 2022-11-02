@@ -450,7 +450,7 @@ static void ex_btn_cb(Fl_Widget* o, void* p)
 static void plus_dlg()
 {
 	//fl_register_images();
-	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理V2.4.1");
+	std::string str1 = StrTool::to_utf8("MiraiCQ插件管理V2.4.1 " + Config::get_instance()->get_name());
 	Fl_Double_Window win(508, 400, str1.c_str());
 	win.color(fl_rgb_color(0, 255, 255));
 	win.size_range(500, 400, 500, 400);

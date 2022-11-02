@@ -106,3 +106,17 @@ bool Config::set_access_token(const std::string& access_token)
 	WritePrivateProfileStringA("Setting", "access_token", access_token.c_str(), config_file.c_str());
 	return get_access_token() == access_token;
 }
+
+std::string Config::get_name()
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	std::string name = StrTool::get_str_from_ini(config_file, "Setting", "name", "");
+	if (name == "")
+	{
+		WritePrivateProfileStringA("Setting", "name", this->name.c_str(), config_file.c_str());
+		return this->name;
+	}
+	return name;
+}
