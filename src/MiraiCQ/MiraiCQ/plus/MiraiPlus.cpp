@@ -473,8 +473,11 @@ MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::stri
 	MiraiLog::get_instance()->add_debug_log("PLUSLOAD", cmd);
 	BOOL bRet = CreateProcessA(path_str, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
 	if (bRet != TRUE) {
-		MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "创建插件进程失败");
-		exit(-1);
+		bRet = CreateProcessA(path_str, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi);
+		if (bRet != TRUE) {
+			MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "创建插件进程失败");
+			exit(-1);
+		}
 	}
 	CloseHandle(pi.hThread);
 	this->process_handle = pi.hProcess;
