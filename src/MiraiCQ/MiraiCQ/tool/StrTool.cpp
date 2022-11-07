@@ -33,9 +33,31 @@ std::string StrTool::tolower(const std::string& str)
 	return ret;
 }
 
+// 将utf8字符中的\n替换成\r\n
+static std::string dealNL(const std::string& str) {
+	std::string ret;
+	int start = 0;
+	int flag = 0;
+	for (int len = EmojiTool::utf8_next_len(str, start); len != 0; len = EmojiTool::utf8_next_len(str, start))
+	{
+		std::string temp = str.substr(start, len);
+		start += len;
+		if (temp == "\n" && flag == 0) {
+			ret.push_back('\r');
+		}else if (temp == "\r") {
+			flag = 1;
+		}else {
+			flag = 0;
+		}
+		ret.append(temp);
+	}
+	return ret;
+}
+
 std::string StrTool::to_ansi(const std::string& utf8_str_)
 {
-	std::string utf8_str = EmojiTool::escape_cq_emoji(utf8_str_);
+	std::string utf8_str_t = EmojiTool::escape_cq_emoji(utf8_str_);
+	std::string utf8_str = dealNL(utf8_str_t);
 	int len = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), utf8_str.size(), NULL, 0);
 	std::wstring unicode_buf(len, L'\0');
 	MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), utf8_str.size(), unicode_buf.data(), len);
