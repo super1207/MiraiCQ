@@ -39,7 +39,14 @@
 		对于群输入流，api返回下一条对应群成员的QQ号和消息，中间用","分割。
 		api默认的超时时间为30000毫秒，超时返回空。也可以自定义超时时间，如：
 			【机器人Cookie inputstream,{"user_id":【发送者QQ】,"group_id":【当前群号】,"timeout":20000}】
-			这样，超时时间就变为了20000毫秒，
+			这样，超时时间就变为了20000毫秒
+	查询cpu和内存使用情况的例子:
+		当前插件的进程ID:【机器人Cookie pid】【换行】
+		当前插件使用CPU:【机器人Cookie cpu_usage】%【换行】
+		当前插件使用内存：【机器人Cookie mem_usage】MB【换行】【换行】
+		主进程ID:【机器人Cookie pid,0】【换行】
+		主进程使用CPU:【机器人Cookie cpu_usage,0】%【换行】
+		主进程使用内存：【机器人Cookie mem_usage,0】MB
 		
 		
 		

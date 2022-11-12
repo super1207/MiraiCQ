@@ -1137,43 +1137,76 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 		return ret;
 	}
 	else if (cmdStr == "pid") {
-		auto plus = MiraiPlus::get_instance();
-		auto plus_def = plus->get_plus(auth_code);
-		if (!plus_def)
-		{
-			return "";
+		int pid = -1;
+		if (cmdData == "") {
+			if (g_is_alone) {
+				pid = GetCurrentProcessId();
+			}
+			else {
+				auto plus = MiraiPlus::get_instance();
+				auto plus_def = plus->get_plus(auth_code);
+				if (!plus_def)
+				{
+					return "";
+				}
+				pid = plus_def->get_process_id();
+			}
 		}
-		int pid = plus_def->get_process_id();
+		else if (cmdData == "0") {
+			pid = GetCurrentProcessId();
+		}
 		if (pid > 0) {
 			return std::to_string(pid);
 		}
 		return "";
 	}
 	else if (cmdStr == "cpu_usage") {
-		auto plus = MiraiPlus::get_instance();
-		auto plus_def = plus->get_plus(auth_code);
-		if (!plus_def)
-		{
-			return "";
+		int pid = -1;
+		if (cmdData == "") {
+			if (g_is_alone) {
+				pid = GetCurrentProcessId();
+			}
+			else {
+				auto plus = MiraiPlus::get_instance();
+				auto plus_def = plus->get_plus(auth_code);
+				if (!plus_def)
+				{
+					return "";
+				}
+				pid = plus_def->get_process_id();
+			}
 		}
-		int pid = plus_def->get_process_id();
+		else if (cmdData == "0") {
+			pid = GetCurrentProcessId();
+		}
 		if (pid > 0) {
 			return std::to_string(SysTool::get_cpu_usage(pid));
 		}
 		return "";
 	}
 	else if (cmdStr == "mem_usage") {
-	auto plus = MiraiPlus::get_instance();
-	auto plus_def = plus->get_plus(auth_code);
-	if (!plus_def)
-	{
+		int pid = -1;
+		if (cmdData == "") {
+			if (g_is_alone) {
+				pid = GetCurrentProcessId();
+			}
+			else {
+				auto plus = MiraiPlus::get_instance();
+				auto plus_def = plus->get_plus(auth_code);
+				if (!plus_def)
+				{
+					return "";
+				}
+				pid = plus_def->get_process_id();
+			}
+		}
+		else if (cmdData == "0") {
+			pid = GetCurrentProcessId();
+		}
+		if (pid > 0) {
+			return std::to_string(SysTool::get_mem_usage(pid));
+		}
 		return "";
-	}
-	int pid = plus_def->get_process_id();
-	if (pid > 0) {
-		return std::to_string(SysTool::get_mem_usage(pid));
-	}
-	return "";
 	}
 	else{
 		return "";

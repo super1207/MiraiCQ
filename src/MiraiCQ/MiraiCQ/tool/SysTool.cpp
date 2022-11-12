@@ -2,6 +2,7 @@
 #include "../log/MiraiLog.h"
 #include "AutoDoSth.h"
 #include <stdint.h>
+#include <map>
 #define WIN32_LEAN_AND_MEAN
 #define WIN32_NO_STATUS
 #include <windows.h>
@@ -330,10 +331,14 @@ static uint64_t convert_time_format(const FILETIME* ftime)
     return li.QuadPart;
 }
 
+
+
 double SysTool::get_cpu_usage(int pid)
 {
-    static int64_t last_time = 0;
-    static int64_t last_system_time = 0;
+	static std::map<int, int64_t> pid_last_time_map;
+	static std::map<int, int64_t> pid_last_system_time_map;
+	// static int64_t last_time = 0;
+    //static int64_t last_system_time = 0;
 
     FILETIME now;
     FILETIME creation_time;
@@ -377,16 +382,16 @@ double SysTool::get_cpu_usage(int pid)
     system_time = (convert_time_format(&kernel_time) + convert_time_format(&user_time)) / cpu_num;
     time = convert_time_format(&now);
 
-    if ((last_system_time == 0) || (last_time == 0))
+    if ((pid_last_system_time_map[pid] == 0) || (pid_last_time_map[pid] == 0))
     {
         // First call, just set the last values.  
-        last_system_time = system_time;
-        last_time = time;
+		pid_last_system_time_map[pid] = system_time;
+		pid_last_time_map[pid] = time;
         return 0.0;
     }
 
-    system_time_delta = system_time - last_system_time;
-    time_delta = time - last_time;
+    system_time_delta = system_time - pid_last_system_time_map[pid];
+    time_delta = time - pid_last_time_map[pid];
 
     //CloseHandle(process);
 
@@ -398,8 +403,8 @@ double SysTool::get_cpu_usage(int pid)
 
     // We add time_delta / 2 so the result is rounded.  
     cpu_ratio = (double)((system_time_delta * 100 + time_delta / 2) / time_delta); // the % unit
-    last_system_time = system_time;
-    last_time = time;
+	pid_last_system_time_map[pid] = system_time;
+	pid_last_time_map[pid] = time;
 
     cpu_ratio /= 100.0; // convert to float number
 
