@@ -243,6 +243,9 @@
     <ClCompile Include="center\InputStream.cpp">
       <Filter>center</Filter>
     </ClCompile>
+    <ClCompile Include="tool\SysTool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -344,6 +347,9 @@
     </ClInclude>
     <ClInclude Include="center\InputStream.h">
       <Filter>center</Filter>
+    </ClInclude>
+    <ClInclude Include="tool\SysTool.h">
+      <Filter>tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

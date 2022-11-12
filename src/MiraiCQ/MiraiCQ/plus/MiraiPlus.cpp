@@ -447,6 +447,15 @@ bool MiraiPlus::PlusDef::is_process_exist()
 	return false;
 }
 
+int MiraiPlus::PlusDef::get_process_id()
+{
+	shared_lock<shared_mutex> lock(mx_plus_def);
+	if (process) {
+		return process->get_pid();
+	}
+	return -1;
+}
+
 bool MiraiPlus::PlusDef::is_recive_ex_event()
 {
 	shared_lock<shared_mutex> lock(mx_plus_def);
@@ -516,6 +525,15 @@ bool MiraiPlus::PlusDef::Process::is_exist()
 		return false;
 	}
 	return true;
+}
+
+int MiraiPlus::PlusDef::Process::get_pid()
+{
+	assert(process_handle != NULL);
+	if (is_exist()) {
+		return GetProcessId(process_handle);
+	}
+	return -1;
 }
 
 void MiraiPlus::PlusDef::Process::wait_process_quit(int timeout)

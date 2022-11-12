@@ -160,6 +160,7 @@
     <ClCompile Include="tool\PathTool.cpp" />
     <ClCompile Include="tool\StrTool.cpp" />
     <ClCompile Include="tool\EmojiTool.cpp" />
+    <ClCompile Include="tool\SysTool.cpp" />
     <ClCompile Include="tool\ThreadTool.cpp" />
     <ClCompile Include="tool\TimeTool.cpp" />
   </ItemGroup>
@@ -195,6 +196,7 @@
     <ClInclude Include="tool\PathTool.h" />
     <ClInclude Include="tool\StrTool.h" />
     <ClInclude Include="tool\EmojiTool.h" />
+    <ClInclude Include="tool\SysTool.h" />
     <ClInclude Include="tool\ThreadSafeMap.h" />
     <ClInclude Include="tool\ThreadTool.h" />
     <ClInclude Include="tool\TimeTool.h" />

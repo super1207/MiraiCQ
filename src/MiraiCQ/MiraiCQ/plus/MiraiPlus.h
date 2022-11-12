@@ -29,8 +29,10 @@ public:
 			Process(const std::string& dll_name,const std::string & uuid);
 			/* 判断进程是否存在 */
 			bool is_exist();
-			/* 等待进程退出,返回函数执行完后进程是否 */
+			/* 等待进程退出,返回函数执行完后进程是否退出 */
 			void wait_process_quit(int timeout);
+			/* 获得进程id */
+			int get_pid();
 			~Process();
 		private:
 			void* process_handle = NULL;
@@ -96,6 +98,11 @@ public:
 		*  描述：返回插件进程是否存在，注意，若插件没有启用，则插件进程一定不存在
 		*/
 		bool is_process_exist();
+
+		/*
+		*  描述：返回插件进程的pid，若插件进程不存在，则返回-1
+		*/
+		int get_process_id();
 
 		bool is_recive_ex_event();
 	private:

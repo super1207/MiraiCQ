@@ -10,6 +10,7 @@
 #include "../tool/MsgIdTool.h"
 #include "../tool/IPCTool.h"
 #include "../tool/AutoDoSth.h"
+#include "../tool/SysTool.h"
 
 #include <websocketpp/base64/base64.hpp>
 #include <fstream>
@@ -1135,10 +1136,49 @@ std::string Center::CQ_getCookiesV2(int auth_code, const char* domain)
 		}
 		return ret;
 	}
+	else if (cmdStr == "pid") {
+		auto plus = MiraiPlus::get_instance();
+		auto plus_def = plus->get_plus(auth_code);
+		if (!plus_def)
+		{
+			return "";
+		}
+		int pid = plus_def->get_process_id();
+		if (pid > 0) {
+			return std::to_string(pid);
+		}
+		return "";
+	}
+	else if (cmdStr == "cpu_usage") {
+		auto plus = MiraiPlus::get_instance();
+		auto plus_def = plus->get_plus(auth_code);
+		if (!plus_def)
+		{
+			return "";
+		}
+		int pid = plus_def->get_process_id();
+		if (pid > 0) {
+			return std::to_string(SysTool::get_cpu_usage(pid));
+		}
+		return "";
+	}
+	else if (cmdStr == "mem_usage") {
+	auto plus = MiraiPlus::get_instance();
+	auto plus_def = plus->get_plus(auth_code);
+	if (!plus_def)
+	{
+		return "";
+	}
+	int pid = plus_def->get_process_id();
+	if (pid > 0) {
+		return std::to_string(SysTool::get_mem_usage(pid));
+	}
+	return "";
+	}
 	else{
 		return "";
 	}
-	
+	return "";
 }
 
 int Center::CQ_getCsrfToken(int auth_code)
