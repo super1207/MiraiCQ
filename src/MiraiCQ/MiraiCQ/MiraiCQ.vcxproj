@@ -105,6 +105,7 @@
     <ClCompile Include="center\event.cpp" />
     <ClCompile Include="center\ex_event.cpp" />
     <ClCompile Include="center\InputStream.cpp" />
+    <ClCompile Include="center\poke_event.cpp" />
     <ClCompile Include="config\config.cpp" />
     <ClCompile Include="ipcprocess\ipcprocess.cpp" />
     <ClCompile Include="log\MiraiLog.cpp" />

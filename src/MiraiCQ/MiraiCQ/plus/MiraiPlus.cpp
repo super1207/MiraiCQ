@@ -139,6 +139,32 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		}
 	}
 
+	// 是否接收额外的poke event
+	{
+		auto recive_poke_event_json = root.get("recive_poke_event", def_str);
+		if (recive_poke_event_json.isBool())
+		{
+			if (recive_poke_event_json.asBool()) {
+				plus_def->recive_poke_event = true;
+			}
+			else {
+				plus_def->recive_poke_event = false;
+			}
+		}
+		else if (recive_poke_event_json.isInt()) {
+			if (recive_poke_event_json.asInt() != 0) {
+				plus_def->recive_poke_event = true;
+			}
+			else {
+				plus_def->recive_poke_event = false;
+			}
+		}
+		else
+		{
+			plus_def->recive_poke_event = false;
+		}
+	}
+
 	{
 		auto author_json = root.get("author", def_str);
 		if (author_json.isString() && author_json.asString() != "")
@@ -460,6 +486,12 @@ bool MiraiPlus::PlusDef::is_recive_ex_event()
 {
 	shared_lock<shared_mutex> lock(mx_plus_def);
 	return this->recive_ex_event;
+}
+
+bool MiraiPlus::PlusDef::is_recive_poke_event()
+{
+	shared_lock<shared_mutex> lock(mx_plus_def);
+	return this->recive_poke_event;
 }
 
 MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::string & uuid)

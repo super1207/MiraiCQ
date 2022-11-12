@@ -22,6 +22,7 @@ std::map<std::string,Json::Value> Center::deal_event(MiraiNet::NetStruct evt)
 	ret["cq_event"] = Json::Value();
 	ret["1207_event"] = Json::Value();
 	ret["ex_event"] = Json::Value();
+	ret["poke_event"] = Json::Value();
 	MiraiLog::get_instance()->add_debug_log("Center", "收到的消息:"+ StrTool::to_ansi(Json::FastWriter().write(*evt)));
 	if (!(*evt).isObject())
 	{
@@ -40,6 +41,8 @@ std::map<std::string,Json::Value> Center::deal_event(MiraiNet::NetStruct evt)
 		ret["1207_event"] = deal_1207_event(*evt);
 
 		ret["ex_event"] = deal_ex_event(*evt);
+
+		ret["poke_event"] = deal_poke_event(*evt);
 
 		if (post_type == "message")
 		{

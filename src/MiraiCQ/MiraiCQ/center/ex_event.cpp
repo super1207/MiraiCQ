@@ -12,7 +12,7 @@ static Json::Value send_private_msg(int64_t user_id,const std::string &  msg) {
 	to_send["data"]["msg_id"] = 0;
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["msg"] = "[CQ:mcqevt,data=" + msg + "]";;
-	to_send["data"]["font"] = 0;
+	to_send["data"]["font"] = 11;
 	return to_send;
 }
 
@@ -25,7 +25,7 @@ static Json::Value send_group_msg(int64_t group_id,int64_t user_id, const std::s
 	to_send["data"]["from_qq"] = user_id;
 	to_send["data"]["anonymous"] = "";
 	to_send["data"]["msg"] = "[CQ:mcqevt,data=" + msg + "]";
-	to_send["data"]["font"] = 0;
+	to_send["data"]["font"] = 11;
 	return to_send;
 }
 

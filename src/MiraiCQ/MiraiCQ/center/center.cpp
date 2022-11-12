@@ -166,6 +166,16 @@ bool Center::run()
 							}
 						}
 
+						if (cqEvtMap.at("poke_event").isNull() == false) {
+							auto plus = MiraiPlus::get_instance()->get_all_plus();
+							for (auto p : plus) {
+								if (p.second->is_enable() && p.second->is_recive_poke_event())
+								{
+									IPC_SendEvent(p.second->get_uuid().c_str(), Json::FastWriter().write(cqEvtMap.at("poke_event")).c_str());
+								}
+							}
+						}
+
 						if (cqEvtMap.at("cq_event").isNull() == false) {
 							auto plus = MiraiPlus::get_instance()->get_all_plus();
 							for (auto p : plus) {

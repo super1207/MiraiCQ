@@ -51,6 +51,7 @@ public:
 		std::shared_ptr<Process> process = nullptr; /* 插件的进程 */
 		std::shared_mutex mx_plus_def;
 		bool recive_ex_event = false;
+		bool recive_poke_event = false;
 
 		~PlusDef();
 		/*
@@ -105,6 +106,8 @@ public:
 		int get_process_id();
 
 		bool is_recive_ex_event();
+
+		bool is_recive_poke_event();
 	private:
 		std::string uuid;
 	};

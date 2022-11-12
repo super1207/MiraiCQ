@@ -111,6 +111,7 @@ private:
 	Json::Value deal_type_message_group(Json::Value& evt);
 	Json::Value deal_1207_event(Json::Value& evt);
 	Json::Value deal_ex_event(Json::Value& evt);
+	Json::Value deal_poke_event(Json::Value& evt);
 
 };
 

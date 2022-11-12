@@ -246,6 +246,9 @@
     <ClCompile Include="tool\SysTool.cpp">
       <Filter>tool</Filter>
     </ClCompile>
+    <ClCompile Include="center\poke_event.cpp">
+      <Filter>center</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
