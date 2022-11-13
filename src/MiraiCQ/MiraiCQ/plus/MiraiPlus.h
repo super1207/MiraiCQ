@@ -6,11 +6,12 @@
 #include <map>
 #include <shared_mutex>
 #include <atomic>
+#include <jsoncpp/json.h>
 
 class MiraiPlus
 {
 public:
-
+	static Json::Value read_plus_json(const std::string& json_path, std::string& err_msg);
 	struct PlusDef
 	{
 		struct Event

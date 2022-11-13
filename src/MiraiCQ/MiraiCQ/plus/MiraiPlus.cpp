@@ -22,6 +22,29 @@ MiraiPlus::MiraiPlus()
 {
 }
 
+Json::Value MiraiPlus::read_plus_json(const std::string& json_path, std::string& err_msg)
+{
+	std::string json_file;
+	try {
+		json_file = PathTool::read_biniary_file(json_path);
+		if (StrTool::is_utf8(json_file)) {
+			json_file = StrTool::to_ansi(json_file);
+		}
+	}
+	catch (...) {
+		err_msg = "模块json文件读取失败";
+		return Json::Value();
+	}
+	Json::Value root;
+	Json::Reader reader;
+	if (!reader.parse(json_file, root))
+	{
+		err_msg = "模块json文件解析失败";
+		return Json::Value();
+	}
+	return root;
+}
+
 MiraiPlus::~MiraiPlus()
 {
 }
@@ -63,22 +86,8 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		return false;
 	}
 
-	std::string json_file;
-	try {
-		json_file = PathTool::read_biniary_file(json_path);
-		if (StrTool::is_utf8(json_file)) {
-			json_file = StrTool::to_ansi(json_file);
-		}
-	}
-	catch (...) {
-		err_msg = "模块json文件读取失败";
-		return false;
-	}
-	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(json_file, root))
-	{
-		err_msg = "模块json文件解析失败";
+	Json::Value root = read_plus_json(json_path, err_msg);
+	if (err_msg != "") {
 		return false;
 	}
 
@@ -114,56 +123,10 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 	}
 
 	// 是否接收额外的event
-	{
-		auto recive_ex_event_json = root.get("recive_ex_event", def_str);
-		if (recive_ex_event_json.isBool())
-		{
-			if (recive_ex_event_json.asBool()) {
-				plus_def->recive_ex_event = true;
-			}
-			else {
-				plus_def->recive_ex_event = false;
-			}
-		}
-		else if (recive_ex_event_json.isInt()) {
-			if (recive_ex_event_json.asInt() != 0) {
-				plus_def->recive_ex_event = true;
-			}
-			else {
-				plus_def->recive_ex_event = false;
-			}
-		}
-		else
-		{
-			plus_def->recive_ex_event = false;
-		}
-	}
+	plus_def->recive_ex_event = StrTool::get_bool_from_json(root, "recive_ex_event", false);
 
 	// 是否接收额外的poke event
-	{
-		auto recive_poke_event_json = root.get("recive_poke_event", def_str);
-		if (recive_poke_event_json.isBool())
-		{
-			if (recive_poke_event_json.asBool()) {
-				plus_def->recive_poke_event = true;
-			}
-			else {
-				plus_def->recive_poke_event = false;
-			}
-		}
-		else if (recive_poke_event_json.isInt()) {
-			if (recive_poke_event_json.asInt() != 0) {
-				plus_def->recive_poke_event = true;
-			}
-			else {
-				plus_def->recive_poke_event = false;
-			}
-		}
-		else
-		{
-			plus_def->recive_poke_event = false;
-		}
-	}
+	plus_def->recive_poke_event = StrTool::get_bool_from_json(root, "recive_poke_event", false);
 
 	{
 		auto author_json = root.get("author", def_str);

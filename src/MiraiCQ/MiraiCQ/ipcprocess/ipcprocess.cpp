@@ -494,6 +494,18 @@ void ipcprocess(const std::string& main_flag, const std::string& plus_flag, cons
 		//释放CQP.dll
 		release_dll();
 
+		std::string err_msg;
+		std::string json_path = PathTool::get_exe_dir() + "app\\" + plus_name + ".json";
+		Json::Value plus_json = MiraiPlus::read_plus_json(json_path, err_msg);
+		if (err_msg != "") {
+			MiraiLog::get_instance()->add_fatal_log("IPC", "read plus json failed:" + err_msg);
+			exit(-1);
+		}
+		// 是否接收额外的event
+		bool recive_ex_event = StrTool::get_bool_from_json(plus_json, "recive_ex_event", false);
+		// 是否接收额外的poke event
+		bool recive_poke_event = StrTool::get_bool_from_json(plus_json, "recive_poke_event", false);
+
 		/* 加载插件，加载失败会强制退出进程 */
 		load_plus(plus_name);
 
@@ -512,7 +524,7 @@ void ipcprocess(const std::string& main_flag, const std::string& plus_flag, cons
 
 
 		/* 用于处理主进程下发的事件 */
-		std::thread([plus_flag]() {
+		std::thread([plus_flag, recive_ex_event, recive_poke_event]() {
 			while (true)
 			{
 				const char* evt = IPC_GetEvent(plus_flag.c_str());
@@ -571,6 +583,12 @@ void ipcprocess(const std::string& main_flag, const std::string& plus_flag, cons
 				std::map<std::string,Json::Value> to_send;
 				try {
 					to_send = Center::get_instance()->deal_event(MiraiNet::NetStruct(new Json::Value(root)));
+					if (!recive_ex_event) {
+						to_send["ex_event"] = Json::Value();
+					}
+					if (!recive_poke_event) {
+						to_send["poke_event"] = Json::Value();
+					}
 				}
 				catch (const std::exception& e) {
 					MiraiLog::get_instance()->add_debug_log("EVENTRECV", "预处理Json消息失败:" + std::string(e.what()));
