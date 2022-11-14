@@ -3,6 +3,7 @@
 #include "AutoDoSth.h"
 #include <stdint.h>
 #include <map>
+#include <mutex>
 #define WIN32_LEAN_AND_MEAN
 #define WIN32_NO_STATUS
 #include <windows.h>
@@ -335,10 +336,14 @@ static uint64_t convert_time_format(const FILETIME* ftime)
 
 double SysTool::get_cpu_usage(int pid)
 {
+	static std::mutex mx;
 	static std::map<int, int64_t> pid_last_time_map;
 	static std::map<int, int64_t> pid_last_system_time_map;
 	// static int64_t last_time = 0;
     //static int64_t last_system_time = 0;
+
+	// 这里加锁防止对pid_last_time_map和pid_last_system_time_map的竞争
+	std::lock_guard<std::mutex> lk(mx);
 
     FILETIME now;
     FILETIME creation_time;
