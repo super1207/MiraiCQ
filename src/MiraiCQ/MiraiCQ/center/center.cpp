@@ -40,6 +40,10 @@ int Center::load_all_plus()
 	std::string exe_dir = PathTool::get_exe_dir();
 	std::string plus_dir = exe_dir + "app\\";
 	PathTool::create_dir(plus_dir);
+	PathTool::create_dir(exe_dir + "pyapp\\");
+	/* 创建图片目录 */
+	PathTool::create_dir(exe_dir + "data\\");
+	PathTool::create_dir(exe_dir + "data\\image");
 	std::vector<std::string> path_file = PathTool::get_path_file(plus_dir);
 	int success_num = 0;
 	for (const auto& file_str : path_file)
@@ -51,7 +55,7 @@ int Center::load_all_plus()
 		auto file_name = StrTool::remove_suffix(file_str);
 		MiraiLog::get_instance()->add_debug_log("Center", "开始加载插件`" + file_name + "`");
 		std::string err;
-		if (plus->load_plus(file_name, err))
+		if (plus->load_plus(file_name,"dll", err))
 		{
 			++success_num;
 			MiraiLog::get_instance()->add_info_log("Center", "插件`" + file_name + "`加载成功");
@@ -62,6 +66,26 @@ int Center::load_all_plus()
 			exit(-1);
 		}
 
+	}
+
+	// 加载python插件
+	{
+		std::string python_path = PathTool::get_exe_dir() + "\\bin\\Python38-32\\python.exe";
+		bool is_python_env = PathTool::is_file_exist(python_path);
+		auto path_dirs = PathTool::get_path_dir(PathTool::get_exe_dir() + "pyapp");
+		if (path_dirs.size() != 0 && is_python_env == false) {
+			MiraiLog::get_instance()->add_warning_log("Center", "`" + python_path + "`不存在,pyapp下的python插件无法加载!");
+		}
+		else {
+			for (auto& file_name : path_dirs) {
+				std::string err;
+				if (plus->load_plus(file_name, "py", err))
+				{
+					++success_num;
+					MiraiLog::get_instance()->add_info_log("Center", "插件`" + file_name + "`加载成功");
+				}
+			}
+		}
 	}
 	return success_num;
 }

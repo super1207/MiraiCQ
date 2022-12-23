@@ -61,6 +61,13 @@ public:
 	static std::vector<std::string> get_path_file(const std::string & path) ;
 
 	/*
+	* 描述：获取目录下得所有目录
+	* 参数`path`：目录
+	* 返回值：目录名数组（只含目录名）
+	*/
+	static std::vector<std::string> get_path_dir(const std::string& path);
+
+	/*
 	* 描述：重命名文件
 	* 参数`old_name`：旧路径
 	* 参数`new_name`：新路径

@@ -11,6 +11,7 @@
 #include "../tool/TimeTool.h"
 #include "../tool/ThreadTool.h"
 #include "../tool/IPCTool.h"
+#include "../config/config.h"
 
 #include <jsoncpp/json.h>
 #include <assert.h>
@@ -50,31 +51,16 @@ MiraiPlus::~MiraiPlus()
 }
 
 
-bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg) 
+bool MiraiPlus::load_dll_plus(const std::string& plus_name, std::string& err_msg)
 {
 	err_msg.clear();
-	{
-		// 设置dll搜索目录
-		std::string path_str = PathTool::get_exe_dir() + "bin\\";
-		PathTool::create_dir(path_str);
-		SetDllDirectoryA(path_str.c_str());
-	}
 
-	//判断CQP.dll是否存在
-	HMODULE hHandle = LoadLibraryA("CQP.dll");
-	if (hHandle == NULL) {
-		err_msg = "CQP.dll加载失败，code:" + std::to_string(GetLastError());
-		return false;
-	}
-	else {
-		FreeLibrary(hHandle);
-	}
-	/* 创建图片目录 */ 
+	/* 创建图片目录 */
 	PathTool::create_dir(PathTool::get_exe_dir() + "data\\");
 	PathTool::create_dir(PathTool::get_exe_dir() + "data\\image");
 
-	std::string dll_path = PathTool::get_exe_dir() + "app\\" + dll_name + ".dll";
-	std::string json_path = PathTool::get_exe_dir() + "app\\" + dll_name + ".json";
+	std::string dll_path = PathTool::get_exe_dir() + "app\\" + plus_name + ".dll";
+	std::string json_path = PathTool::get_exe_dir() + "app\\" + plus_name + ".json";
 	if (!PathTool::is_file_exist(dll_path))
 	{
 		err_msg = "模块dll文件不存在";
@@ -93,7 +79,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 
 	std::shared_ptr<PlusDef> plus_def(new PlusDef);
 
-	plus_def->filename = dll_name;
+	plus_def->filename = plus_name;
 
 	Json::Value def_str = "";
 	{
@@ -154,7 +140,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 		}
 	}
 
-	auto event_json_arr = root.get("event","");
+	auto event_json_arr = root.get("event", "");
 	if (event_json_arr.isArray())
 	{
 		for (auto& node : event_json_arr)
@@ -180,7 +166,7 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 				}
 				else
 				{
-					err_msg = "模块json文件解析失败,event函数`"+ event->fun_name +"`缺少type";
+					err_msg = "模块json文件解析失败,event函数`" + event->fun_name + "`缺少type";
 					return false;
 				}
 			}
@@ -193,11 +179,11 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 				else
 				{
 					event->priority = 30000;
-					std::string msg = "函数`"+ event->fun_name +"`缺少priority,使用默认值30000";
+					std::string msg = "函数`" + event->fun_name + "`缺少priority,使用默认值30000";
 					MiraiLog::get_instance()->add_debug_log("load_plus", msg);
 				}
 			}
-		
+
 			plus_def->event_vec.push_back(event);
 		}
 	}
@@ -232,8 +218,9 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 			plus_def->menu_vec.push_back(menu);
 		}
 	}
-	plus_def->dll_name = dll_name;
+	plus_def->dll_name = plus_name;
 	plus_def->ac = StrTool::gen_ac();
+	plus_def->plus_type = "dll";
 
 	{
 		unique_lock<shared_mutex> lock(this->mx_plus_map);
@@ -241,6 +228,56 @@ bool MiraiPlus::load_plus(const std::string& dll_name, std::string & err_msg)
 	}
 
 	return true;
+}
+
+bool MiraiPlus::load_py_plus(const std::string& plus_name, std::string& err_msg)
+{
+	err_msg.clear();
+	std::string main_path = PathTool::get_exe_dir() + "pyapp\\" + plus_name + "\\main.py";
+	std::string json_path = PathTool::get_exe_dir() + "pyapp\\" + plus_name + "\\main.json";
+	if (!PathTool::is_file_exist(main_path))
+	{
+		err_msg = main_path + " 文件不存在";
+		return false;
+	}
+	if (!PathTool::is_file_exist(json_path))
+	{
+		err_msg = json_path + " 文件不存在";
+		return false;
+	}
+
+	Json::Value root = read_plus_json(json_path, err_msg);
+	if (err_msg != "") {
+		return false;
+	}
+
+	std::shared_ptr<PlusDef> plus_def(new PlusDef);
+
+	plus_def->filename = plus_name;
+	plus_def->dll_name = plus_name;
+	plus_def->author = StrTool::get_str_from_json(root, "author", "未知");
+	plus_def->description = StrTool::get_str_from_json(root, "description", "无");
+	plus_def->name = StrTool::get_str_from_json(root, "name", "无名");
+	plus_def->version = StrTool::get_str_from_json(root, "version", "未知");
+	plus_def->plus_type = "py";
+	plus_def->ac = StrTool::gen_ac();
+	{
+		unique_lock<shared_mutex> lock(this->mx_plus_map);
+		plus_map[plus_def->ac] = plus_def;
+	}
+
+	return true;
+
+}
+
+bool MiraiPlus::load_plus(const std::string& plus_name, std::string plus_type ,std::string & err_msg) 
+{
+	err_msg.clear();
+	if (plus_type == "dll") {
+		return load_dll_plus(plus_name, err_msg);
+	}else {
+		return load_py_plus(plus_name, err_msg);
+	}
 }
 
 bool MiraiPlus::enable_plus(int ac, std::string & err_msg) 
@@ -267,36 +304,42 @@ bool MiraiPlus::enable_plus(int ac, std::string & err_msg)
 	assert(uuid != "");
 
 	/* 创建插件进程 */
-	std::shared_ptr<MiraiPlus::PlusDef::Process> proc = std::make_shared<MiraiPlus::PlusDef::Process>(plus->dll_name,uuid);
+	std::shared_ptr<MiraiPlus::PlusDef::Process> proc = std::make_shared<MiraiPlus::PlusDef::Process>(plus->dll_name,uuid, plus->plus_type);
 	
 	{
 		unique_lock<shared_mutex> lock(plus->mx_plus_def);
 		plus->process = proc;
 	}
 
-	// 等待插件进程加载
-	Json::Value to_send;
-	to_send["action"] = "is_load";
-	bool is_load = false;
-	for (int i = 0; i < 100; ++i)
-	{
-		const char* ret = IPC_ApiSend(uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 100);
-		if (strcmp(ret, "OK") == 0)
+	if (plus->plus_type == "dll") {
+		// 等待插件进程加载
+		Json::Value to_send;
+		to_send["action"] = "is_load";
+		bool is_load = false;
+		for (int i = 0; i < 100; ++i)
 		{
-			is_load = true;
-			break;
+			const char* ret = IPC_ApiSend(uuid.c_str(), Json::FastWriter().write(to_send).c_str(), 100);
+			if (strcmp(ret, "OK") == 0)
+			{
+				is_load = true;
+				break;
+			}
+		}
+		if (!is_load)
+		{
+			err_msg = "插件无响应";
+			plus->set_uuid("");
+			{
+				unique_lock<shared_mutex> lock(plus->mx_plus_def);
+				plus->process = nullptr;
+			}
+			return false;
 		}
 	}
-	if (!is_load)
-	{
-		err_msg = "插件无响应";
-		plus->set_uuid("");
-		{
-			unique_lock<shared_mutex> lock(plus->mx_plus_def);
-			plus->process = nullptr;
-		}
-		return false;
+	else {
+		// py插件，do nothing
 	}
+
 	return true;
 }
 
@@ -314,14 +357,16 @@ void MiraiPlus::disable_plus(int ac)
 		return ;
 	}
 
-	Json::Value to_send;
-	to_send["event_type"] = "exit";
-	// 发送退出事件
-	IPC_SendEvent(plus->get_uuid().c_str(), to_send.toStyledString().c_str());
-	// 等待进程退出(5s)
-	{
-		shared_lock<shared_mutex> lock(mx_plus_map);
-		plus->process->wait_process_quit(5000);
+	if (plus->plus_type == "dll") {
+		Json::Value to_send;
+		to_send["event_type"] = "exit";
+		// 发送退出事件
+		IPC_SendEvent(plus->get_uuid().c_str(), to_send.toStyledString().c_str());
+		// 等待进程退出(5s)
+		{
+			shared_lock<shared_mutex> lock(mx_plus_map);
+			plus->process->wait_process_quit(5000);
+		}
 	}
 	{
 		unique_lock<shared_mutex> lock(mx_plus_map);
@@ -457,32 +502,57 @@ bool MiraiPlus::PlusDef::is_recive_poke_event()
 	return this->recive_poke_event;
 }
 
-MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::string & uuid)
+MiraiPlus::PlusDef::Process::Process(const std::string& dll_name,const std::string & uuid,std::string plus_type)
 {
-	char path_str[MAX_PATH + 1] = { 0 };
-	if (GetModuleFileNameA(NULL, path_str, MAX_PATH) == 0)
-	{
-		MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "获得当前exe名称失败");
-		exit(-1); 
-	}
-	std::string cmd = "\"" + string(path_str) + "\"";
-	cmd += " ";
-	cmd += IPC_GetFlag();
-	cmd += " ";
-	cmd += uuid;
-	cmd += " ";
-	cmd += websocketpp::base64_encode(dll_name);
-	STARTUPINFO si = { sizeof(si) };
+
+	std::string cmd = "";
 	PROCESS_INFORMATION pi;
-	MiraiLog::get_instance()->add_debug_log("PLUSLOAD", cmd);
-	BOOL bRet = CreateProcessA(path_str, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
-	if (bRet != TRUE) {
-		bRet = CreateProcessA(path_str, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi);
-		if (bRet != TRUE) {
-			MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "创建插件进程失败");
+	if (plus_type == "dll") {
+		char path_str[MAX_PATH + 1] = { 0 };
+		if (GetModuleFileNameA(NULL, path_str, MAX_PATH) == 0)
+		{
+			MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "获得当前exe名称失败");
 			exit(-1);
 		}
+		cmd = "\"" + string(path_str) + "\"";
+		cmd += " ";
+		cmd += IPC_GetFlag();
+		cmd += " ";
+		cmd += uuid;
+		cmd += " ";
+		cmd += websocketpp::base64_encode(dll_name);
+		STARTUPINFO si = { sizeof(si) };
+		MiraiLog::get_instance()->add_debug_log("PLUSLOAD", cmd);
+		BOOL bRet = CreateProcessA(NULL, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, DETACHED_PROCESS | CREATE_BREAKAWAY_FROM_JOB, NULL, NULL, &si, &pi);
+		if (bRet != TRUE) {
+			bRet = CreateProcessA(NULL, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi);
+			if (bRet != TRUE) {
+				MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "创建插件进程失败");
+				exit(-1);
+			}
+		}
 	}
+	else {
+		Config::get_instance()->get_access_token();
+		Json::Value root;
+		root["ws_url"] = Config::get_instance()->get_ws_url();
+		root["access_token"] = Config::get_instance()->get_access_token();
+		std::string env = websocketpp::base64_encode(Json::FastWriter().write(root));
+		std::string exe_dir = PathTool::get_exe_dir();
+		cmd = "\"" + exe_dir + "bin\\Python38-32\\python.exe\" \"" + exe_dir + "pyapp\\" + dll_name + "\\main.py\" " + env;
+		std::string work_path = exe_dir + "pyapp\\" + dll_name;
+		STARTUPINFO si = { sizeof(si) };
+		MiraiLog::get_instance()->add_debug_log("PLUSLOAD", cmd);
+		BOOL bRet = CreateProcessA(NULL, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, CREATE_NEW_CONSOLE | CREATE_BREAKAWAY_FROM_JOB, NULL, work_path.c_str(), &si, &pi);
+		if (bRet != TRUE) {
+			bRet = CreateProcessA(NULL, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, work_path.c_str(), &si, &pi);
+			if (bRet != TRUE) {
+				MiraiLog::get_instance()->add_fatal_log("PLUSLOAD", "创建插件进程失败");
+				exit(-1);
+			}
+		}
+	}
+	
 	CloseHandle(pi.hThread);
 	this->process_handle = pi.hProcess;
 	//绑定主进程，确保主进程结束后子进程能强制退出

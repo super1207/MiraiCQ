@@ -27,7 +27,7 @@ public:
 		};
 		struct Process
 		{
-			Process(const std::string& dll_name,const std::string & uuid);
+			Process(const std::string& dll_name,const std::string & uuid,std::string plus_type);
 			/* 判断进程是否存在 */
 			bool is_exist();
 			/* 等待进程退出,返回函数执行完后进程是否退出 */
@@ -40,11 +40,12 @@ public:
 			void* job_handle = NULL;
 		};
 		std::string name; /* 插件名字 */
-		std::string filename; /* 插件的文件名 */
+		std::string filename; /* 插件的文件名(不含后缀) */
 		std::string version; /* 插件版本 */
 		std::string author; /* 插件作者 */
 		std::string description; /* 插件描述 */
 		std::string dll_name;  /* 插件的文件名(不含后缀) */
+		std::string plus_type; /* dll 或者 py */
 		int ac; /* 插件ac */
 		std::vector<std::shared_ptr<const Event>> event_vec;
 		std::vector<std::shared_ptr<const Menu>> menu_vec;
@@ -121,7 +122,7 @@ public:
 	* 参数`err_msg`,加载失败时说明原因
 	* 返回值：成功返回`true`,失败返回`false`
 	*/
-	bool load_plus(const std::string& dll_name,std::string & err_msg) ;
+	bool load_plus(const std::string& plus_name, std::string plus_type, std::string & err_msg) ;
 
 	/*
 	* 描述：启用一个插件
@@ -166,6 +167,8 @@ public:
 	static MiraiPlus* get_instance() ;
 private:
 	MiraiPlus();
+	bool load_dll_plus(const std::string& plus_name, std::string& err_msg);
+	bool load_py_plus(const std::string& plus_name, std::string& err_msg);
 	std::map<int, std::shared_ptr<PlusDef>> plus_map;
 	std::shared_mutex mx_plus_map;
 };
