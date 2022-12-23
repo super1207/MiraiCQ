@@ -67,7 +67,7 @@ int Center::load_all_plus()
 		}
 
 	}
-
+	 
 	// ¼ÓÔØpython²å¼þ
 	{
 		std::string python_path = PathTool::get_exe_dir() + "\\bin\\Python38-32\\python.exe";
