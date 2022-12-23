@@ -3,6 +3,7 @@
 #include <list>
 #include <functional>
 #include <vector>
+#include <string>
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Multiline_Input.H>
