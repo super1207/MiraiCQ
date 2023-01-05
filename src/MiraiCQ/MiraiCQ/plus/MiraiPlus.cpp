@@ -38,7 +38,7 @@ Json::Value MiraiPlus::read_plus_json(const std::string& json_path, std::string&
 	}
 	Json::Value root;
 	Json::Reader reader;
-	if (!reader.parse(json_file, root))
+	if (!reader.parse(json_file, root,true))
 	{
 		err_msg = "模块json文件解析失败";
 		return Json::Value();
