@@ -11,6 +11,7 @@ public:
 		unsigned int height = 0;
 		unsigned int size = 0;
 		std::string type = "";
+		std::string md5_str = "";
 	};
 	/*
 	* 描述：获得图片信息
@@ -18,7 +19,7 @@ public:
 	* 参数`info`：输出图片信息
 	* 返回值：成功返回`true`，失败返回`false`
 	*/
-	static bool get_info(const std::string& url, ImgInfo & info);
+	static bool get_info(const std::string& url, ImgInfo & info, bool isqq);
 
 	/*
 	* 描述：下载图片

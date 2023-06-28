@@ -249,6 +249,9 @@
     <ClCompile Include="center\poke_event.cpp">
       <Filter>center</Filter>
     </ClCompile>
+    <ClCompile Include="tool\Md5Tool.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="log\MiraiLog.h">
@@ -354,6 +357,9 @@
     <ClInclude Include="tool\SysTool.h">
       <Filter>tool</Filter>
     </ClInclude>
+    <ClInclude Include="tool\Md5Tool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
@@ -361,6 +367,7 @@
       <Filter>plusprocess</Filter>
     </None>
     <None Include="debug_tip.json" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiraiCQ.rc" />

@@ -10,6 +10,7 @@
 #include "../tool/BinTool.h"
 #include "../tool/ImgTool.h"
 #include "../tool/MsgIdTool.h"
+#include "../tool/Md5Tool.h"
 #include <websocketpp/base64/base64.hpp>
 
 
@@ -423,7 +424,9 @@ static bool deal_json_array(Json::Value & json_arr)
 			std::string md5_str;
 			std::string url;
 			std::string file_str = StrTool::get_str_from_json(dat_json, "file", "");
+			bool is_qq = false;
 			if (is_qq_url(dat_json)) {
+				is_qq = true;
 				md5_str = get_md5_from_file_str(file_str);
 				if (md5_str == "") {
 					md5_str = get_md5_from_imgurl(StrTool::get_str_from_json(dat_json, "url", ""));
@@ -431,11 +434,10 @@ static bool deal_json_array(Json::Value & json_arr)
 				url = "https://gchat.qpic.cn/gchatpic_new/0/0-0-" + md5_str + "/0?term=2";
 			}
 			else {
-				md5_str = get_md5_from_file_str(file_str);
 				url = StrTool::get_str_from_json(dat_json, "url", "");
 			}
 			
-			if (md5_str == "") 
+			if (md5_str == "" && is_qq == true)
 			{
 				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取图片的md5");
 				node = Json::Value();
@@ -450,8 +452,9 @@ static bool deal_json_array(Json::Value & json_arr)
 			
 			/* 获得图片信息需要下载一部分图片 */
 			ImgTool::ImgInfo info;
+			info.md5_str = md5_str;
 			/* 这里进行两次尝试，增大成功概率 */
-			if (!ImgTool::get_info(url, info) && !ImgTool::get_info(url, info))
+			if (!ImgTool::get_info(url, info, is_qq) && !ImgTool::get_info(url, info, is_qq))
 			{
 				MiraiLog::get_instance()->add_warning_log("Center", "无法从url中获取图片信息:" + url);
 				/* 
@@ -463,14 +466,22 @@ static bool deal_json_array(Json::Value & json_arr)
 				info.height = info.width = info.size = 0;
 				info.type = "image";
 			}
-			std::string cqimg_name = md5_str + "." + info.type;
+
+			if (info.md5_str == "")
+			{
+				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取图片的md5");
+				node = Json::Value();
+				continue;
+			}
+
+			std::string cqimg_name = info.md5_str + "." + info.type;
 			/* 创建目录 */
 			std::string exe_dir = PathTool::get_exe_dir();
 			PathTool::create_dir(exe_dir + "data");
 			PathTool::create_dir(exe_dir + "data\\image");
 			std::string cqimg_path = exe_dir + "data\\image\\" + cqimg_name + ".cqimg";
 			/* 此处将图片信息直接写入cqimg文件即可 */
-			WritePrivateProfileStringA("image", "md5", md5_str.c_str(), cqimg_path.c_str());
+			WritePrivateProfileStringA("image", "md5", info.md5_str.c_str(), cqimg_path.c_str());
 			WritePrivateProfileStringA("image", "width", std::to_string(info.width).c_str(), cqimg_path.c_str());
 			WritePrivateProfileStringA("image", "height", std::to_string(info.height).c_str(), cqimg_path.c_str());
 			WritePrivateProfileStringA("image", "size", std::to_string(info.size).c_str(), cqimg_path.c_str());

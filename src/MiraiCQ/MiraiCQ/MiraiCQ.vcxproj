@@ -51,6 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <Linkage>StaticLibrary_MT</Linkage>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -157,6 +158,7 @@
     <ClCompile Include="tool\ImgTool.cpp" />
     <ClCompile Include="tool\InputTool.cpp" />
     <ClCompile Include="tool\IPCTool.cpp" />
+    <ClCompile Include="tool\Md5Tool.cpp" />
     <ClCompile Include="tool\MsgIdTool.cpp" />
     <ClCompile Include="tool\PathTool.cpp" />
     <ClCompile Include="tool\StrTool.cpp" />
@@ -193,6 +195,7 @@
     <ClInclude Include="tool\ImgTool.h" />
     <ClInclude Include="tool\InputTool.h" />
     <ClInclude Include="tool\IPCTool.h" />
+    <ClInclude Include="tool\Md5Tool.h" />
     <ClInclude Include="tool\MsgIdTool.h" />
     <ClInclude Include="tool\PathTool.h" />
     <ClInclude Include="tool\StrTool.h" />
@@ -205,6 +208,7 @@
   <ItemGroup>
     <None Include="..\CQP_BIN\CQP.dll" />
     <None Include="debug_tip.json" />
+    <None Include="packages.config" />
     <None Include="plusprocess\cqpexport.def" />
   </ItemGroup>
   <ItemGroup>
@@ -215,5 +219,17 @@
     <Image Include="MiraiCQ.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\curl-vc140-static-32_64.7.53.0\build\native\curl-vc140-static-32_64.targets" Condition="Exists('..\packages\curl-vc140-static-32_64.7.53.0\build\native\curl-vc140-static-32_64.targets')" />
+    <Import Project="..\packages\openssl-vc140-static-32_64.1.1.0\build\native\openssl-vc140-static-32_64.targets" Condition="Exists('..\packages\openssl-vc140-static-32_64.1.1.0\build\native\openssl-vc140-static-32_64.targets')" />
+    <Import Project="..\packages\curlcpp-vc140-static-32_64.1.0.2\build\native\curlcpp-vc140-static-32_64.targets" Condition="Exists('..\packages\curlcpp-vc140-static-32_64.1.0.2\build\native\curlcpp-vc140-static-32_64.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\curl-vc140-static-32_64.7.53.0\build\native\curl-vc140-static-32_64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\curl-vc140-static-32_64.7.53.0\build\native\curl-vc140-static-32_64.targets'))" />
+    <Error Condition="!Exists('..\packages\openssl-vc140-static-32_64.1.1.0\build\native\openssl-vc140-static-32_64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl-vc140-static-32_64.1.1.0\build\native\openssl-vc140-static-32_64.targets'))" />
+    <Error Condition="!Exists('..\packages\curlcpp-vc140-static-32_64.1.0.2\build\native\curlcpp-vc140-static-32_64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\curlcpp-vc140-static-32_64.1.0.2\build\native\curlcpp-vc140-static-32_64.targets'))" />
+  </Target>
 </Project>

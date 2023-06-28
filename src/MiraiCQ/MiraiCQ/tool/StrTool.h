@@ -157,8 +157,6 @@ public:
 	*/
 	static void trim(std::string& text);
 
-
-
 private:
 	StrTool();
 };
