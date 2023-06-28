@@ -439,7 +439,7 @@ static bool deal_json_array(Json::Value & json_arr)
 			
 			if (md5_str == "" && is_qq == true)
 			{
-				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取图片的md5");
+				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取qq图片的md5");
 				node = Json::Value();
 				continue;
 			}
@@ -452,7 +452,7 @@ static bool deal_json_array(Json::Value & json_arr)
 			
 			/* 获得图片信息需要下载一部分图片 */
 			ImgTool::ImgInfo info;
-			info.md5_str = md5_str;
+			
 			/* 这里进行两次尝试，增大成功概率 */
 			if (!ImgTool::get_info(url, info, is_qq) && !ImgTool::get_info(url, info, is_qq))
 			{
@@ -467,9 +467,13 @@ static bool deal_json_array(Json::Value & json_arr)
 				info.type = "image";
 			}
 
+			if (md5_str != "") {
+				info.md5_str = md5_str;
+			}
+
 			if (info.md5_str == "")
 			{
-				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取图片的md5");
+				MiraiLog::get_instance()->add_warning_log("Center", "无法从file字段获取图片的md5???");
 				node = Json::Value();
 				continue;
 			}
