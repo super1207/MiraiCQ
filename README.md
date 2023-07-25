@@ -59,6 +59,8 @@ Windows 7 with sp1 以及更新的版本，系统语言必须是中文。
 
 您可以寻找以前CQ的SDK来开发MiraiCQ的插件。如[kyubotics/cqcppsdk](https://github.com/kyubotics/cqcppsdk)
 
+你也可以在https://github.com/super1207/MiraiCQ/discussions/22#discussion-5437319 中发布或寻找插件。
+
 #### 相关项目：
 
 1. [botuniverse/onebot-11](https://github.com/botuniverse/onebot-11)(对接标准)
