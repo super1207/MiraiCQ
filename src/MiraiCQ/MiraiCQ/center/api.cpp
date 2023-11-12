@@ -62,6 +62,9 @@ static TER_TYPE normal_call(
 
 	MiraiNet::NetStruct json(new Json::Value);
 	fun1(json); // 用于构造要发给net的json
+	if (json->get("params", Json::nullValue).isNull()) {
+		(*json)["params"] = Json::objectValue;
+	}
 
 	MiraiNet::NetStruct ret_json = nullptr;
 	if (g_is_alone) 
