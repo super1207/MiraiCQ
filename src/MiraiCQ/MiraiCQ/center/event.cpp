@@ -394,6 +394,13 @@ static bool is_qq_url(const Json::Value & dat_json)
 	if (url.find("c2cpicdw") != url.npos) {
 		return true;
 	}
+	std::string file = StrTool::get_str_from_json(dat_json, "file", "");
+	if (file.find("gchat") != file.npos) {
+		return true;
+	}
+	if (file.find("c2cpicdw") != file.npos) {
+		return true;
+	}
 	return false;
 }
 
@@ -430,6 +437,9 @@ static bool deal_json_array(Json::Value & json_arr)
 				md5_str = get_md5_from_file_str(file_str);
 				if (md5_str == "") {
 					md5_str = get_md5_from_imgurl(StrTool::get_str_from_json(dat_json, "url", ""));
+				}
+				if (md5_str == "") {
+					md5_str = get_md5_from_imgurl(StrTool::get_str_from_json(dat_json, "file", ""));
 				}
 				url = "https://gchat.qpic.cn/gchatpic_new/0/0-0-" + md5_str + "/0?term=2";
 			}

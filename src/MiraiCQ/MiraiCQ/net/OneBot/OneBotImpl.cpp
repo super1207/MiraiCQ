@@ -6,6 +6,7 @@
 #include "../../tool/StrTool.h"
 #include "../../tool/TimeTool.h"
 #include "../../tool/AutoDoSth.h"
+#include "../../config/config.h"
 
 using namespace std;
 
@@ -250,7 +251,7 @@ MiraiNet::NetStruct OneBotNetImpl::call_fun(NetStruct senddat, int timeout,bool 
 		auto send_json = Json::FastWriter().write(*api_json);
 		// MiraiLog::get_instance()->add_debug_log("OnebotImpl", "send_json_size:" + std::to_string(send_json.size()));
 		// 超过50kb的信息建立新的连接来发送
-		if ((send_json.size() > 1024 * 50) && (in_new_net == false))
+		if (get_config("is_support_multi_ws") == "true" && (send_json.size() > 1024 * 50) && (in_new_net == false))
 		{
 			auto new_net = MiraiNet::get_instance(this->get_config("net_type"));
 			if (!new_net)

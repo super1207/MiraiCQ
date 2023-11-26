@@ -65,6 +65,7 @@ static bool login(LOGIN_INFO* login_info)
 	net->set_config("access_token", login_info->access_token);
 	net->set_config("verifyKey", Config::get_instance()->get_verifyKey());
 	net->set_config("http_url", Config::get_instance()->get_http_url());
+	net->set_config("is_support_multi_ws", Config::get_instance()->get_is_support_multi_ws());
 	if (!net->connect())
 	{
 		std::string str = StrTool::to_utf8("ÍøÂçÁ¬½Ó´íÎó");

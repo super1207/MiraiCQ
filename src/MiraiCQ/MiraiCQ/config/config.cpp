@@ -120,3 +120,17 @@ std::string Config::get_name()
 	}
 	return name;
 }
+
+std::string Config::get_is_support_multi_ws()
+{
+	std::string config_path = PathTool::get_exe_dir() + "config\\";
+	PathTool::create_dir(config_path);
+	std::string config_file = config_path + "config.ini";
+	std::string is_support_multi_ws = StrTool::get_str_from_ini(config_file, "Setting", "is_support_multi_ws", "");
+	if (is_support_multi_ws == "")
+	{
+		WritePrivateProfileStringA("Setting", "is_support_multi_ws", this->is_support_multi_ws.c_str(), config_file.c_str());
+		return this->is_support_multi_ws;
+	}
+	return is_support_multi_ws;
+}
