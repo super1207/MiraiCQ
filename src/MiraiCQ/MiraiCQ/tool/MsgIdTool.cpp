@@ -7,7 +7,7 @@ inline MsgIdTool::MsgIdTool()
 
 int MsgIdTool::to_cqid(const Json::Value & webid)
 {
-	if (!(webid.isInt() || webid.isString()))
+	if (!(webid.isInt64() || webid.isString()))
 	{
 		throw std::runtime_error("wrong msg_id type");
 	}
